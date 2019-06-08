@@ -1,0 +1,73 @@
+version "4.0"
+
+
+#include "CODE/ZSCRIPT/LIBS/mk_matrix.zsc"
+#include "CODE/ZSCRIPT/LIBS/mk_coordutil.zsc"
+#include "CODE/ZSCRIPT/LIBS/mk_quaternion.zsc"
+
+#include "CODE/ZSCRIPT/EVENTHANDLERS/StaticShaderControl.zsc"
+#include "CODE/ZSCRIPT/EVENTHANDLERS/mblur.zsc"
+
+#include "CODE/ZSCRIPT/heatHaze.zsc"
+
+#include "CODE/ZSCRIPT/nature_distance_control.zsc"
+#include "CODE/ZSCRIPT/nature_time_of_day.zsc"
+#include "CODE/ZSCRIPT/nature_weather.zsc"
+#include "CODE/ZSCRIPT/nature_plants.zsc"
+#include "CODE/ZSCRIPT/terrain_splashes.zsc"
+#include "CODE/ZSCRIPT/fx.zsc"
+#include "CODE/ZSCRIPT/gore.txt"
+#include "CODE/ZSCRIPT/items.txt"
+#include "CODE/ZSCRIPT/decor/lights.txt"
+#include "CODE/ZSCRIPT/decor/gecor_controllers.txt"
+#include "CODE/ZSCRIPT/decor/decor.txt"
+#include "CODE/ZSCRIPT/decor/corpses.txt"
+#include "CODE/ZSCRIPT/effects/SmokeTrails.txt"
+#include "CODE/ZSCRIPT/effects/debris.txt"
+#include "CODE/ZSCRIPT/objectives.txt"
+#include "CODE/ZSCRIPT/damnation.txt"
+
+
+
+#include "CODE/ZSCRIPT/WEAPONS/CHweapon.txt"
+#include "CODE/ZSCRIPT/WEAPONS/Puffs.txt"
+#include "CODE/ZSCRIPT/WEAPONS/NoWeapon.txt"
+#include "CODE/ZSCRIPT/WEAPONS/Pitchfork.txt"
+#include "CODE/ZSCRIPT/WEAPONS/SawedOff.txt"
+#include "CODE/ZSCRIPT/WEAPONS/TNTBundle.txt"
+#include "CODE/ZSCRIPT/WEAPONS/TNTremote.txt"
+#include "CODE/ZSCRIPT/WEAPONS/TommyGun.txt"
+#include "CODE/ZSCRIPT/WEAPONS/FlareGun.txt"
+#include "CODE/ZSCRIPT/WEAPONS/Rat.txt"
+
+
+
+
+#include "CODE/ZSCRIPT/WEAPONS/Ammo.txt"
+
+
+
+
+#include "CODE/ZSCRIPT/PLAYER/player.zsc"
+#include "CODE/ZSCRIPT/PLAYER/Caleb.txt"
+#include "CODE/ZSCRIPT/PLAYER/torch.zsc"
+#include "CODE/ZSCRIPT/PLAYER/AbilityController.txt"
+#include "CODE/ZSCRIPT/switches.txt"
+
+
+
+
+#include "CODE/ZSCRIPT/Monsters/defiler.txt"
+#include "CODE/ZSCRIPT/Monsters/nest.txt"
+#include "CODE/ZSCRIPT/Monsters/ch_monster.txt"
+#include "CODE/ZSCRIPT/Monsters/zombie.txt"
+#include "CODE/ZSCRIPT/Monsters/cultists.txt"
+#include "CODE/ZSCRIPT/Monsters/spiders.txt"
+#include "CODE/ZSCRIPT/Monsters/bat.txt"
+#include "CODE/ZSCRIPT/Monsters/eel.txt"
+#include "CODE/ZSCRIPT/Monsters/gargoyle.txt"
+#include "CODE/ZSCRIPT/Monsters/rat.txt"
+#include "CODE/ZSCRIPT/Monsters/pod.txt"
+#include "CODE/ZSCRIPT/Monsters/bigspider.txt"
+#include "CODE/ZSCRIPT/Monsters/predator.txt"
+

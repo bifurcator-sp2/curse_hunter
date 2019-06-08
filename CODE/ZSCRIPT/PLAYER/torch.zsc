@@ -1,0 +1,330 @@
+
+
+Class z_FireBug : CustomInventory
+{
+	//one use per 15 tick - toggle
+	//if toggle - count use - count in
+	bool activeBug;
+	int count;
+	int delay;
+	int distanceStep;
+	int distance;
+	int curdist;
+	int CurrentStep;
+	FireBugItself BUG;
+
+	Default
+	{
+		+INVENTORY.AUTOACTIVATE;
+
+		inventory.pickupmessage "$FIREBUG_PICKUP";
+		+INVENTORY.HUBPOWER;
+		+INVENTORY.PERSISTENTPOWER;
+		+INVENTORY.UNDROPPABLE;
+		Inventory.MaxAmount 1;
+		+floatbob;
+		FloatBobStrength 0.3;
+		radius 32;
+		height 48;
+		+FLOAT;
+		speed 16;
+		+NOGRAVITY;
+		scale 0.25;
+		RenderStyle "Add";
+		+FORCEXYBILLBOARD;
+
+	}
+
+	override void PostBeginPlay()
+	{
+		distanceStep = 64;
+	}
+	override void DoEffect()
+	{
+		if(BUG){
+			if(!distance){
+				vector3 mypos = Owner.pos;
+				mypos.z = mypos.z+Owner.height;
+				BUG.setOrigin(mypos, 1);
+			} else {
+				int movespeed = 8;
+				if(!activeBug){	movespeed = 16;}
+				if(abs(distance-curdist)>movespeed){
+					if(distance>curdist){
+						curdist = curdist+movespeed;
+					} else {
+						curdist = curdist-movespeed;
+					}
+				}
+				FLineTraceData WallCheckRay;
+				Owner.LineTrace(
+				   Owner.angle,
+				   curdist,
+				   Owner.pitch,
+				   flags:TRF_THRUACTORS,
+				   offsetz: Owner.height-24,
+				   data: WallCheckRay
+				);
+				vector3 mypos = WallCheckRay.HitLocation;
+
+				//a_logInt(WallCheckRay.HitLine.sidedef.size());
+
+				if (WallCheckRay.HitType){
+					FLineTraceData WallCheckRay2;
+					Owner.LineTrace(
+					   Owner.angle,
+					   WallCheckRay.distance-24,
+					   Owner.pitch,
+					   flags:TRF_THRUACTORS,
+					   offsetz: Owner.height-24,
+					   data: WallCheckRay2
+					);
+					mypos = WallCheckRay2.HitLocation;
+
+				}
+				BUG.setOrigin(mypos, 1);
+
+
+				if(curdist<16 && !activeBug){
+					HideBug();
+				}
+
+			}
+		}
+
+
+		if(count){delay++;}
+		if( (delay>15 && count==1 && activeBug) || (BUG && BUG.waterlevel)){ //turn off if one use in 15 ticks when active or in water
+			activeBug = false;
+			count = 0;
+			delay = 0;
+			distance = 1;
+			CurrentStep = 0;
+			BUG.goback = true;
+		}
+		if(delay>15){
+			count = 0;
+			delay = 0;
+		}
+	}
+
+	virtual void pressed(){
+		if(activeBug){
+			count ++;
+			delay = 0;
+			ReleaseBug(CurrentStep++);
+		}
+		else {
+			activeBug = 1;
+			ReleaseBug(0);
+		}
+	}
+	virtual void restPos(){
+
+	}
+	virtual void ReleaseBug(int step)
+	{
+		distance = distanceStep*step;
+		if(distance>512){distance=512;}
+		if(!BUG){
+			vector3 mypos = Owner.pos;
+			mypos.z = mypos.z+32;
+			BUG = FireBugItself(Owner.spawn("FireBugItself", mypos));
+		}
+
+	}
+	virtual void HideBug()
+	{
+		if(BUG){BUG.destroy();}
+
+	}
+	States
+	{
+		Spawn:
+			BUGL BC 2 Light("BugLight") {
+					//a_setroll(roll+5);
+					a_wander();
+					a_playSound("items/firebugBack", CHAN_ITEM, 1.0, true, ATTN_NORM);
+					//a_playSound("items/firebugInBox", CHAN_ITEM, 1.0, true, ATTN_NORM);
+				}
+			Loop;
+		Use:
+			TNT1 A 1 {invoker.pressed();}
+			Loop;
+	}
+}
+
+
+class FireBugItself : actor
+{
+	bool goback;
+	default
+	{
+		RenderStyle "Add";
+		radius 4;
+		height 8;
+		mass 1;
+		scale 0.15;
+		+floatbob;
+		FloatBobStrength 0.3;
+		+FORCEXYBILLBOARD;
+		+DONTTHRUST;
+		+NOGRAVITY;
+	}
+
+	override void tick(){
+		super.tick();
+		a_setroll(roll+5);
+		if(!goback){
+			a_playSound("items/firebug", CHAN_ITEM, 1.0, true, ATTN_NORM);
+		} else {
+			a_playSound("items/firebugBack", CHAN_ITEM, 1.0, true, ATTN_NORM);
+
+		}
+		//spawn("firebugTracer", self.pos);
+	}
+
+	states
+	{
+		Spawn:
+			BUGL BC 2 Light("BugLight");
+			Loop;
+
+	}
+}
+/*
+class firebugTracer : actor
+{
+	default
+	{
+		RenderStyle "Add";
+		+NOINTERACTION;
+		Scale 0.25;
+		+ROLLSPRITE;
+		+FORCEXYBILLBOARD;
+	}
+	states
+	{
+		Spawn:
+			TNT1 A 5;
+			BUGL A 1 Light("BugLight");
+			stop;
+
+	}
+
+}
+*/
+
+/*
+class TorchEvent : EventHandler
+{
+	override void PlayerEntered(PlayerEvent e)
+	{
+		Super.PlayerEntered(e);
+		PlayerInfo player = players[e.PlayerNumber];
+		player.mo.giveInventory("DSCTorch", 1);
+
+
+	}
+}
+
+
+
+class DSCTorch : CustomInventory
+{
+	const layer = -10;
+	TorchDynamicLight tdl;
+	bool active;
+
+	override void DoEffect()
+	{
+		if(active)
+		{
+			if(!tdl)
+			{
+				tdl = TorchDynamicLight(Spawn("TorchDynamicLight",owner.pos));
+				tdl.Master = owner;
+				tdl.offsetAngle = 80;
+				tdl.offsetZ = 40.5;
+				tdl.angle = owner.angle;
+			}
+		}
+		else
+		{
+			if(tdl) tdl.Destroy();
+		}
+	}
+
+	action void ToggleTorch()
+	{
+		if(invoker.active)
+		{
+
+			invoker.active = False;
+			A_PlaySound("torch/clickOn", CHAN_AUTO);
+		}
+		else
+		{
+			invoker.active = True;
+			A_PlaySound("torch/clickOff", CHAN_AUTO);
+		}
+	}
+
+	States
+	{
+		Spawn:
+			POSS A -1;
+			Stop;
+		Use:
+			TNT1 A 1 ToggleTorch();
+			Loop;
+		Torch:
+			PLSG A 1;
+			Loop;
+	}
+}
+
+class TorchDynamicLight : DynamicLight
+{
+	vector3 followerPos;
+	double offsetAngle, offsetZ;
+	int baseIntendity;
+	default
+	{
+		DynamicLight.Type "Point";
+		//DynamicLight.Type "Flicker";
+		+DYNAMICLIGHT.ATTENUATE;
+
+	//	+DYNAMICLIGHT.SPOT
+	}
+
+	override void PostBeginPlay()
+	{
+		baseIntendity = 192;
+		args[LIGHT_RED] = 248;
+		args[LIGHT_GREEN] = 195;
+		args[LIGHT_BLUE] = 119;
+		args[LIGHT_INTENSITY] = baseIntendity;
+		//args[LIGHT_SECONDARY_INTENSITY] = 96;
+		self.angle = 32;
+	}
+
+	override void Tick()
+	{
+		Super.Tick();
+	args[LIGHT_INTENSITY] = random(baseIntendity-6, baseIntendity+6);
+		if(Master)
+		{
+			followerPos = Master.Vec3Angle(
+				Master.Radius,
+				Master.angle + offsetAngle,
+				offsetZ * Master.player.crouchfactor,
+				true);
+			SetOrigin(followerPos, true);
+			self.angle = Master.angle;
+			A_SetPitch(Master.pitch, SPF_INTERPOLATE);
+			self.floorz = Master.floorz;
+		}
+	}
+}
+*/

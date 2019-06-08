@@ -1,0 +1,205 @@
+Class bullet : Ammo
+{
+	default
+	{
+	Inventory.Amount 1;
+	Inventory.MaxAmount 300;
+	Inventory.icon "BULLA0";
+	+INVENTORY.IGNORESKILL;
+	}
+}
+
+Class Z_bullets : bullet
+{
+	default
+	{
+		Inventory.Amount 5;
+		Inventory.MaxAmount 300;
+		tag "$BULLETS_NAME";
+		inventory.pickupsound "dsammoup";
+		inventory.pickupmessage "$BULLETS_PICKED";
+		scale 0.5;
+	}
+	States
+	{
+		Spawn:
+			BULL A -1;
+			Stop;
+	}
+}
+Class Z_bullets_drum : bullet
+{
+	default
+	{
+		Inventory.Amount 50;
+		Inventory.MaxAmount 300;
+		tag "$BULLETS_DRUM_NAME";
+		inventory.pickupsound "dsammoup";
+		inventory.pickupmessage "$BULLETS_DRUM_PICKED";
+		scale 0.5;
+	}
+	States
+	{
+		Spawn:
+			TOMA A -1;
+			Stop;
+	}
+}
+
+
+
+
+
+
+Class Bshell : Ammo
+{
+	default
+	{
+	Inventory.Amount 1;
+	Inventory.MaxAmount 50;
+	Inventory.icon "SHELA0";
+	+INVENTORY.IGNORESKILL;
+	}
+}
+
+
+
+Class z_Bshells : Bshell
+{
+	default
+	{
+	  inventory.pickupmessage "$SHELLS_PICKED";
+	  inventory.pickupsound "dsammoup";
+	  inventory.amount 5;
+	  Inventory.MaxAmount 50;
+	  tag "$SHELLS_NAME";
+	  scale 0.5;
+	}
+  States
+  {
+	Spawn:
+		SHEL A -1;
+		Stop;
+  }
+}
+
+
+
+Class TNTAmmo : Ammo
+{
+	default
+	{
+		inventory.amount 1;
+		inventory.maxamount 50;
+		inventory.icon "TBNDA0";
+		+inventory.IGNORESKILL;
+	}
+}
+Class TNTremoteAmmo : Ammo
+{
+	default
+	{
+		inventory.amount 1;
+		inventory.maxamount 50;
+		inventory.icon "REPKA0";
+		+inventory.IGNORESKILL;
+	}
+}
+Class TNTremoteFakeAmmo : Ammo
+{
+	default
+	{
+		inventory.amount 1;
+		inventory.maxamount 1;
+		inventory.icon "REPKA0";
+		+inventory.IGNORESKILL;
+	}
+}
+Class RatFakeAmmo : Ammo
+{
+	default
+	{
+		inventory.amount 1;
+		inventory.maxamount 1;
+		inventory.icon "REPKA0";
+		+inventory.IGNORESKILL;
+	}
+}
+
+Class z_TNTAmmoBox : CustomInventory
+{
+
+	default
+	{
+		inventory.pickupmessage "$TNTBOX_PICKED";
+		inventory.pickupsound "dsammoup";
+		//inventory.amount 5;
+		//inventory.maxamount 50;
+		inventory.icon "TBNDA0";
+		TAG "$TNTBOX_NAME";
+		-NOGRAVITY;
+		scale 0.75;
+		+SHOOTABLE;
+		+NOBLOOD;
+		+NOBLOODDECALS;
+		+INVULNERABLE;
+
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		GiveInventory("Pointable", 1);
+	}
+	States
+	{
+		Spawn:
+			TBOX A -1;
+			Stop;
+		Pickup:
+			TNT1 A 0 A_GiveInventory("TNTAmmo", 5);
+			TNT1 A 0 A_GiveInventory("Dynamite", 1);
+			Stop;
+	}
+}
+
+class GunFireLight : actor
+{
+	default
+	{
+		+NOGRAVITY;
+		+NOINTERACTION;
+	}
+	States
+	{
+		Spawn:
+			TNT1 A 4 NODELAY light("GunshotLight");
+			TNT1 A 0  destroy();
+			Stop;
+	}
+}
+
+
+/*
+Class z_DTNTBOX : CustomInventory
+{
+	default
+	{
+		Inventory.PickupMessage "$TNTPROX_PICKED";
+		inventory.pickupsound "dsammoup";
+		Inventory.amount 1;
+		inventory.maxamount 50;
+		Scale 0.5;
+		Inventory.Icon "ProxA0";
+		TAG "$TNTPROX_NAME";
+	}
+	States
+	{
+		Spawn:
+			PROX A -1;
+			Stop;
+		Pickup:
+			TNT1 A 0 A_GiveInventory("DTNTAMMO", 3);
+			TNT1 A 0 A_GiveInventory("ProximityDynamite", 1);
+			Stop;
+	}
+}*/

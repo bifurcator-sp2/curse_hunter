@@ -1,0 +1,94 @@
+
+
+Class z_Rat : CHmonster
+{
+	Default
+	{
+		tag "$RAT_NAME";
+		Health 10;
+		Radius 8;
+		Height 10;
+		DeathHeight 8;
+		Mass 3;
+		Speed 4;
+		FastSpeed 8;
+		scale 0.34;
+		MeleeDamage 2;
+		MeleeRange 22;
+		MaxTargetRange 24;
+		MaxStepHeight 9;
+		Monster;
+		+FLOORCLIP;
+		+LOOKALLAROUND;
+		-CANUSEWALLS;
+		Obituary "$RAT_OBITUARY";
+		SeeSound "Ratsee";
+		PainSound "Ratpain";
+		DeathSound "Ratdie";
+		ActiveSound "RatActive";
+		//Meleesound "animal/smallBite";
+
+		PainChance "Fire", 64;
+		DamageFactor "Fire",2;
+	}
+	override void SetNames(){
+		N_NAME = StringTable.Localize("$RAT_NAME");
+		N_DEATHNAME = StringTable.Localize("$RAT_DEATHNAME");
+		N_BURNDEATHNAME = StringTable.Localize("$RAT_BURNDEATHNAME ");
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		SetNames();
+		GiveInventory("MenhirSkipMark", 1);
+		giveInventory("AvoidFire", 1);
+		//takeInventory("Unhandable", 1);
+		//giveInventory("SeekPlayerController", 1);
+	}
+
+	States
+	{
+		SetSprite:
+			RATW A 1;//for DistanceSpawned
+	  	Spawn:
+			RATW A 1 A_Look;
+			Loop;
+		See:
+			RATW AAAABBBBCCCCDDDD 1 A_Chase();
+			Loop;
+		Wander:
+			RATW ABCD 4 A_Wander();
+			TNT1 A 0 A_jump(32, "See");
+			Loop;
+		Missile:
+		Melee:
+			RATW A 5  A_FaceTarget;
+			RATW B 5  { a_playSound("animal/smallBite"); A_CustomMeleeAttack(random(2,4),"","RatByte"); }
+			RATW C 5;
+			Goto See;
+		Pain:
+			RATW D 3;
+			RATW D 3 A_Pain;
+			Goto See;
+		Death:
+			RATW E 5 A_Scream;
+			RATW F 5 setTag(N_DEATHNAME);
+			RATW GHI 5;
+			RATW J 15;
+			Goto Corpse;
+		Death.Fire:
+		    RABU ABCDEONMABCDEONMABCDEONM 4 BRIGHT;
+			RABU  F 8 Bright A_Scream;
+			RABU GH 7 Bright BDSM();
+			RABU IJKIJKIJKIJK 12 Bright;
+			RABU L 64 Bright setTag(N_BURNDEATHNAME);
+			Goto Corpse;
+		Corpse:
+			"####" "#" 0 {
+				bSHOOTABLE = 1;
+				bSOLID = 0;
+			}
+			"####" "#" -1;
+			Stop;
+	}
+}

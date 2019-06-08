@@ -1,0 +1,767 @@
+
+
+Class Burner15sec : Burner
+{
+	override void DoEffect(){
+		ControlPlayerFireOff();
+		if(!FP){
+			FirePlace = z_fx_fireplace(Spawn("z_fx_fireplace_timer", owner.pos));
+			FirePlace.Master = owner;
+			FP = true;
+			FirePlace.A_SetSize(Owner.radius, Owner.height);
+			FirePlace.offsetZ = Owner.height/8;
+			FirePlace.adaptiveSize = true;
+			FirePlace.timer = 35*15;
+		}
+	}
+}
+
+
+
+
+Class Burner : CustomInventory
+{
+	z_fx_fireplace FirePlace;
+	int fx_fireplace_offset;
+	float fx_fireplace_scale;
+	int timer;
+	int forceIntensity;
+	bool FP;
+	int mCounter, mPresscounter, secCounter;
+	Default
+	{
+		Inventory.MaxAmount 1;
+		+INVENTORY.UNDROPPABLE;
+		+INVENTORY.UNTOSSABLE;
+		+INVENTORY.AUTOACTIVATE;
+	}
+	Override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+		mCounter = int(35/4);
+		mPresscounter = 10;
+		secCounter = 70;
+		if(owner && owner.checkInventory("z_PointController", 1)){
+			Owner.A_Playsound("Caleb/firePain", CHAN_VOICE, 1.0, true);
+		}
+	}
+
+	virtual void ControlPlayerFireOff(){
+		if(owner && owner.checkInventory("z_PointController", 1)){
+			secCounter--;
+			mCounter--;
+			z_PointController Controller = z_PointController(owner.FindInventory("z_PointController"));
+
+			if(Controller.USE){mPresscounter--;}
+
+			if(mPresscounter<=0 && secCounter>0){
+				Owner.A_Stopsound(CHAN_VOICE);
+				Owner.TakeInventory(getClassName(), 1);
+			}
+			if(secCounter<=0){secCounter=70;mPresscounter=10;}
+			if(Owner && Owner.waterlevel>1){ Owner.A_Stopsound(CHAN_VOICE); Owner.TakeInventory(getClassName(), 1); }
+			if(mCounter<=0){
+				mCounter = int(35/4);
+				CALLacs("SupressFireMes", 0, 0, 0, 0);
+			}
+
+		}
+	}
+
+	override void DoEffect(){
+		if(owner is "PointUsable" && !PointUsable(owner).isActive()){
+			return;
+		}
+		ControlPlayerFireOff();
+		if(!FP && Owner.health>0){
+			FirePlace = z_fx_fireplace(Spawn("z_fx_fireplace", owner.pos));
+			FirePlace.Master = owner;
+			FP = true;
+
+			if(forceIntensity){
+				FirePlace.forceIntensity = forceIntensity;
+			}
+
+			if(!fx_fireplace_offset && !fx_fireplace_scale){
+				if(owner is "z_nature_tree"){
+					z_nature_tree tree = z_nature_tree(owner);
+					FirePlace.offsetZ = tree.fx_fireplace_offset;
+					FirePlace.scale.x = tree.fx_fireplace_scale;
+				} else {
+					FirePlace.A_SetSize(Owner.radius, Owner.height);
+					FirePlace.offsetZ = Owner.height/8;
+					FirePlace.adaptiveSize = true;
+				}
+			} else {
+					FirePlace.offsetZ = fx_fireplace_offset;
+					FirePlace.scale.x = fx_fireplace_scale;
+
+			}
+		}
+
+	}
+
+	states
+	{
+		Spawn:
+			TNT1 A 1;
+			stop;
+		Use:
+			TNT1 A 1;
+			Loop;
+	}
+}
+
+class z_fx_fireplace_timer : z_fx_fireplace
+{
+
+	Override void PostBeginPlay(){
+		super.PostBeginPlay();
+		timer = timer?timer:5*35;
+	}
+	override void Burn()
+	{
+
+		if(TraceMaster){
+			if(!Master){
+				ThisLight.Destroy();
+				self.Destroy();
+			} else {
+				vector3 selfpos = Master.pos;
+				selfpos.z = Master.pos.z+offsetZ;
+				SetOrigin(selfpos, true);
+				ThisLight.SetOrigin(selfpos, true);
+			}
+		}
+		timer--;
+		//a_logint(timer);
+		if(timer<0){
+			ThisLight.Destroy();
+			self.Destroy();
+		}
+		if(Activated){
+			int Chance = 255*CurrentDistance / getActivationDistance();
+			if(Chance<128){Chance=128;}
+			A_SpawnItemEx("FX_FireSmoke", Random(-r, r), Random(-r, r), Random(h, h+h/4), 0, 0, Frandom(speed*0.5, speed), 0, SXF_NOCHECKPOSITION|SXF_SETMASTER, Chance+64, 0);
+			A_SpawnItemEx("FX_FireFlame", Random(-r, r), Random(-r, r), Random(0, h), 0, 0, Frandom(speed*0.5, speed), 0, SXF_NOCHECKPOSITION|SXF_SETMASTER, Chance, 0);
+		}
+		DamageDelayCounter++;
+		if(DamageDelayCounter==35){
+			A_Explode(damage, r*2, XF_NOSPLASH, false, 0, 0, 0, "", "Fire");
+			DamageDelayCounter = 0;
+		}
+	}
+}
+Class z_fx_fireplace : DistanceActivated
+{
+	bool Startup;
+	vector3 PrevMasterPos;
+	FirePlaceLight ThisLight;
+	float speed;
+	float r;
+	int DamageDelayCounter;
+	int damage;
+	bool TraceMaster;
+	float offsetZ;
+	float h;
+	//float hsmo;
+	bool adaptiveSize;
+	int timer;
+	int forceIntensity;
+	//bool timered;
+	Default
+	{
+		radius  16;
+		height  16;
+
+		+ClientSideOnly;
+		//+Nointeraction;
+		+Noclip;
+		-SOLID;
+		+GHOST;
+		//+NOBLOCKMAP;
+		+THRUACTORS;
+		+NOGRAVITY;
+
+	}
+
+	Override void PostBeginPlay()
+	{
+
+		Startup = 1;
+		super.PostBeginPlay();
+
+		speed = 4;
+		r = 16;
+		h = 16;
+		damage = 16;
+		Super.PostBeginPlay();
+		if(!adaptiveSize){// manual placed fireplace or tree burning
+
+			speed = speed*scale.x;
+			r = r*scale.x;
+			h = r/4;
+
+			damage = damage*scale.x;
+		} else {
+			float V1 = 2*r*h;
+			float V2 = 2*radius*height;
+			scale.x = V2/V1;
+			speed = height/32;
+
+			r = radius*0.75;
+			h = height*0.5;
+
+			damage = V2/2000*damage;
+
+		}
+		if(h<4){h=4;}
+		if(Master){
+			TraceMaster=true;
+			Master.a_playSound("fx/fireON");
+		}
+
+
+		if(scale.x < 1 ){ A_PlaySound("fx/smallFire", CHAN_BODY, 1.0, TRUE, ATTN_NORM); }
+		if(scale.x >=1 && scale.x < 4){ A_PlaySound("fx/mediumFire", CHAN_BODY, 1.0, TRUE, ATTN_NORM); }
+		if(scale.x >=4 ){ A_PlaySound("fx/bigFire", CHAN_BODY, 1.0, TRUE, ATTN_NORM); }
+
+
+		ThisLight = FirePlaceLight(Spawn("FirePlaceLight", self.pos));
+		ThisLight.Master = self;
+		if(forceIntensity){
+			ThisLight.forceIntensity = forceIntensity;
+		}
+
+	}
+	Override int getActivationDistance(){
+		return 512+2048*scale.x;
+	}
+
+	override void Tick()
+	{
+		if(Master){
+			if(Master is "PointUsable"){
+				PointUsable MST = PointUsable(Master);
+				PrevMasterPos = MST.previousPOS;
+			}
+		}
+		Super.Tick();
+	}
+
+	virtual void Burn()
+	{
+		if(Startup || Activated){
+			if(CurrentDistance > getActivationDistance()){ return;}
+			if(TraceMaster){
+				if(!Master || Master.health<=0 || waterlevel>0){
+						if(ThisLight){ThisLight.Destroy();}
+						self.Destroy();
+
+				} else {
+					if(Master){
+						if(!Master.CheckInventory("Burner", 1) && !Master.CheckInventory("Burner15sec", 1)){ ThisLight.Destroy(); destroy();}
+						if(!Master.waterlevel > 1){ ThisLight.Destroy(); destroy();}
+						if(Master.health<=0){ Master.TakeInventory("Burner", 1); }
+
+						if(Startup || PrevMasterPos.x!=Master.Pos.x || PrevMasterPos.y!=Master.Pos.y || PrevMasterPos.z!=Master.Pos.z){
+							Startup = 0;
+							vector3 selfpos = Master.pos;
+							selfpos.z = Master.pos.z+offsetZ;
+							SetOrigin(selfpos, true);
+							if(ThisLight){ThisLight.SetOrigin(selfpos, true);}
+						}
+					}
+				}
+			}
+
+
+			int Chance = 255*CurrentDistance / getActivationDistance();
+			if(Chance<128){Chance=128;}
+			int Fchance = Chance;
+			if(r>64){Fchance-=r;} Fchance = Fchance>0?Fchance:0;
+			A_SpawnItemEx("FX_FireFlame", Random(-r, r), Random(-r, r), Random(0, h), 0, 0, Frandom(speed*0.5, speed), 0, SXF_NOCHECKPOSITION|SXF_SETMASTER, Fchance, 0);
+
+			A_SpawnItemEx("FX_FireSmoke", Random(-r, r), Random(-r, r), Random(h, h+h/4), 0, 0, Frandom(speed*0.5, speed), 0, SXF_NOCHECKPOSITION|SXF_SETMASTER, Chance+64, 0);
+
+			DamageDelayCounter++;
+			if(DamageDelayCounter==35){
+				A_Explode(damage, r*2, XF_NOSPLASH, false, 0, 0, 0, "", "Fire");
+				DamageDelayCounter = 0;
+			}
+		}
+
+	}
+
+	States
+	{	SetSprite:
+		Spawn:
+			TNT1 A 1 Burn();
+			Loop;
+	}
+
+}
+
+
+
+Class FX_FireFlame : Actor
+{
+	int RollSpeed;
+	float ThisScale;
+	float ScaleDecrease;
+	z_fx_fireplace fireplace;
+	Default
+	{
+		+NoInteraction;
+		+Rollsprite
+		+FORCEXYBILLBOARD
+		+DONTSPLASH;
+		-SOLID;
+		RenderStyle "Add";
+
+	}
+	Override void PostBeginPlay()
+	{
+		if(master){
+			fireplace = z_fx_fireplace(master);
+			if(!fireplace.adaptiveSize){
+				ThisScale = master.scale.x*1.5;
+				ThisScale = ThisScale > 3 ? 3.0 : ThisScale;
+			} else {
+				float V = 2*fireplace.radius*fireplace.height;
+				ThisScale = V/4000+0.2;
+
+			}
+		} else {
+			ThisScale = 0.25;
+		}
+		ScaleDecrease = ThisScale/40;
+		if(random(1, 0)){
+			RollSpeed = Random(-20, -5);
+		} else {
+			RollSpeed = Random(5, 20);
+		}
+
+
+		A_SetRoll(random(0, 360));
+
+		Super.PostBeginPlay();
+	}
+	virtual void ParticleLife()
+	{
+		ThisScale = ThisScale-ScaleDecrease;
+		if(ThisScale<=0){self.destroy();}
+		A_SetScale(ThisScale);
+		A_SetRoll(roll+RollSpeed,SPF_INTERPOLATE);
+
+	}
+	States
+	{
+
+		Spawn:
+			TNT1 A 1 NODELAY A_Jump (256, 1, 2, 3, 4, 5);
+			FL1M A 0 A_jump(256, "Burn");
+			FL1M B 0 A_jump(256, "Burn");
+			FL1M C 0 A_jump(256, "Burn");
+			FL1M D 0 A_jump(256, "Burn");
+			FL1M E 0 A_jump(256, "Burn");
+		Burn:
+			"####" "#" 1 {ParticleLife();}
+			LOOP;
+
+	}
+}
+
+Class FX_FireSmoke : Actor
+{
+	int RollSpeed;
+	float ThisScale;
+	float ScaleDecrease;
+	z_fx_fireplace fireplace;
+	float DeltaAlpha;
+	Default
+	{
+		+NoInteraction;
+		+Rollsprite
+		+FORCEXYBILLBOARD
+		+DONTSPLASH;
+		-SOLID;
+		RenderStyle "Translucent";
+		Alpha 0.5;
+
+	}
+	Override void PostBeginPlay()
+	{
+		if(master){
+			fireplace = z_fx_fireplace(master);
+			if(!fireplace.adaptiveSize){
+				ThisScale = master.scale.x*1.5;
+				DeltaAlpha = 0.05/ThisScale;
+			} else {
+				float V = 2*fireplace.radius*fireplace.height;
+				ThisScale = V/4000+0.2;
+				DeltaAlpha = 0.01/ThisScale;
+			}
+		} else {
+			ThisScale = 0.25;
+		}
+
+		if(DeltaAlpha<0.002){DeltaAlpha=0.002;}
+		if(DeltaAlpha>0.01){DeltaAlpha=0.01;}
+
+		//a_logFloat(DeltaAlpha);
+		if(random(1, 0)){
+			RollSpeed = Random(-6, -2);
+		} else {
+			RollSpeed = Random(2, 6);
+		}
+		A_SetScale(ThisScale);
+
+		A_SetRoll(random(0, 360));
+
+		Super.PostBeginPlay();
+	}
+	virtual void ParticleLife()
+	{
+
+		A_fadeOut(DeltaAlpha, FTF_REMOVE);
+		//A_SetScale(scale.x+DeltaAlpha, scale.x+DeltaAlpha);
+		A_SetRoll(roll+RollSpeed,SPF_INTERPOLATE);
+
+	}
+	States
+	{
+
+		Spawn:
+			TNT1 A 1;
+		Burn:
+			S1MK A 1 {ParticleLife();}
+			LOOP;
+
+	}
+}
+
+class FirePlaceLight : PointLightFlickerAttenuated
+{
+	int baseIntensity;
+	int defIntensity;
+	int forceIntensity;
+	bool Active;
+	int ActivationDistance;
+	default
+	{
+		//DynamicLight.Type "Point";
+		//+DYNAMICLIGHT.ATTENUATE;
+		+DONTSPLASH;
+	}
+	void setBaseIntensity(int intens){
+		baseIntensity=intens;
+	}
+	virtual int getActivationDistance(){
+		return ActivationDistance;
+	}
+	override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		defIntensity = 128;
+		z_fx_fireplace fireplace;
+		fireplace = z_fx_fireplace(master);
+		if(!fireplace.adaptiveSize){
+			baseIntensity = Master?defIntensity*Master.scale.x:defIntensity;
+		} else {
+			baseIntensity = fireplace.radius*4;
+		}
+		baseIntensity = forceIntensity?forceIntensity:baseIntensity;
+
+		baseIntensity = (baseIntensity<64)?64:baseIntensity;
+		baseIntensity = (baseIntensity>364)?364:baseIntensity;
+		ActivationDistance = baseIntensity*5;
+		args[LIGHT_RED] = 200;
+		args[LIGHT_GREEN] = 130;
+		args[LIGHT_BLUE] = 65;
+		args[LIGHT_INTENSITY] = baseIntensity;
+		args[LIGHT_SECONDARY_INTENSITY] = baseIntensity+(baseIntensity*0.2);
+		angle = 64;
+
+	}
+
+}
+
+
+class Alerter : Actor
+{
+    Default
+    {
+        +ISMONSTER;
+        +LOOKALLAROUND;
+    }
+
+    override void PostBeginPlay()
+    {
+        Super.PostBeginPlay();
+        A_Look();
+        A_AlertMonsters(512);
+        Destroy();
+    }
+}
+
+class Explosion : Actor
+{
+	default
+	{
+	  radius 1;
+	  height 10;
+	  +NOBLOCKMAP;
+	  +NOGRAVITY;
+	  PROJECTILE;
+	  Decal "Scorch";
+	  renderstyle "Add";
+	  alpha 1.0;
+	  +NOGRAVITY ;
+	  //+DONTSPLASH;
+	  +RANDOMIZE;
+	  deathsound "weapons/rocklx";
+	}
+
+	states
+	{
+	  Spawn:
+		TNT1 A 0 NODELAY A_AlertMonsters();
+	  See:
+		TNT1 A 0 A_JumpIf(waterlevel>2,"Vapor");
+		TNT1 A 0;
+		TNT1 A 0;
+		TNT1 A 0;
+		TNT1 A 0 A_AlertMonsters();
+		goto Death;
+	  Vapor:
+		//MISL AAAAAA 0 A_SpawnItemEx("SmokeTrailIn4OutSlow",0,0,0,random[Puffs](random[Puffs](-4,0),random[Puffs](0,4)),random[Puffs](random[Puffs](-4,0),random[Puffs](0,4)),random[Puffs](2,4));
+	  Death:
+		TNT1 A 0 {
+			//A_CustomMissile("NapalmDebris", 0, 0, random[Puffs](0,360), 2, random[Puffs](-90,90));
+			Spawn("Alerter", self.pos);
+			A_SpawnDebris ("NapalmDebris") ;
+			A_Explode(8, 128, XF_HURTSOURCE, true, 0, 0, 0, "", "fire" );
+			A_Explode(180, 140, XF_HURTSOURCE, true, 96, 0, 0, "", "blast");
+			A_Scream();
+			 A_QuakeEx(5, 5, 5, 15, 0, 512);
+		}
+		MISL BCDEFGHIJKLMN 3 bright light("KabumLight");
+
+		stop;
+	}
+
+}
+Class ExplosionSmall : Explosion
+{
+	default{
+		scale 0.6;
+	}
+	states
+	{
+	  Death:
+		TNT1 A 0 {
+			Spawn("Alerter", self.pos);
+			A_SpawnDebris ("NapalmDebris") ;
+			A_Explode(8, 96, XF_HURTSOURCE, true, 0, 0, 0, "", "fire" );
+			A_Explode(90, 100, XF_HURTSOURCE, true, 96, 0, 0, "", "blast");
+			A_Scream();
+			A_QuakeEx(3, 3, 3, 10, 0, 512);
+		}
+		MISL BCDEFGHIJKLMN 3 bright light("KabumLight");
+
+		stop;
+	}
+}
+
+class AltFlareExplosion : Actor
+{
+	default
+	{
+	  radius 1;
+	  height 10;
+	  +NOBLOCKMAP;
+	  +NOGRAVITY;
+	  PROJECTILE;
+	  Decal "Scorch";
+	  renderstyle "Add";
+	  alpha 1.0;
+	  scale 0.6;
+	  +NOGRAVITY ;
+	  //+DONTSPLASH;
+	  +RANDOMIZE;
+	  deathsound "weapons/softExplo";
+	}
+
+	states
+	{
+	  Spawn:
+		TNT1 A 0 NODELAY A_AlertMonsters();
+	  See:
+		TNT1 A 0 A_AlertMonsters();
+	  Death:
+		TNT1 A 0 {
+			//A_CustomMissile("NapalmDebris", 0, 0, random[Puffs](0,360), 2, random[Puffs](-90,90));
+			Spawn("Alerter", self.pos);
+			A_SpawnDebris ("NapalmDebris") ;
+			A_Explode(32, 96, XF_HURTSOURCE, true, 0, 0, 0, "", "fire" );
+			A_Scream();
+		}
+		FLEX ABCDEFGHJ 3 bright light("KabumLight");
+		stop;
+	}
+
+}
+
+class ThunderBolt : Actor
+{
+	default
+	{
+	  radius 16;
+	  height 32;
+	  +NOBLOCKMAP;
+	  +NOGRAVITY;
+	  PROJECTILE;
+	  Decal "Scorch";
+	  renderstyle "Add";
+	  alpha 1.0;
+	  scale 1.0;
+	  +NOGRAVITY ;
+	  //+DONTSPLASH;
+	  +RANDOMIZE;
+	  //deathsound "weapons/softExplo";
+	}
+
+	states
+	{
+	  Spawn:
+		TNT1 A 0 NODELAY A_AlertMonsters();
+	  See:
+		TNT1 A 0 A_AlertMonsters();
+	  Death:
+		TNT1 A 0 {
+			//A_CustomMissile("NapalmDebris", 0, 0, random[Puffs](0,360), 2, random[Puffs](-90,90));
+			z_Dust_Gen Deb2 = z_Dust_Gen(spawn("z_Dust_Gen", pos));
+			Deb2.Master = Self;
+			Deb2.Args[3] = 16;
+			Deb2.PostBeginPlay();
+
+			Spawn("Alerter", self.pos);
+
+			for(int i = 0; i<16; i++){
+				a_spawnItemEX("FlareSparks", random(-16, 16), random(-16, 16), random(0, 24), Frandom(-4, 4), Frandom(-4, 4), Frandom(4, 8), 0, SXF_NOCHECKPOSITION|SXF_SETMASTER, 64, 0);
+			}
+			//A_SpawnDebris ("FlareSparks");
+			A_Explode(32, 96, XF_HURTSOURCE, true, 0, 0, 0, "", "Electro" );
+			A_Scream();
+		}
+		TNDR DDDDDDDDDD 1 bright light("ThunderBoltLight") a_fadeOut(0.1);
+		stop;
+	}
+
+}
+
+class z_IntoCrossGlow :SwitchableDecoration
+{
+	int iteration;
+	float Yoffset;
+	float Zoffset;
+	float scaleBoost;
+	float alphaMinus;
+
+	default
+	{
+		+NOINTERACTION;
+		+NOGRAVITY;
+	}
+	Override void PostBeginPlay(){
+		Super.PostBeginPlay();
+		Yoffset = 2.0;
+		Zoffset = 1.0;
+		scaleBoost = 0.03;
+		alphaMinus = 0.001;
+	}
+
+	virtual void SetGlow(){
+		vector3 ITpos = pos;
+		ITpos.y = ITpos.y-iteration*Yoffset;
+		ITpos.Z = ITpos.Z-iteration*Zoffset;
+		actor glow = spawn("intro_crossGlow", ITpos);
+		glow.angle = angle;
+		glow.alpha = 0.15-alphaMinus*iteration;
+		glow.a_setScale(glow.scale.x+glow.scale.x*iteration*scaleBoost);
+		iteration++;
+	}
+
+
+	states
+	{
+	  Spawn:
+		TNT1 A 0;
+			GOTO Inactive;
+		Inactive:
+			TNT1 A 1;
+			LOOP;
+		Active:
+			TNT1 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA 1 SetGlow();
+			stop;
+	}
+
+}
+
+class ExternalSound : actor
+{
+	int before;
+	int after;
+	string soundName;
+	bool played;
+	default{
+		+NOINTERACTION;
+		+NOGRAVITY;
+		+DONTTHRUST;
+	}
+	Override void PostBeginPlay(){
+		Super.PostBeginPlay();
+		before = 35;
+		after = 70;
+		soundName = "MENHIR";
+	}
+	states {
+		spawn:
+			TNT1 A 1{
+				if(before>0){
+					before--;
+				} else {
+					if(!played){ a_playSound(soundName); played= 1; }
+					if(after>0){
+						after--;
+					} else { destroy();}
+				}
+			}
+			Loop;
+	}
+}
+
+
+class z_PredatorPointer : SwitchableDecoration
+{
+	default
+	{
+		+NOINTERACTION;
+		Alpha 0.0;
+		speed 8;
+		scale 0.5;
+		renderStyle "Add";
+		+FLATSPRITE;
+	}
+	states {
+		spawn:
+		Inactive:
+			TNT1 A 10;
+			Loop;
+		Active:
+			PNTR B 1 BRIGHT a_fadeIn(0.01, FTF_CLAMP);
+			Loop;
+
+	}
+}

@@ -1,0 +1,819 @@
+Class z_CeilingMoss1 : actor
+{
+	Default
+	{
+		+NOINTERACTION;
+		+ClientSideOnly;
+		+NOGRAVITY;
+		+WALLSPRITE;
+
+	}
+	States
+	{
+		Spawn:
+			MOSS A -1;
+			Stop;
+	}
+
+}
+
+
+
+
+Class z_nature_tree_spawner : actor
+{
+	Array<string> Items;
+	Default
+	{
+		+NOINTERACTION;
+		+ClientSideOnly;
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		Items.Push("z_nature_tree_1");
+		Items.Push("z_nature_tree_2");
+		Items.Push("z_nature_tree_3");
+		Items.Push("z_nature_tree_4");
+		Items.Push("z_nature_tree_5");
+		Items.Push("z_nature_tree_6");
+		Spawn(Items[random(0, Items.Size()-1)], self.pos);
+		self.destroy();
+	}
+
+}
+
+
+
+Class z_nature_tree_1 : z_nature_tree
+{
+	States
+	{
+		SetSprite:
+			BTR1 A 0 {
+				fx_fireplace_offset = 64*self.scale.y;
+				fx_fireplace_scale = 1.0*self.scale.x;
+			}
+			Goto Draw;
+
+		Death:
+			TNT1 A 0 {
+				A_PlaySound("nature/breakTree", CHAN_AUTO, 1.0, false, ATTN_NORM);
+				for(int i = 0; i<random(5, 10); i++){
+					A_SpawnItemEx("z_nature_tree_limp", random(-32*scale.Y, 32*scale.Y), random(-32*scale.Y, 32*scale.Y), random(64, 128+128*scale.Y), random(-4, 4), random(-4, 4), 0,0,SXF_NOCHECKPOSITION);
+				}
+				for(int i = 0; i<random(10, 30); i++){
+					A_SpawnItemEx("z_nature_tree_leave", random(-32*scale.Y, 32*scale.Y), random(-32*scale.Y, 32*scale.Y), random(64, 128+128*scale.Y), 0, 0, 0,0,SXF_NOCHECKPOSITION);
+				}
+
+
+			}
+			BTR1 B -1;
+			Stop;
+
+	}
+
+}
+Class z_nature_tree_2 : z_nature_tree
+{
+	States
+	{
+		SetSprite:
+			BTR2 A 0 {
+				fx_fireplace_offset = 64*self.scale.y;
+				fx_fireplace_scale = 1.0*self.scale.x;
+			}
+			Goto Draw;
+
+		Death:
+			TNT1 A 0 {
+				A_PlaySound("nature/breakTree", CHAN_AUTO, 1.0, false, ATTN_NORM);
+				for(int i = 0; i<random(5, 10); i++){
+					A_SpawnItemEx("z_nature_tree_limp", random(-32*scale.Y, 32*scale.Y), random(-32*scale.Y, 32*scale.Y), random(64, 128+128*scale.Y), random(-4, 4), random(-4, 4), 0,0,SXF_NOCHECKPOSITION);
+				}
+				for(int i = 0; i<random(10, 30); i++){
+					A_SpawnItemEx("z_nature_tree_leave", random(-32*scale.Y, 32*scale.Y), random(-32*scale.Y, 32*scale.Y), random(64, 128+128*scale.Y), 0, 0, 0,0,SXF_NOCHECKPOSITION);
+				}
+
+
+			}
+			BTR1 B -1;
+			Stop;
+
+	}
+
+}
+Class z_nature_tree_3 : z_nature_tree
+{
+	States
+	{
+		SetSprite:
+			BTR3 A 0 {
+				fx_fireplace_offset = 64*self.scale.y;
+				fx_fireplace_scale = 1.0*self.scale.x;
+			}
+			Goto Draw;
+
+		Death:
+			TNT1 A 0 {
+				A_PlaySound("nature/breakTree", CHAN_AUTO, 1.0, false, ATTN_NORM);
+				for(int i = 0; i<random(5, 10); i++){
+					A_SpawnItemEx("z_nature_tree_limp", random(-32*scale.Y, 32*scale.Y), random(-32*scale.Y, 32*scale.Y), random(64, 128+128*scale.Y), random(-4, 4), random(-4, 4), 0,0,SXF_NOCHECKPOSITION);
+				}
+			}
+			BTR1 B -1;
+			Stop;
+
+	}
+
+}
+Class z_nature_tree_4 : z_nature_tree
+{
+	States
+	{
+		SetSprite:
+			BTR4 A 0 {
+				fx_fireplace_offset = 82*self.scale.y;
+				fx_fireplace_scale = 2.0*self.scale.x;
+			}
+			Goto Draw;
+
+		Death:
+			TNT1 A 0 {
+				A_PlaySound("nature/breakTree", CHAN_AUTO, 1.0, false, ATTN_NORM);
+				for(int i = 0; i<random(5, 20); i++){
+					A_SpawnItemEx("z_nature_tree_limp", random(-96*scale.Y, 96*scale.Y), random(-96*scale.Y, 96*scale.Y), random(64, 128+192*scale.Y), random(-4, 4), random(-4, 4), 0,0,SXF_NOCHECKPOSITION);
+				}
+				for(int i = 0; i<random(10, 50); i++){
+					A_SpawnItemEx("z_nature_tree_leave", random(-96*scale.Y, 96*scale.Y), random(-96*scale.Y, 96*scale.Y), random(64, 128+192*scale.Y), 0, 0, 0,0,SXF_NOCHECKPOSITION);
+				}
+
+
+			}
+			BTR4 B -1;
+			Stop;
+
+	}
+
+}
+Class z_nature_tree_5 : z_nature_tree
+{
+	States
+	{
+		SetSprite:
+			BTR5 A 0 {
+				fx_fireplace_offset = 155*self.scale.y;
+				fx_fireplace_scale = 2.0*self.scale.x;
+			}
+			Goto Draw;
+
+		Death:
+			TNT1 A 0 {
+				A_PlaySound("nature/breakTree", CHAN_AUTO, 1.0, false, ATTN_NORM);
+				for(int i = 0; i<random(5, 20); i++){
+					A_SpawnItemEx("z_nature_tree_limp", random(-96*scale.Y, 96*scale.Y), random(-96*scale.Y, 96*scale.Y), random(64, 128+192*scale.Y), random(-4, 4), random(-4, 4), 0,0,SXF_NOCHECKPOSITION);
+				}
+				for(int i = 0; i<random(10, 50); i++){
+					A_SpawnItemEx("z_nature_tree_leave", random(-96*scale.Y, 96*scale.Y), random(-96*scale.Y, 96*scale.Y), random(64, 128+192*scale.Y), 0, 0, 0,0,SXF_NOCHECKPOSITION);
+				}
+
+
+			}
+			BTR5 B -1;
+			Stop;
+
+	}
+
+}
+Class z_nature_tree_6 : z_nature_tree
+{
+	States
+	{
+		SetSprite:
+			BTR6 A 0 {
+				fx_fireplace_offset = 95*self.scale.y;
+				fx_fireplace_scale = 2.0*self.scale.x;
+			}
+			Goto Draw;
+
+		Death:
+			TNT1 A 0 {
+				A_PlaySound("nature/breakTree", CHAN_AUTO, 1.0, false, ATTN_NORM);
+				for(int i = 0; i<random(5, 20); i++){
+					A_SpawnItemEx("z_nature_tree_limp", random(-96*scale.Y, 96*scale.Y), random(-96*scale.Y, 96*scale.Y), random(64, 128+192*scale.Y), random(-4, 4), random(-4, 4), 0,0,SXF_NOCHECKPOSITION);
+				}
+				for(int i = 0; i<random(10, 50); i++){
+					A_SpawnItemEx("z_nature_tree_leave", random(-96*scale.Y, 96*scale.Y), random(-96*scale.Y, 96*scale.Y), random(64, 128+192*scale.Y), 0, 0, 0,0,SXF_NOCHECKPOSITION);
+				}
+
+
+			}
+			BTR6 B -1;
+			Stop;
+
+	}
+
+}
+Class z_nature_tree :  z_nature_plant
+{
+	bool bushesSpawned;
+	int fx_fireplace_offset;
+	float fx_fireplace_scale;
+	Default
+	{
+		+FORCEYBILLBOARD;
+		-Nogravity;
+		+DONTTHRUST;
+		+SOLID;
+		+SHOOTABLE;
+		-NOBLOCKMAP;
+		-GHOST;
+		BloodType "z_nature_treecracks";
+		Health 300;
+		radius 16;
+		height 256;
+		DeathHeight 16;
+
+		PainChance 200;
+		PainChance "Fire", 50;
+
+	}
+	Override void PostBeginPlay()
+	{
+
+
+		nightRandom.clear();
+		nightRandom.Push("nature/TreesNight");
+		nightRandomSound = nightRandom.Size()?nightRandom[random(0, nightRandom.Size()-1)]:"";
+		itNOplayRandomSound = random(0, 16);
+		Super.PostBeginPlay();
+
+		SetZ(floorz);
+		if(!CheckFloorTexture() ) {	self.destroy();	}
+		Activated = false;
+		self.scale.x = frandom(1.0, 2.0);
+		self.scale.y = self.scale.x+frandom(-0.5, 0.5);
+
+		A_SetHealth(self.Health*self.scale.x*3);
+
+
+		fx_fireplace_offset = 160;
+		fx_fireplace_scale = 2.0*self.scale.x;
+
+
+	}
+	override int getRenderDistance(){
+		PlayerInfo players = players[consoleplayer];
+		return Cvar.GetCVar("z_natue_renderdistance_tree", players).GetInt();
+	}
+	override int getActivationDistance(){
+		PlayerInfo players = players[consoleplayer];
+		return self.getRenderDistance()/2;
+	}
+	override bool CheckFloorTexture(){
+		floorTex.Push("BLUD030_");
+		floorTex.Push("BLUD0855");
+		floorTex.Push("BLUD0340");
+
+		return Super.CheckFloorTexture();
+	}
+
+	Override void Enable(){
+
+		if(!Activated){
+			Activated = true;
+
+			if(!bushesSpawned && Cvar.GetCVar("z_natue_draw_bushes", players[consoleplayer]).GetInt()){
+				PlayerInfo players = players[consoleplayer];
+				int dens = Cvar.GetCVar("z_natue_bush_density", players).GetInt();
+				int bushNum = random(0, dens?dens:1024);
+				for(int i = 0; i<bushNum; i++){
+					vector3 Gpos2;
+					int angle2 = random(0, 359);
+					Gpos2.x = self.pos.x+cos(angle2)*128;
+					Gpos2.y = self.pos.y+sin(angle2)*128;
+					Gpos2.Z = self.pos.z;
+
+					z_nature_bush Bush = z_nature_bush(Spawn("z_nature_bush",Gpos2));
+				}
+				bushesSpawned = true;
+			}
+		} else {
+			A_SpawnItemEx("z_nature_tree_leave", random(-48*scale.Y, 48*scale.Y), random(-48*scale.Y, 48*scale.Y), random(64, 128+128*scale.Y), 3, 0, 0,0,SXF_NOCHECKPOSITION, 250, 0 );
+
+		}
+
+	}
+	States
+	{
+		SetSprite:
+			TNT1 A 0 A_Jump (256, 1, 2, 3, 4, 5, 6);
+			BTR1 A 0 A_jump(256, "Draw");
+			BTR1 B 0 A_jump(256, "Draw");
+			BTR1 C 0 A_jump(256, "Draw");
+			BTR1 D 0 A_jump(256, "Draw");
+			BTR1 E 0 A_jump(256, "Draw");
+			BTR1 F 0 A_jump(256, "Draw");
+
+		Pain.Fire:
+			"####" "#" 1 {self.giveInventory("Burner", 1);}
+			Goto Draw;
+
+	}
+
+}
+
+
+class z_nature_bush : z_nature_plant
+{
+
+
+	Default
+	{
+		Health 80;
+		PainChance 70;
+		radius 16;
+		height 48;
+		+SHOOTABLE;
+		+DONTTHRUST;
+		+NEVERTARGET;
+		+NOBLOOD;
+		DamageFactor "Normal",0.0;
+		DamageFactor "fire", 1.0;
+	}
+
+	Override void PostBeginPlay()
+	{
+		nightLoop.clear();
+		dayLoop.clear();
+		dayLoop.Push("nature/BudhDay1");
+		nightLoop.Push("nature/BudhNight");
+		DayLoopSound = dayLoop.Size()?dayLoop[random(0, dayLoop.Size()-1)]:"";
+		NightLoopSound = nightLoop.Size()?nightLoop[random(0, nightLoop.Size()-1)]:"";
+		itNOplaySound = random(0, 3);
+
+		Super.PostBeginPlay();
+
+		if(!CheckFloorTexture() ) {	self.destroy();	}
+
+		self.scale.x = frandom(0.5, 1.0);
+		self.scale.y = frandom(0.5, 1.0);
+		if(random(0, 4) == 0){
+			self.scale.x = frandom(1.0, 1.5);
+			self.scale.y = frandom(1.0, 1.5);
+		}
+
+	}
+	override int getRenderDistance(){
+		PlayerInfo players = players[consoleplayer];
+		return Cvar.GetCVar("z_natue_renderdistance_bush", players).GetInt();
+	}
+	override bool CheckFloorTexture(){
+		floorTex.Push("BLUD030_");
+		floorTex.Push("BLUD0855");
+		floorTex.Push("BLUD0340");
+		return Super.CheckFloorTexture();
+	}
+
+	States
+	{
+		SetSprite:
+			TNT1 A 0 giveInventory("Unhandable", 1);
+			TNT1 A 0 A_Jump (256, 1, 2, 3);
+			BUH1 A 0 A_jump(256, "Draw");
+			BUH1 B 0 A_jump(256, "Draw");
+			BUH1 C 0 A_jump(256, "Draw");
+		Pain.Fire:
+			"####" "#" 0 {self.giveInventory("Burner", 1);}
+			Goto Draw;
+		Death.Fire:
+			BUH1 D -1;
+			Stop;
+		Death:
+			BUH1 D -1;
+			Stop;
+
+	}
+}
+
+
+Class z_nature_kuvshinka : z_nature_plant
+{
+	Default
+	{
+		-FORCEXYBILLBOARD;
+		+FLATSPRITE;
+	}
+
+	override int getRenderDistance(){
+		PlayerInfo players = players[consoleplayer];
+		return Cvar.GetCVar("z_natue_renderdistance_grass", players).GetInt();
+	}
+
+	Override void PostBeginPlay()
+	{
+		if(!CheckFloorTexture() ) {	self.destroy();	}
+		Super.PostBeginPlay();
+
+	}
+
+	override bool CheckFloorTexture(){
+		floorTex.Push("SLUDGE_1");
+		return Super.CheckFloorTexture();
+	}
+
+	States
+	{
+		SetSprite:
+			TNT1 A 0
+			{
+				if(random(0, 64)==0){
+					A_PlaySound("nature/GILL", CHAN_AUTO, 0.3, true, ATTN_NORM);
+				}
+			}
+			TNT1 A 0 A_Jump (256, 1, 2, 3, 4);
+			KUVS A 0 A_jump(256, "Draw");
+			KUVS B 0 A_jump(256, "Draw");
+			KUVS C 0 A_jump(256, "Draw");
+			KUVS D 0 A_jump(256, "Draw");
+
+
+	}
+}
+
+Class z_nature_grass :  z_nature_plant
+{
+	bool osok;
+	int fx_fireplace_offset;
+	override int getRenderDistance(){
+		PlayerInfo players = players[consoleplayer];
+		return Cvar.GetCVar("z_natue_renderdistance_grass", players).GetInt();
+	}
+	Default
+	{
+		Health 35;
+		PainChance 70;
+		radius 16;
+		height 1;
+		+SHOOTABLE;
+		+DONTTHRUST;
+		+NEVERTARGET;
+		+NOCLIP;
+		//+NOBLOCKMAP;//////////////
+		//-SOLID;
+		+GHOST;
+		+NOBLOOD;
+		//DamageFactor "Normal",0.0;
+		DamageFactor "fire", 1.0;
+	}
+	Override void PostBeginPlay()
+	{
+
+
+		dayLoop.clear();
+		dayLoop.Push("nature/GrassDay");
+		nightLoop.Push("nature/GrassNight");
+		DayLoopSound = dayLoop.Size()?dayLoop[random(0, dayLoop.Size()-1)]:"";
+		NightLoopSound = nightLoop.Size()?nightLoop[random(0, nightLoop.Size()-1)]:"";
+		itNOplaySound = random(0, 256);
+
+		if(!CheckFloorTexture() ) {	self.destroy();	}
+		Super.PostBeginPlay();
+		A_SetHealth(self.Health*self.scale.x);
+		fx_fireplace_offset = 16;
+
+		vector3 fNormal = self.CurSector.FloorPlane.Normal;
+
+		if( (abs(fNormal.x)+abs(fNormal.y)+abs(fNormal.z))>1.4 ){ self.destroy();}
+
+		//a_logFloat(fNormal.x);
+		//a_logFloat(fNormal.y);
+		//a_logFloat(fNormal.z);
+
+	}
+
+	override bool CheckFloorTexture(){
+		floorTex.Push("BLUD0227");
+		floorTex.Push("BLUD030_");
+		floorTex.Push("BLUD0855");
+		floorTex.Push("OSOK");
+		floorTex.Push("SLUDGE_1");
+
+
+
+		return Super.CheckFloorTexture();
+	}
+	States
+	{
+		SetSprite:
+			TNT1 A 0 {
+
+				TextureID tx=TexMan.CheckForTexture("OSOK",TexMan.Type_Flat);
+				if(tx == floorpic){
+					osok = true;
+
+					dayLoop.Clear();
+					nightLoop.Clear();
+					itNOplaySound = random(0, 64);
+
+					dayLoop.Push("nature/OsokaDay");
+					nightLoop.Push("nature/OsokaNihgt1");
+
+					DayLoopSound = dayLoop.Size()?dayLoop[random(0, dayLoop.Size()-1)]:"";
+					NightLoopSound = nightLoop.Size()?nightLoop[random(0, nightLoop.Size()-1)]:"";
+				} else { osok = false; }
+
+				tx=TexMan.CheckForTexture("SLUDGE_1",TexMan.Type_Flat);
+				if(tx == floorpic){
+					spawn("z_nature_kuvshinka", self.pos);
+					self.destroy();
+				}
+			}
+			BTRG D 0 A_jumpIf(osok, "Draw");
+
+
+			TNT1 A 0 A_Jump (256, 1, 2, 3);
+			BTRG A 0 A_jump(256, "Draw");
+			BTRG B 0 A_jump(256, "Draw");
+			BTRG C 0 A_jump(256, "Draw");
+
+		Pain.Fire:
+			"####" "#" 0 {self.giveInventory("Burner", 1); a_setSize(radius, 24);}
+			Goto Draw;
+		Death.Fire:
+			BTRG F -1;
+			Stop;
+		Death:
+			BTRG F -1;
+			Stop;
+	}
+}
+
+Class z_nature_plant : DistanceSpawned
+{
+	int Acounter;
+
+	Array<string> floorTex;
+	Array<string> nightLoop;
+	Array<string> dayLoop;
+	Array<string> nightRandom;
+	Array<string> dayRandom;
+	string DayLoopSound;
+	string NightLoopSound;
+	string dayRandomSound;
+	string nightRandomSound;
+
+	bool nightLooping;
+	bool dayLooping;
+
+	bool itNOplaySound;
+	bool itNOplayRandomSound;
+
+	Default
+	{
+		+FORCEXYBILLBOARD;
+		+ClientSideOnly;
+		+NOBLOODDECALS;
+		+NOTAUTOAIMED;
+		+NEVERTARGET;
+		//+Nogravity;
+		//+NOBLOCKMAP;
+		//+GHOST;
+
+		alpha 0.0;
+	}
+
+	Override void PostBeginPlay()
+	{
+
+		Super.PostBeginPlay();
+
+		SetZ(floorz);
+		if(self.scale.x==1){
+			self.scale.x = frandom(0.3, 0.8);
+			self.scale.y = frandom(0.3, 0.8);
+		}
+
+	}
+
+
+	virtual void SoundAmbience(){
+		if(!itNOplaySound){
+			int Time;
+			Acounter++;
+			if(Acounter>35){
+				Acounter = 0;
+				Time = CallACS("GetTime",0,0,0);
+				if(Time>7*60 && Time<20*60){
+					//daytime
+					if(!dayLooping){
+						A_StopSound(CHAN_BODY);
+						A_PlaySound(DayLoopSound, CHAN_BODY, 0.1, true, ATTN_NORM);
+						dayLooping = true;
+						nightLooping = false;
+					}
+				} else {
+					//nighttime
+					if(!(Time<7*60 && Time>6*60) && !(Time>20*60 && Time<21*60)){
+						if(!nightLooping){
+							A_StopSound(CHAN_BODY);
+							A_PlaySound(NightLoopSound, CHAN_BODY, 0.1, true, ATTN_NORM);
+							dayLooping = false;
+							nightLooping = true;
+						}
+						if(!itNOplayRandomSound){
+							if(random(0, 64)==0){
+								A_PlaySound(nightRandomSound, CHAN_AUTO, 1.0, FALSE, ATTN_NORM);
+							}
+						}
+					} else { A_StopSound(CHAN_BODY); }
+				}
+
+			}
+		}
+	}
+
+	virtual bool CheckFloorTexture()
+	{
+		vector2 myXY;
+		myXY.x = pos.x+1;
+		myXY.y = pos.y+1;
+		/*if(!TryMove(myXY, PCM_NOACTORS)){
+			//a_log(getclassName());
+			return false;
+		}*/
+
+		int fTexLenght = floorTex.Size();
+		for (int i = 0; i < fTexLenght;i++)
+		{
+			TextureID tx=TexMan.CheckForTexture(floorTex[i],TexMan.Type_Flat);
+			if (tx == floorpic || Skip)//manually placed plant can grow on any floor texture
+			{
+				giveInventory("Unhandable", 1);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	States
+	{
+		SetSprite://for DistanceSpawned
+		Spawn:
+			TNT1 A 1;
+			 Loop;
+		Draw:
+			"####" "#" 1 {
+				a_fadeIn(0.1, FTF_CLAMP);
+				SoundAmbience();
+
+			}
+			loop;
+	}
+}
+
+
+
+
+
+Class z_nature_tree_leave : z_nature_debris
+{
+
+	Default
+	{
+		+NOGRAVITY;
+
+	}
+
+	virtual void LeafLife()
+	{
+		setZ(self.pos.z-3);
+		A_SetRoll(roll+RollSpeed,SPF_INTERPOLATE);
+		if( self.pos.z <= floorz ){
+			A_fadeOut(FadeoutSpeed, true);
+		}
+	}
+
+	States
+	{
+		Spawn:
+			TNT1 A 0 A_Jump (256, 1, 2, 3);
+			LEAV A 0 A_jump(256, 2);
+			LEAV B 0 A_jump(256, 1);
+			LEAV C 0;
+			Goto Life;
+		Life:
+			"####" "#" 1 LeafLife();
+			Loop;
+
+	}
+}
+Class z_nature_tree_limp : z_nature_debris
+{
+	States
+	{
+		Spawn:
+			TNT1 A 0 A_Jump (256, 1, 2, 3, 4);
+			BTRL A 0 A_jump(256, "Life");
+			BTRL B 0 A_jump(256, "Life");
+			BTRL C 0 A_jump(256, "Life");
+			BTRL D 0 A_jump(256, "Life");
+			Goto Life;
+
+	}
+}
+
+
+Class z_nature_treecracks: actor
+{
+	Default
+	{
+		+nointeraction;
+		+clientsideonly;
+
+
+	}
+	States
+	{
+		Spawn:
+			TNT1 A 1 nodelay {
+				a_playSound("Pitch/Wood", CHAN_AUTO);
+				for(int i = 0; i<random(3, 10); i++){
+					A_SpawnItemEx("z_nature_treecrack", random(-4, 4), random(-4, 4), random(-4, 4), random(-4, 4), random(-4, 4), random(-4, 4), 0,SXF_NOCHECKPOSITION);
+				}
+			}
+			Stop;
+
+	}
+}
+
+Class z_nature_treecrack: z_nature_debris
+{
+	Default
+	{
+		Scale 0.3;
+	}
+	States
+	{
+		Spawn:
+			TNT1 A 0 A_Jump (256, 1, 2, 3);
+			BTRC A 0 A_jump(256, "Life");
+			BTRC B 0 A_jump(256, "Life");
+			BTRC C 0 A_jump(256, "Life");
+			Goto Life;
+
+	}
+}
+
+Class z_nature_debris : Actor
+{
+	float ScaleMultiplerMin;
+	float ScaleMultiplerMax;
+	float RollSpeed;
+	float FadeoutSpeed;
+	bool startFade;
+	Default
+	{
+		Scale 1.0;
+		+Rollsprite;
+		+FORCEXYBILLBOARD;
+		//+Missile;
+		//+NoBlockMap;
+		+NOBLOCKMAP;
+		+GHOST;
+		+DONTTHRUST;
+		-SOLID;
+		//Mass 200;
+		Renderstyle "Translucent";
+		alpha 1.0;
+	}
+	Override void PostBeginPlay()
+	{
+
+		ScaleMultiplerMax = ScaleMultiplerMax?ScaleMultiplerMax:1.5;
+		ScaleMultiplerMin = ScaleMultiplerMin?ScaleMultiplerMin:0.7;
+		FadeoutSpeed = 0.1;
+		RollSpeed = 10.0;
+		A_SetScale(scale.X*frandom(ScaleMultiplerMin, ScaleMultiplerMax));
+		RollSpeed = FRandom(1, RollSpeed);
+		A_SetRoll(random(0, 360));
+		Super.PostBeginPlay();
+	}
+	virtual void ParticleLife()
+	{
+	//a_logfloat(RollSpeed);
+		A_SetRoll(roll+RollSpeed,SPF_INTERPOLATE);
+		if( self.pos.z <= floorz ){
+			A_fadeOut(FadeoutSpeed, true);
+		}
+	}
+	States
+	{
+		Life:
+			"####" "#" 1 ParticleLife();
+			Loop;
+
+	}
+
+}
+

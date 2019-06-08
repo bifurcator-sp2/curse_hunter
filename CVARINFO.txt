@@ -1,0 +1,84 @@
+
+
+user bool dpwh_filmictonemap = true;
+user bool dpwh_chromaticAberration = true;
+user bool dpwh_naturalVignette = false;
+user string dsc_scene_lut = "TonemapBlood";
+user bool dpwh_filmgrain = true;
+
+
+server int WORLD_TIME = 0;
+server int WORLD_TIME_DELAY = 35;
+server bool WORLD_TIME_STOP = false;
+server bool WORLD_SWITCH_RAIN = false;
+server int WORLD_RAIN_DECITY = 0;
+
+user bool z_natue_render_rain = true;
+user int z_natue_renderdistance_tree = 3072;//3072;
+user int z_natue_renderdistance_bush = 2048;//2048;
+user int z_natue_renderdistance_grass = 1024;//1024;
+user int z_natue_renderdistance_big_decor = 2048;//2048;
+user int z_natue_vegetation_density = 2000;
+
+user bool z_natue_vegetation_redraw = false;
+
+user int z_natue_renderdistance_ring = 128;
+user int z_natue_tree_density = 5;
+user int z_natue_grass_density = 100;
+user int z_natue_bush_density = 5;
+
+
+user bool z_natue_draw_plants = true;
+user bool z_natue_draw_grass = true;
+user bool z_natue_draw_bushes = true;
+user bool z_natue_draw_fog = true;
+user bool z_natue_draw_extra_decor = true;
+user float z_natue_draw_extra_decor_dinsity = 1.0;
+user float z_natue_renderDistCoeff = 1.0;
+
+user int z_natue_activation_radius = 1024;
+
+user int monsters_render_radius = 3200;
+user int blood_render_radius = 3200;
+
+user int USER_HAND_DISTANCE = 72;
+user int USER_QUICKKILL_DISTANCE = 128;
+user int USER_LEAPKILL_DISTANCE = 512;
+
+user bool HUD_DISPLAY_SPLASHSCREEN = true;
+user bool HUD_DISPLAY_TUTORIAL = true;
+user bool HUD_DISPLAY_OBJECTIVES = true;
+user bool HUD_SHOW_BOUNDINGBOXES = false;
+user bool RENDER_CORONAS = true;
+user bool RENDER_DIRTY_LENS = true;
+user bool RENDER_SUN_LENS_FLARE = true;
+user bool RENDER_CHAINFLARES = true;
+
+user int ITEM_RESPAWN_DISTANCE = 2048;
+
+user int DAMNATION_BASE_RADIUS = 196;
+user bool DISCLAIMER = true;
+
+
+
+
+//Motion blur mod
+
+user bool mblur = false ;
+user int mblur_samples = 8 ;
+user float mblur_strength = 66 ;
+user float mblur_recovery = 42 ;
+user bool mblur_autostop = true ;
+user float mblur_threshold = 30 ;
+user float mblur_recovery2 = 90 ;
+
+//Caleb movement
+server int PlayerMovementModel = 0;
+server float sv_friction = 4.0;
+server float sv_stopspeed = 100.0;
+server float sv_maxvelocity = 3500.0;
+server float sv_accelerate = 10.0;
+server float sv_airaccelerate = 10.0;
+server float sv_hlGravity = 800.0;
+server float sv_noclipspeed = 5.0;
+server float sv_noclipaccelerate = 5.0;

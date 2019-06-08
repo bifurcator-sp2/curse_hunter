@@ -1,0 +1,764 @@
+Class ActorPosHolder {
+	Vector2 pos;
+	Vector2 dim;
+	float alpha;
+	float dist, dist2;
+}
+
+
+class FlickerCoronasController : CoronasController
+{
+
+
+    FlickerCoronasController Init(RenderEvent e, string CoronaSprite, string ActorClassName)
+    {
+
+		update(e);
+
+        mark = TexMan.CheckForTexture(CoronaSprite,TexMan.Type_Any);
+
+		lens1 = TexMan.CheckForTexture("LENSA0",TexMan.Type_Any);
+		lens2 = TexMan.CheckForTexture("LENSB0",TexMan.Type_Any);
+		lens3 = TexMan.CheckForTexture("LENSC0",TexMan.Type_Any);
+		lens4 = TexMan.CheckForTexture("LENSD0",TexMan.Type_Any);
+		lens5 = TexMan.CheckForTexture("LENSE0",TexMan.Type_Any);
+
+		bighalo = TexMan.CheckForTexture("FLFIREbi",TexMan.Type_Any);
+		midhalo = TexMan.CheckForTexture("FLFIREmi",TexMan.Type_Any);
+		smallhalo = TexMan.CheckForTexture("FLFIREsi",TexMan.Type_Any);
+
+		ActorClass = ActorClassName;
+        return self;
+    }
+
+    override void PrepareData()
+    {
+        if(!ti) ti = ThinkerIterator.Create(ActorClass);
+        ti.ReInit();
+        aph.Clear();
+        actor a;
+        //Vector3 vdir = (cos(ViewAngle)*cos(ViewPitch),sin(ViewAngle)*cos(ViewPitch),-sin(ViewPitch));
+
+        while ( a = actor(ti.Next()) )
+        {
+
+            double dist = players[consoleplayer].mo.Distance3D(a);
+            if (!a.alpha ) { continue; }
+			//if (!a.visible) { continue; }
+
+
+            Vector3 tdir = ViewPos + Level.Vec3Diff(ViewPos,a.Pos); //+(0,0,a.Height*0.5)
+
+            Vector3 spos = CoordUtil.WorldToScreen(tdir,ViewPos,ViewPitch,ViewAngle,ViewRoll,players[consoleplayer].FOV);
+            if ( spos.z > 1.0 || spos.z < -1 ) continue;
+
+            ActorPosHolder ph = new("ActorPosHolder");
+            ph.pos = CoordUtil.ToViewport(spos);
+			ph.alpha = a.alpha*frandom(0.3, 1.0);
+			ph.dist = dist; if(ph.dist>192){ph.dist=192;}
+			ph.dist2 = dist; if(ph.dist2>768){ph.dist2=768;}
+			ph.dim = TexMan.GetScaledSize(mark);
+			ph.alpha /= (dist / 480 * players[consoleplayer].FOV / 90);
+			ph.dim /= 1.0+(dist / 480 * players[consoleplayer].FOV / 90);
+			//ph.dim.x *= factor;
+			//ph.dim.y *= factor;
+
+            aph.Push(ph);
+        }
+    }
+	override void Draw( int bottom, int visibility ){
+        PrepareData();
+		float a1, a2, a3, a4, a5;
+		double window_aspect = 1.0 * Screen.GetWidth() / Screen.GetHeight();
+        Vector2 resolution        = 480 * (window_aspect, 1);
+
+
+        for(int i = 0; i < aph.Size(); ++i) {
+            if(aph[i].alpha>0){
+				aph[i].pos.x = resolution.x*aph[i].pos.x/screen.GetWidth();
+				aph[i].pos.y = resolution.y*aph[i].pos.y/screen.GetHeight();
+
+				if (Cvar.GetCVar("RENDER_DIRTY_LENS", players[consoleplayer]).GetInt() > 0){
+					a1+= (calcMudAlpha((0, 0), aph[i].pos) % 1.0) *  (1-aph[i].dist2/768);
+					a2+= (calcMudAlpha((640, 0), aph[i].pos) % 1.0) *  (1-aph[i].dist2/768);
+					a3+= (calcMudAlpha((640, 480), aph[i].pos) % 1.0) *  (1-aph[i].dist2/768);
+					a4+= (calcMudAlpha((0, 480), aph[i].pos) % 1.0) *  (1-aph[i].dist2/768);
+					a5+= (calcMudAlpha((320, 240), aph[i].pos) % 1.0) *  (1-aph[i].dist/192);
+				}
+				Screen.DrawTexture(mark, false, aph[i].pos.x, aph[i].pos.y, DTA_VirtualWidthF, resolution.x, DTA_VirtualHeightF, resolution.y, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, aph[i].alpha, DTA_DestWidthF, aph[i].dim.x, DTA_DestHeightF, aph[i].dim.y);//, DTA_DestWidthF, aph[i].dim.x, DTA_DestHeightF, aph[i].dim.y, DTA_CleanNoMove_1, true,
+
+				FlareCoordinator.drawFlarePath(aph[i], smallhalo, midhalo, bighalo, false);
+			}
+
+
+		}
+		if (Cvar.GetCVar("RENDER_DIRTY_LENS", players[consoleplayer]).GetInt() > 0){
+			if(a1>0) Screen.DrawTexture(lens1, false, 0, 0, DTA_VirtualWidthF, 640, DTA_VirtualHeightF, 480, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, a1);
+			if(a2>0) Screen.DrawTexture(lens2, false, 640, 0, DTA_VirtualWidthF, 640, DTA_VirtualHeightF, 480, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, a2);
+			if(a3>0) Screen.DrawTexture(lens3, false, 640, 480, DTA_VirtualWidthF, 640, DTA_VirtualHeightF, 480, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, a3);
+			if(a4>0) Screen.DrawTexture(lens4, false, 0, 480, DTA_VirtualWidthF, 640, DTA_VirtualHeightF, 480, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, a4);
+
+			if(a5>0) Screen.DrawTexture(lens5, false, 320, 240, DTA_VirtualWidthF, 640, DTA_VirtualHeightF, 480, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, a5);
+		}
+	}
+}
+
+class CoronasController : HUDMessageBase
+{
+    Array<ActorPosHolder> aph;
+    Actor Camera;
+    transient ThinkerIterator ti;
+	string ActorClass;
+
+
+
+    Vector3 ViewPos;
+    double ViewAngle, ViewPitch, ViewRoll;
+
+    TextureID mark;
+	TextureID lens1;
+	TextureID lens2;
+	TextureID lens3;
+	TextureID lens4;
+	TextureID lens5;
+	TextureID bighalo, midhalo, smallhalo;
+
+
+    CoronasController Init(string CoronaSprite, string ActorClassName)
+    {
+        mark = TexMan.CheckForTexture(CoronaSprite,TexMan.Type_Any);
+
+		lens1 = TexMan.CheckForTexture("LENSA0",TexMan.Type_Any);
+		lens2 = TexMan.CheckForTexture("LENSB0",TexMan.Type_Any);
+		lens3 = TexMan.CheckForTexture("LENSC0",TexMan.Type_Any);
+		lens4 = TexMan.CheckForTexture("LENSD0",TexMan.Type_Any);
+		lens5 = TexMan.CheckForTexture("LENSE0",TexMan.Type_Any);
+
+		//bighalo = TexMan.CheckForTexture("LEFLW1",TexMan.Type_Any);
+		//midhalo = TexMan.CheckForTexture("LEFLW2",TexMan.Type_Any);
+		//smallhalo = TexMan.CheckForTexture("LEFLW3",TexMan.Type_Any);
+
+		ActorClass = ActorClassName;
+        return self;
+    }
+
+    virtual void PrepareData()
+    {
+        if(!ti) ti = ThinkerIterator.Create(ActorClass);
+        ti.ReInit();
+        aph.Clear();
+        actor a;
+        //Vector3 vdir = (cos(ViewAngle)*cos(ViewPitch),sin(ViewAngle)*cos(ViewPitch),-sin(ViewPitch));
+
+        while ( a = actor(ti.Next()) )
+        {
+
+            double dist = players[consoleplayer].mo.Distance3D(a);
+            if (!a.alpha ) { continue; }
+			//if (!a.visible) { continue; }
+
+
+            Vector3 tdir = ViewPos + Level.Vec3Diff(ViewPos,a.Pos); //+(0,0,a.Height*0.5)
+
+            Vector3 spos = CoordUtil.WorldToScreen(tdir,ViewPos,ViewPitch,ViewAngle,ViewRoll,players[consoleplayer].FOV);
+            if ( spos.z > 1.0 || spos.z < -1 ) continue;
+
+            ActorPosHolder ph = new("ActorPosHolder");
+            ph.pos = CoordUtil.ToViewport(spos);
+			ph.alpha = a.alpha;
+			ph.dist = dist; if(ph.dist>192){ph.dist=192;}
+			ph.dist2 = dist; if(ph.dist2>768){ph.dist2=768;}
+			ph.dim = TexMan.GetScaledSize(mark);
+			ph.dim /= 0.3+dist / 480 * players[consoleplayer].FOV / 90;
+			//ph.dim.x *= factor;
+			//ph.dim.y *= factor;
+
+            aph.Push(ph);
+        }
+    }
+
+	virtual void update(renderevent e){
+		Camera = e.Camera;
+		ViewPos = e.ViewPos;
+		ViewAngle = e.ViewAngle;
+		ViewPitch = e.ViewPitch;
+		ViewRoll = e.ViewRoll;
+	}
+
+
+
+	override bool Tick(){ return !Camera;  }
+
+	float calcMudAlpha(vector2 Point, vector2 CoronaPos){
+		float d, xp, yp;
+		double window_aspect = 1.0 * Screen.GetWidth() / Screen.GetHeight();
+		if(CoronaPos.x > 0 && CoronaPos.x<640*window_aspect && CoronaPos.y > 0 && CoronaPos.y<480){
+			d =  sqrt( (Point.x-CoronaPos.x)*(Point.x-CoronaPos.x) + (Point.y-CoronaPos.y)*(Point.y-CoronaPos.y) );
+
+			if(d>300){ return 0;}
+		}
+		return 1-d/300;
+	}
+
+    override void Draw( int bottom, int visibility )
+    {
+        PrepareData();
+		float a1, a2, a3, a4, a5;
+		double window_aspect = 1.0 * Screen.GetWidth() / Screen.GetHeight();
+        Vector2 resolution        = 480 * (window_aspect, 1);
+
+
+        for(int i = 0; i < aph.Size(); ++i) {
+            if(aph[i].alpha>0){
+				aph[i].pos.x = resolution.x*aph[i].pos.x/screen.GetWidth();
+				aph[i].pos.y = resolution.y*aph[i].pos.y/screen.GetHeight();
+
+				if (Cvar.GetCVar("RENDER_DIRTY_LENS", players[consoleplayer]).GetInt() > 0){
+					a1+= (calcMudAlpha((0, 0), aph[i].pos) % 1.0) *  (1-aph[i].dist2/768);
+					a2+= (calcMudAlpha((640, 0), aph[i].pos) % 1.0) *  (1-aph[i].dist2/768);
+					a3+= (calcMudAlpha((640, 480), aph[i].pos) % 1.0) *  (1-aph[i].dist2/768);
+					a4+= (calcMudAlpha((0, 480), aph[i].pos) % 1.0) *  (1-aph[i].dist2/768);
+					a5+= (calcMudAlpha((320, 240), aph[i].pos) % 1.0) *  (1-aph[i].dist/192);
+				}
+				Screen.DrawTexture(mark, false, aph[i].pos.x, aph[i].pos.y, DTA_VirtualWidthF, resolution.x, DTA_VirtualHeightF, resolution.y, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, aph[i].alpha, DTA_DestWidthF, aph[i].dim.x, DTA_DestHeightF, aph[i].dim.y);//, DTA_DestWidthF, aph[i].dim.x, DTA_DestHeightF, aph[i].dim.y, DTA_CleanNoMove_1, true,
+
+				//FlareCoordinator.drawFlarePath(aph[i], smallhalo, midhalo, bighalo);
+			}
+
+
+		}
+		if (Cvar.GetCVar("RENDER_DIRTY_LENS", players[consoleplayer]).GetInt() > 0){
+			if(a1>0) Screen.DrawTexture(lens1, false, 0, 0, DTA_VirtualWidthF, 640, DTA_VirtualHeightF, 480, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, a1);
+			if(a2>0) Screen.DrawTexture(lens2, false, 640, 0, DTA_VirtualWidthF, 640, DTA_VirtualHeightF, 480, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, a2);
+			if(a3>0) Screen.DrawTexture(lens3, false, 640, 480, DTA_VirtualWidthF, 640, DTA_VirtualHeightF, 480, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, a3);
+			if(a4>0) Screen.DrawTexture(lens4, false, 0, 480, DTA_VirtualWidthF, 640, DTA_VirtualHeightF, 480, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, a4);
+
+			if(a5>0) Screen.DrawTexture(lens5, false, 320, 240, DTA_VirtualWidthF, 640, DTA_VirtualHeightF, 480, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, a5);
+		}
+    }
+}
+
+class FlareCoordinator
+{
+	static vector3 GetFlareCoords(vector2 sunCoords, float fDist, bool nodistcorrection = false, int ScreenFactor = 480){
+		vector3 fCoords;
+		vector2 centerPoint;
+		float vecWidth, SunVecWidth;
+
+		double window_aspect = 1.0 * Screen.GetWidth() / Screen.GetHeight();
+        Vector2 resolution  = ScreenFactor * (window_aspect, 1);
+
+		centerPoint.x = resolution.x/2;
+		centerPoint.y = resolution.y/2;
+
+		SunVecWidth =  sqrt( (sunCoords.x-centerPoint.x)*(sunCoords.x-centerPoint.x) + (sunCoords.y-centerPoint.y)*(sunCoords.y-centerPoint.y) );
+		vecWidth =  SunVecWidth*2*fDist;
+
+		double angle = VectorAngle (centerPoint.x-sunCoords.x, centerPoint.y-sunCoords.y);
+
+		fCoords.x = sunCoords.x+vecWidth*cos(angle);
+		fCoords.y = sunCoords.y+vecWidth*sin(angle);
+		if(!nodistcorrection){
+			fCoords.z = (resolution.y*0.35-SunVecWidth)/SunVecWidth;
+		} else {
+			fCoords.z = 1.0;
+		}
+		return fCoords;
+	}
+
+	static void drawFlarePath(ActorPosHolder aph, TextureID smallhalo, TextureID midhalo, TextureID bighalo, bool nodistcorrection = false, int ScreenFactor = 480){
+			if (Cvar.GetCVar("RENDER_CHAINFLARES", players[consoleplayer]).GetInt() < 1){ return; }
+
+			vector3 flarePos;
+			double window_aspect = 1.0 * Screen.GetWidth() / Screen.GetHeight();
+			Vector2 resolution  = ScreenFactor * (window_aspect, 1);
+
+			flarePos = FlareCoordinator.GetFlareCoords(aph.pos, 0.35, nodistcorrection);
+
+			if(!flarePos.z){return;}
+
+			Screen.DrawTexture(smallhalo, false, flarePos.x, flarePos.y, DTA_VirtualWidthF, resolution.x, DTA_VirtualHeightF, resolution.y, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, aph.alpha*flarePos.z);//, DTA_DestWidthF, aph[i].dim.x, DTA_DestHeightF, aph[i].dim.y, DTA_CleanNoMove_1, true,
+
+			flarePos = FlareCoordinator.GetFlareCoords(aph.pos, 0.4, nodistcorrection);
+			Screen.DrawTexture(midhalo, false, flarePos.x, flarePos.y, DTA_VirtualWidthF, resolution.x, DTA_VirtualHeightF, resolution.y, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, aph.alpha*flarePos.z);//,
+
+			flarePos = FlareCoordinator.GetFlareCoords(aph.pos, 0.45, nodistcorrection);
+			Screen.DrawTexture(smallhalo, false, flarePos.x, flarePos.y, DTA_VirtualWidthF, resolution.x, DTA_VirtualHeightF, resolution.y, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, aph.alpha*flarePos.z);//, DTA_DestWidthF, aph[i].dim.x, DTA_DestHeightF, aph[i].dim.y, DTA_CleanNoMove_1, true,
+
+			flarePos = FlareCoordinator.GetFlareCoords(aph.pos, 0.6, nodistcorrection);
+			Screen.DrawTexture(smallhalo, false, flarePos.x, flarePos.y, DTA_VirtualWidthF, resolution.x, DTA_VirtualHeightF, resolution.y, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, aph.alpha*flarePos.z);//, DTA_DestWidthF, aph[i].dim.x, DTA_DestHeightF, aph[i].dim.y, DTA_CleanNoMove_1, true,
+
+			flarePos = FlareCoordinator.GetFlareCoords(aph.pos, 0.7, nodistcorrection);
+			Screen.DrawTexture(bighalo, false, flarePos.x, flarePos.y, DTA_VirtualWidthF, resolution.x, DTA_VirtualHeightF, resolution.y, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, aph.alpha*flarePos.z);//, DTA_DestWidthF, aph[i].dim.x, DTA_DestHeightF, aph[i].dim.y, DTA_CleanNoMove_1, true,
+
+			flarePos = FlareCoordinator.GetFlareCoords(aph.pos, 0.75, nodistcorrection);
+			Screen.DrawTexture(smallhalo, false, flarePos.x, flarePos.y, DTA_VirtualWidthF, resolution.x, DTA_VirtualHeightF, resolution.y, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, aph.alpha*flarePos.z);//, DTA_DestWidthF, aph[i].dim.x, DTA_DestHeightF, aph[i].dim.y, DTA_CleanNoMove_1, true,
+
+			flarePos = FlareCoordinator.GetFlareCoords(aph.pos, 0.9, nodistcorrection);
+			Screen.DrawTexture(midhalo, false, flarePos.x, flarePos.y, DTA_VirtualWidthF, resolution.x, DTA_VirtualHeightF, resolution.y, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, aph.alpha*flarePos.z);//, DTA_DestWidthF, aph[i].dim.x, DTA_DestHeightF, aph[i].dim.y, DTA_CleanNoMove_1, true,
+
+
+	}
+
+}
+
+class HUDlensFlaare : HUDMessageBase
+{
+
+    Array<ActorPosHolder> aph;
+    Actor Camera;
+    transient ThinkerIterator ti;
+    Vector3 ViewPos;
+	string markerClass;
+    double ViewAngle, ViewPitch, ViewRoll;
+	TextureID mark;
+
+
+    void PrepareData()
+    {
+        if(!ti) ti = ThinkerIterator.Create(markerClass);
+        ti.ReInit();
+        aph.Clear();
+        actor a;
+
+        while ( a = actor(ti.Next()) ){
+			if(a.getClassName()!= markerClass ){continue;}
+            double dist = players[consoleplayer].mo.Distance3D(a);
+            Vector3 tdir = ViewPos + Level.Vec3Diff(ViewPos,a.Pos);
+            Vector3 spos = CoordUtil.WorldToScreen(tdir,ViewPos,ViewPitch,ViewAngle,ViewRoll,players[consoleplayer].FOV);
+            if ( spos.z > 1.0 || spos.z < -1 ) continue;
+
+            ActorPosHolder ph = new("ActorPosHolder");
+            ph.pos = CoordUtil.ToViewport(spos);
+			ph.dim = TexMan.GetScaledSize(mark);
+			ph.dim /= dist / 1080 * players[consoleplayer].FOV / 90;
+			ph.dim*=15;
+			ph.alpha = a.alpha;
+            aph.Push(ph);
+        }
+    }
+
+    override bool Tick()
+    {
+        PrepareData();
+        return !Camera;
+    }
+}
+
+
+class SunController : HUDlensFlaare
+{
+
+
+    TextureID bighalo, midhalo, smallhalo;
+
+    SunController Init(renderevent e)
+    {
+		update(e);
+
+		markerClass = "SunMarker";
+        mark = TexMan.CheckForTexture("LEFLW0",TexMan.Type_Any);
+		bighalo = TexMan.CheckForTexture("LEFLW1",TexMan.Type_Any);
+		midhalo = TexMan.CheckForTexture("LEFLW2",TexMan.Type_Any);
+		smallhalo = TexMan.CheckForTexture("LEFLW3",TexMan.Type_Any);
+        return self;
+    }
+
+	virtual void update(renderevent e){
+		Camera = e.Camera;
+		ViewPos = e.ViewPos;
+		ViewAngle = e.ViewAngle;
+		ViewPitch = e.ViewPitch;
+		ViewRoll = e.ViewRoll;
+	}
+
+    override void Draw( int bottom, int visibility )
+    {
+        PrepareData();
+		int ScreenFactor = 1080;
+
+		double window_aspect = 1.0 * Screen.GetWidth() / Screen.GetHeight();
+        Vector2 resolution  = ScreenFactor * (window_aspect, 1);
+		vector3 flarePos;
+
+        for(int i = 0; i < aph.Size(); ++i) {
+			aph[i].pos.x = resolution.x*aph[i].pos.x/screen.GetWidth();
+			aph[i].pos.y = resolution.y*aph[i].pos.y/screen.GetHeight();
+
+            Screen.DrawTexture(mark, false, aph[i].pos.x, aph[i].pos.y, DTA_VirtualWidthF, resolution.x, DTA_VirtualHeightF, resolution.y, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, aph[i].alpha, DTA_DestWidthF, aph[i].dim.x, DTA_DestHeightF, aph[i].dim.y);//, DTA_DestWidthF, aph[i].dim.x, DTA_DestHeightF, aph[i].dim.y, DTA_CleanNoMove_1, true,
+
+			flarePos = FlareCoordinator.GetFlareCoords(aph[i].pos, 0.35, false, ScreenFactor);
+
+			if(!flarePos.z){continue;}
+
+			Screen.DrawTexture(smallhalo, false, flarePos.x, flarePos.y, DTA_VirtualWidthF, resolution.x, DTA_VirtualHeightF, resolution.y, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, aph[i].alpha*flarePos.z);//, DTA_DestWidthF, aph[i].dim.x, DTA_DestHeightF, aph[i].dim.y, DTA_CleanNoMove_1, true,
+
+			flarePos = FlareCoordinator.GetFlareCoords(aph[i].pos, 0.4, false, ScreenFactor);
+			Screen.DrawTexture(midhalo, false, flarePos.x, flarePos.y, DTA_VirtualWidthF, resolution.x, DTA_VirtualHeightF, resolution.y, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, aph[i].alpha*flarePos.z);//, DTA_DestWidthF, aph[i].dim.x, DTA_DestHeightF, aph[i].dim.y, DTA_CleanNoMove_1, true,
+
+			flarePos = FlareCoordinator.GetFlareCoords(aph[i].pos, 0.45, false, ScreenFactor);
+			Screen.DrawTexture(smallhalo, false, flarePos.x, flarePos.y, DTA_VirtualWidthF, resolution.x, DTA_VirtualHeightF, resolution.y, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, aph[i].alpha*flarePos.z);//, DTA_DestWidthF, aph[i].dim.x, DTA_DestHeightF, aph[i].dim.y, DTA_CleanNoMove_1, true,
+
+			flarePos = FlareCoordinator.GetFlareCoords(aph[i].pos, 0.6, false, ScreenFactor);
+			Screen.DrawTexture(smallhalo, false, flarePos.x, flarePos.y, DTA_VirtualWidthF, resolution.x, DTA_VirtualHeightF, resolution.y, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, aph[i].alpha*flarePos.z);//, DTA_DestWidthF, aph[i].dim.x, DTA_DestHeightF, aph[i].dim.y, DTA_CleanNoMove_1, true,
+
+			flarePos = FlareCoordinator.GetFlareCoords(aph[i].pos, 0.7, false, ScreenFactor);
+			Screen.DrawTexture(bighalo, false, flarePos.x, flarePos.y, DTA_VirtualWidthF, resolution.x, DTA_VirtualHeightF, resolution.y, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, aph[i].alpha*flarePos.z);//, DTA_DestWidthF, aph[i].dim.x, DTA_DestHeightF, aph[i].dim.y, DTA_CleanNoMove_1, true,
+
+			flarePos = FlareCoordinator.GetFlareCoords(aph[i].pos, 0.75, false, ScreenFactor);
+			Screen.DrawTexture(smallhalo, false, flarePos.x, flarePos.y, DTA_VirtualWidthF, resolution.x, DTA_VirtualHeightF, resolution.y, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, aph[i].alpha*flarePos.z);//, DTA_DestWidthF, aph[i].dim.x, DTA_DestHeightF, aph[i].dim.y, DTA_CleanNoMove_1, true,
+
+
+			flarePos = FlareCoordinator.GetFlareCoords(aph[i].pos, 0.9, false, ScreenFactor);
+			Screen.DrawTexture(midhalo, false, flarePos.x, flarePos.y, DTA_VirtualWidthF, resolution.x, DTA_VirtualHeightF, resolution.y, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, aph[i].alpha*flarePos.z);//, DTA_DestWidthF, aph[i].dim.x, DTA_DestHeightF, aph[i].dim.y, DTA_CleanNoMove_1, true,
+
+
+		}
+
+
+    }
+}
+
+class MoonController : HUDlensFlaare
+{
+
+    TextureID halo;
+
+    MoonController Init(renderevent e)
+    {
+		update(e);
+
+		markerClass = "MoonMarker";
+        mark = TexMan.CheckForTexture("LENSF0",TexMan.Type_Any);
+		halo = TexMan.CheckForTexture("LENSG0",TexMan.Type_Any);
+        return self;
+    }
+	virtual void update(renderevent e){
+		Camera = e.Camera;
+		ViewPos = e.ViewPos;
+		ViewAngle = e.ViewAngle;
+		ViewPitch = e.ViewPitch;
+		ViewRoll = e.ViewRoll;
+	}
+
+    override void Draw( int bottom, int visibility )
+    {
+        PrepareData();
+		double window_aspect = 1.0 * Screen.GetWidth() / Screen.GetHeight();
+        Vector2 resolution  = 1080 * (window_aspect, 1);
+		vector3 flarePos;
+
+        for(int i = 0; i < aph.Size(); ++i) {
+			aph[i].pos.x = resolution.x*aph[i].pos.x/screen.GetWidth();
+			aph[i].pos.y = resolution.y*aph[i].pos.y/screen.GetHeight();
+			aph[i].dim/=7;
+            Screen.DrawTexture(mark, false, aph[i].pos.x, aph[i].pos.y, DTA_VirtualWidthF, resolution.x, DTA_VirtualHeightF, resolution.y, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, aph[i].alpha, DTA_DestWidthF, aph[i].dim.x, DTA_DestHeightF, aph[i].dim.y);//, DTA_DestWidthF, aph[i].dim.x, DTA_DestHeightF, aph[i].dim.y, DTA_CleanNoMove_1, true,
+
+			flarePos = FlareCoordinator.GetFlareCoords(aph[i].pos, 0.7, true, 1080);
+
+			if(!flarePos.z){continue;}
+			aph[i].dim = TexMan.GetScaledSize(halo);
+			aph[i].dim*=3;
+			Screen.DrawTexture(halo, false, flarePos.x, flarePos.y, DTA_VirtualWidthF, resolution.x, DTA_VirtualHeightF, resolution.y, DTA_LegacyRenderStyle,STYLE_Add, DTA_KEEPRATIO, true , DTA_Alpha, aph[i].alpha*flarePos.z, DTA_DestWidthF, aph[i].dim.x, DTA_DestHeightF, aph[i].dim.y);//, DTA_DestWidthF, aph[i].dim.x, DTA_DestHeightF, aph[i].dim.y, DTA_CleanNoMove_1, true,
+
+
+		}
+
+
+    }
+
+}
+
+class LensFlares : EventHandler {
+	ui CoronasController osh;
+	ui SunController osh2;
+	ui MoonController osh3;
+	ui FlickerCoronasController osh4;
+	ui FlickerCoronasController osh5;
+
+	override void RenderOverlay( RenderEvent e )
+	{
+		if (Cvar.GetCVar("RENDER_CORONAS", players[consoleplayer]).GetInt() > 0){
+			if ( !osh ){
+				osh = new("CoronasController").Init("LEFLW0", "LightFlareStat1");
+				StatusBar.AttachMessage(osh,0,StatusBar.HUDMSGLayer_UnderHUD);
+			}
+			osh.update(e);
+
+			if ( !osh4 ){
+				osh4 = new("FlickerCoronasController").Init(e, "FLFIRE", "FlareFire");
+				StatusBar.AttachMessage(osh4,0,StatusBar.HUDMSGLayer_UnderHUD);
+			}
+			osh4.update(e);
+
+
+			if ( !osh5 ){
+				osh5 = new("FlickerCoronasController").Init(e, "FLFIRE", "FlareAltFire");
+				StatusBar.AttachMessage(osh5,0,StatusBar.HUDMSGLayer_UnderHUD);
+			}
+			osh5.update(e);
+
+		}
+		if (Cvar.GetCVar("RENDER_SUN_LENS_FLARE", players[consoleplayer]).GetInt() > 0){
+			if ( !osh2 ){
+				osh2 = new("SunController").Init(e);
+				StatusBar.AttachMessage(osh2,0,StatusBar.HUDMSGLayer_UnderHUD);
+			}
+			osh2.update(e);
+
+			if ( !osh3 ){
+				osh3 = new("MoonController").Init(e);
+				StatusBar.AttachMessage(osh3,0,StatusBar.HUDMSGLayer_UnderHUD);
+			}
+			osh3.update(e);
+
+		}
+	}
+}
+
+
+
+
+Class SDPWHScreenEffects : StaticEventHandler
+{
+
+
+	override void WorldLoaded(WorldEvent e){
+		Super.WorldLoaded(e);
+
+		//Cvar.GetCvar("vid_aspect",players[consoleplayer]).SetInt(0);
+		CallACS("splashScreen", 0, 0, 0, 0);
+	}
+
+	override void RenderOverlay(RenderEvent e)
+	{
+		PlayerInfo players = players[consoleplayer];
+
+		if(players.mo.FindInventory("PlayerDamagedMarker")){
+			Shader.SetEnabled(players,"Vignette", true );
+			Shader.SetUniform1f(players, "Vignette", "vignetteScale", 1.0); //more bigger effect
+			Shader.SetUniform1f(players,"Vignette", "vignetteOpacity" , 0.5 );
+			Shader.SetUniform3f(players,"Vignette", "vignetteColor", ( 255 / 255, 16 / 255, 13 / 255) );
+			Shader.SetUniform3f(players,"Vignette", "vignetteWeights", (0.99, 0.98, 0.98) );
+		} else {
+			Shader.SetEnabled(players,"Vignette", false );
+		}
+
+		if(players.mo.FindInventory("poisoningController")){
+			Shader.SetEnabled(players, "TonemapPoison", true);
+
+		} else {
+			Shader.SetEnabled(players, "TonemapPoison", false);
+		}
+
+		if(players.mo.FindInventory("DamnVision")){
+			Shader.SetEnabled(players, "TonemapDamned", true);
+
+		} else {
+			Shader.SetEnabled(players, "TonemapDamned", false);
+		}
+
+
+		if(players.mo.FindInventory("SixVision")){
+			Shader.SetEnabled(players, "TonemapVision", true);
+
+		} else {
+			Shader.SetEnabled(players, "TonemapVision", false);
+		}
+
+
+		Shader.SetUniform1f(players, "dscHeatHaze", "timer", gametic + e.FracTic);
+		if(players.mo.FindInventory("HeatHazeTimerInv")) Shader.SetUniform1f(players, "dscHeatHaze", "timer", gametic + e.FracTic);
+		else Shader.SetEnabled(players, "dscHeatHaze", false);
+
+		if(!players.mo.FindInventory("NoTiltShift") && ((level.mapName == "TITLEMAP") || (level.mapName == "INTRO") || players.mo.FindInventory("poisoningController"))){
+			Shader.SetEnabled(players, "TiltShiftPass1", true);
+			Shader.SetEnabled(players, "TiltShiftPass2", true);
+			Shader.SetEnabled(players, "TiltShiftPass3", true);
+		} else {
+			Shader.SetEnabled(players, "TiltShiftPass1", false);
+			Shader.SetEnabled(players, "TiltShiftPass2", false);
+			Shader.SetEnabled(players, "TiltShiftPass3", false);
+		}
+		if (Cvar.GetCVar("dpwh_filmictonemap", players).GetInt() > 0){
+			DisableLUTshaders();
+			Shader.SetEnabled(players, "TonemapBlood", true);
+			/*if((level.mapName == "TITLEMAP")){
+				DisableLUTshaders();
+				Shader.SetEnabled(players, "TonemapTitlemap", true);
+			}*/
+
+		} else {DisableLUTshaders();}
+
+
+		if (Cvar.GetCVar("dpwh_chromaticAberration", players).GetInt() > 0)
+		{
+			//Cvar.GetCvar("gl_lens",players).SetInt(0);
+			EnableCubicCA();
+		}
+		else
+		{
+			DisableCubicCA();
+		}
+		if (Cvar.GetCVar("dpwh_naturalVignette", players).GetInt() > 0)
+		{
+			EnableNaturalVignette();
+		}
+		else
+		{
+			DisableNaturalVignette();
+		}
+
+		if (Cvar.GetCVar("dpwh_filmgrain", players).GetInt() > 0)
+		{
+			EnableFilmGrain(e);
+		}
+		else
+		{
+			DisableFilmGrain();
+		}
+
+
+	//item titles on pointer
+		if(players.mo.FindInventory("z_PointController")){
+			z_PointController pointer = z_PointController(players.mo.FindInventory("z_PointController"));
+			if(pointer.PointerText != ""){
+				string Text = String.Format("%s\n%s", pointer.ActorName, pointer.PointerText);
+				int x = SmallFont.StringWidth(Text) +1;
+				screen.DrawText(SmallFont, Font.CR_WHITE, 320.0, 150.0, Text, DTA_KeepRatio, true, DTA_VirtualWidth, 640+x, DTA_VirtualHeight, 400);
+			}
+		}
+
+	//render fullscreen blood splashes in battle
+		string SplashName;
+		TextureID ScreenBlood;
+		for(int i=0; i<11; i++){
+			SplashName = String.Format("ScreenBloodSplash_%i", i);
+			if(players.mo.FindInventory(SplashName)){
+				//ScreenBloodSplash Splash = ScreenBloodSplash(players.mo.FindInventory(SplashName));
+				let Splash = ScreenBloodSplash(players.mo.FindInventory(SplashName));
+				if(Splash){
+					ScreenBlood = TexMan.CheckForTexture(Splash.Tex,TexMan.Type_Any);
+					screen.DrawTexture(ScreenBlood, false, Splash.X, Splash.Y, DTA_VirtualWidth, 1024, DTA_VirtualHeight, 768, DTA_Alpha, Splash.alpha);
+				}
+
+			}
+		}
+		for(int i=0; i<11; i++){
+			SplashName = String.Format("ScreenBloodSplashGreen_%i", i);
+			if(players.mo.FindInventory(SplashName)){
+				//ScreenBloodSplash Splash = ScreenBloodSplash(players.mo.FindInventory(SplashName));
+				let Splash = ScreenBloodSplash(players.mo.FindInventory(SplashName));
+				if(Splash){
+					ScreenBlood = TexMan.CheckForTexture(Splash.Tex,TexMan.Type_Any);
+					screen.DrawTexture(ScreenBlood, false, Splash.X, Splash.Y, DTA_VirtualWidth, 1024, DTA_VirtualHeight, 768, DTA_Alpha, Splash.alpha);
+				}
+
+			}
+		}
+	//render fx picture on screen
+
+		if(players.mo.FindInventory("HealEffect")){
+			let Splash = HealEffect(players.mo.FindInventory("HealEffect"));
+			if(Splash){
+				TextureID HEALFX = TexMan.CheckForTexture("HEALFX",TexMan.Type_Any);
+				screen.DrawTexture(HEALFX, false, 320.0, 240.0, DTA_VirtualWidth, 640, DTA_VirtualHeight, 480, DTA_Alpha, Splash.alpha);
+			}
+		}
+		if(players.mo.FindInventory("CarnageEffect")){
+			let Splash = CarnageEffect(players.mo.FindInventory("CarnageEffect"));
+			if(Splash){
+				TextureID CRNGFX = TexMan.CheckForTexture("CRNGFX",TexMan.Type_Any);
+				screen.DrawTexture(CRNGFX, false, 320.0, 240.0, DTA_VirtualWidth, 640, DTA_VirtualHeight, 480, DTA_Alpha, Splash.alpha);
+			}
+		}
+		if(players.mo.FindInventory("CarnageEffect1")){
+			let Splash = CarnageEffect1(players.mo.FindInventory("CarnageEffect1"));
+			if(Splash){
+				TextureID CRNGFX = TexMan.CheckForTexture("CRNGFX1",TexMan.Type_Any);
+				screen.DrawTexture(CRNGFX, false, 320.0, 240.0, DTA_VirtualWidth, 640, DTA_VirtualHeight, 480, DTA_Alpha, Splash.alpha);
+			}
+		}
+		if(players.mo.FindInventory("DominationEffect")){
+			let Splash = DominationEffect(players.mo.FindInventory("DominationEffect"));
+			if(Splash){
+				TextureID DOMNFX = TexMan.CheckForTexture("DOMNFX",TexMan.Type_Any);
+				screen.DrawTexture(DOMNFX, false, 320.0, 240.0, DTA_VirtualWidth, 640, DTA_VirtualHeight, 480, DTA_Alpha, Splash.alpha);
+			}
+		}
+		if(players.mo.FindInventory("SurvivalEffect")){
+			let Splash = SurvivalEffect(players.mo.FindInventory("SurvivalEffect"));
+			if(Splash){
+				TextureID SURVFX = TexMan.CheckForTexture("SURVFX",TexMan.Type_Any);
+				screen.DrawTexture(SURVFX, false, 320.0, 240.0, DTA_VirtualWidth, 640, DTA_VirtualHeight, 480, DTA_Alpha, Splash.alpha);
+			}
+		}
+
+	//render spider stunweb on screen
+
+		if(players.mo.FindInventory("WebStunController")){
+			let WB = WebStunController(players.mo.FindInventory("WebStunController"));
+			if(WB){
+				TextureID WEB = TexMan.CheckForTexture("WWWBC0",TexMan.Type_Any);
+				screen.DrawTexture(WEB, false, 320.0, 240.0, DTA_VirtualWidth, 640, DTA_VirtualHeight, 480, DTA_Alpha, WB.alpha/2);
+			}
+		}
+
+	}
+
+
+	ui void DisableLUTshaders(void)
+	{
+		PlayerInfo players = players[consoleplayer];
+		Shader.SetEnabled(players, "TonemapDefault", false);
+		Shader.SetEnabled(players, "TonemapBlood", false);
+
+	}
+
+
+	ui void EnableFilmGrain(RenderEvent e)
+	{
+		PlayerInfo players = players[consoleplayer];
+		Shader.SetUniform1f(players, "FilmGrain", "timer", gametic + e.FracTic);
+		Shader.SetEnabled(players, "FilmGrain", true);
+	}
+
+	ui void DisableFilmGrain(void)
+	{
+		PlayerInfo players = players[consoleplayer];
+		Shader.SetEnabled(players, "FilmGrain", false);
+	}
+
+
+
+	ui void EnableNaturalVignette(void)
+	{
+		PlayerInfo players = players[consoleplayer];
+		Shader.SetEnabled(players, "NaturalVignette", true);
+	}
+
+	ui void DisableNaturalVignette(void)
+	{
+		PlayerInfo players = players[consoleplayer];
+		Shader.SetEnabled(players, "NaturalVignette", false);
+	}
+
+	ui void EnableCubicCA(void)
+	{
+		PlayerInfo players = players[consoleplayer];
+		Shader.SetEnabled(players, "CubicCA", true);
+	}
+
+	ui void DisableCubicCA(void)
+	{
+		PlayerInfo players = players[consoleplayer];
+		Shader.SetEnabled(players, "CubicCA", false);
+	}
+
+}
+
+
+
+
+
+class NoTiltShift : Undroppable {}

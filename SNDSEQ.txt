@@ -1,0 +1,74 @@
+
+
+:PlyDoorRotateNormalOpen
+  /* platform 1
+   playuntildone Plat1BEG
+   playrepeat Plat1MID
+   stopsound Plat1END*/
+
+   play			world/smallDoorOpenScreep
+   stopsound	world/MediumStop2
+
+end
+
+
+:PlyDoorRotateNormalClose
+
+   play			world/SmallDoorOpenScreep2
+   stopsound	world/MediumStop2
+
+end
+
+
+:WoodDoorVerticalOpen
+	//playrepeat  world/bigSlideLoop
+	play			world/WoodSlide
+	stopsound	world/WoodSlideStop
+end
+:WoodDoorVerticalClose
+	//playrepeat  world/bigSlideLoop
+	play			world/StartMove
+	stopsound	world/BigMoveStop
+end
+[DoorNormal
+ 0		WoodDoorVerticalOpen
+ 1		WoodDoorVerticalClose
+]
+
+
+
+:IronDoorOpen
+	play			world/MetalSlideStart
+	stopsound		world/GreatStop
+end
+
+:IronDoorClose
+	play			world/MetalSlideStart
+	stopsound		world/GreatStop
+end
+[DoorMetal
+ 0		IronDoorOpen
+ 1		IronDoorClose
+]
+
+:BigStoneMove
+playrepeat  world/StoneLoop
+stopsound	world/GreatStoneStop
+end
+
+:CellGates
+play			world/MetalSlideStop
+end
+
+
+:WoodPlatform
+playrepeat  world/bigSlideLoop
+stopsound	world/WoodSlideStop
+end
+
+:MetallMove
+playrepeat  world/MetalLoop
+stopsound	world/MecStop
+end
+
+

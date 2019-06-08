@@ -1,0 +1,1035 @@
+Class Caleb : PlayerPawn
+{
+	int HoldFire;
+	int OldHealth;
+	default
+	{
+	Player.forwardMove 0.75, 0.70;
+	player.displayname "Caleb";
+	player.soundclass "Caleb";
+	+NOBLOODDECALS;
+	+THRUGHOST;
+
+	player.startitem "Pitchfork";
+	player.startitem "NoWeapon";
+	player.startitem "RatWeapon";
+
+
+	Player.ViewBob 0.5;
+
+	Stamina 100;
+    Player.CrouchSprite "CALC";
+
+	Player.WeaponSlot 1, "PitchFork";
+	Player.WeaponSlot 2, "FlareGun";
+	Player.WeaponSlot 3, "z_SawedoffDouble", "Sawedoff";//, "z_SawedoffDouble";
+	Player.WeaponSlot 4, "TommyGun";
+	//Player.WeaponSlot 5, "NapalmLauncher"
+	Player.WeaponSlot 6, "RemoteDynamite", "Dynamite";
+	/*Player.WeaponSlot 7, "SprayCan"
+	Player.WeaponSlot 8, "TeslaRifle"
+	Player.WeaponSlot 9, "LifeLeech"
+	Player.WeaponSlot 0, "VoodooDoll"
+	*/
+	/*
+	DamageFactor "Blast", 0.544
+	DamageFactor "Flare", 3
+	DamageFactor "Shock", 0.75
+	DamageFactor "Napalm", 1.22
+	*/
+	Player.AttackZOffset 16;
+	//Friction 1.1;
+	  Player.ColorRange 112, 127;
+
+
+	  Player.ColorSet 0, "Light Gray",    0x58, 0x67,  0x5A;
+	  Player.ColorSet 1, "Gray",          0x60, 0x6F,  0x62;
+	  Player.ColorSet 2, "Brown",         0x40, 0x4F,  0x42;
+	  Player.ColorSet 3, "Red",           0x20, 0x2F,  0x22;
+
+	  Player.ColorSet 4, "Green",         0x70, 0x7F,  0x72;
+	  Player.ColorSet 5, "Light Brown",   0x38, 0x47,  0x3A;
+	  Player.ColorSet 6, "Light Red",     0xB0, 0xBF,  0xB2;
+	  Player.ColorSet 7, "Light Blue",    0xC0, 0xCF,  0xC2;
+
+
+	player.jumpz 10;//jumping distance increased
+	Player.DamageScreenColor "dd 11 00", .8;
+	Player.DamageScreenColor "ff 88 11", .8, "Fire";
+	Player.DamageScreenColor "22 88 22", 1, "Electro";
+
+	PainChance "fire", 64;
+	DamageFactor "fire", 0.5;
+	DamageFactor "Blast", 0.5;
+	DamageFactor "PlayerJumpDownDamage", 0.0;
+	DamageFactor "KineticPlayerDamage", 0.0;
+
+	XScale 0.6;
+	YScale 0.6;
+	+ThruSpecies;
+	Species "PlayerThrough";
+	Mass 500;
+
+
+	}
+	override void Tick(){
+		super.tick();
+		if(OldHealth && Health>OldHealth && !checkInventory("HealEffect", 1)){
+			giveInventory("HealEffect", 1);
+			a_PlaySound("items/heartpickup");
+		}
+		OldHealth = Health;
+	}
+	override void CheatGive (String name, int amount){
+		if (name ~== "all" || name == "firebug"){
+			GiveInventory("FireBug", 1);
+		}
+		if (name ~== "all" || name == "armor"){
+			GiveInventory("BodyArmor", 200);
+			GiveInventory("FireArmor", 200);
+			GiveInventory("SpiritArmor", 200);
+		}
+		if (name ~== "all"){
+
+			GiveInventory("NoTutorial", 1);
+			GiveInventory("Curse", 100);
+			GiveInventory("AM_Carnage", 3);
+			GiveInventory("AM_Domination", 3);
+			GiveInventory("AM_Survival", 3);
+			AbilityController AC = AbilityController(findInventory("AbilityController"));
+			AC.NoTutorial = 1;
+			AC.analize();
+			AC.NoTutorial = 0;
+
+		}
+		Super.CheatGive(name, amount);
+		A_TakeInventory("ThrowPower", 100);
+	}
+
+
+
+
+
+
+    states
+
+    {
+    Spawn:
+		CALB I 1;
+		Loop;
+	See:
+		CALB AAAABBBBCCCCDDDDEEEEFFFF 1 ;
+		CALB F 1 A_JumpIf(waterlevel>1,"SwimThaw");
+		Loop;
+	Missile:
+		CALB IIII 1;
+		CALB I 1 A_JumpIf(waterlevel>1,"SwimThaw");
+		Goto Spawn;
+	Melee:
+		CALB GGGGGG 1 BRIGHT;
+		Goto Missile;
+		Pain.GOUPBOY:
+		CALB H 0 ThrustThingZ(0,60,0,1);
+	Pain.fire:
+		TNT1 a 0 giveInventory("Burner", 1);
+	Pain:
+		CALB H 0 ;
+		CALB HHHH 1;
+		TNT1 A 0 A_Playsound("CalebPain");
+		CALB HHHH 1;
+		Goto Spawn;
+
+	SwimThaw:
+		CALE A 4;
+		CALE BCD 4;
+		CALE A 0 A_JumpIf(Waterlevel<1,"StopSwim");
+		Loop;
+	StopSwim:
+		CALE A 4;
+		Goto See;
+
+	Death:
+
+		TNT1 A 0 A_NoBlocking;
+		CALB JJJJJJJJJJ 1;
+		TNT1 A 0 A_Playsound("Caleb/Death");
+		CALB KKKKKKKKKK 1;
+
+		CALB LLLLLLLLLL 1;
+		CALB MMMMMMMMMMNNNNNNNNNN 1;
+		CALB O -1;
+		Stop;
+	XDeath:
+		CALX A 0 A_NoBlocking;
+		CALX A 7;
+		CALX B 8 A_Playsound("misc/gibbed");
+		CALX C 8 ;
+		CALX DEFGHIJK 8;
+		CALX L -1;
+		Stop;
+    }
+}
+
+
+class HealEffect  : Undroppable
+{
+	override void DoEffect(){
+		a_fadeOut(0.05);
+		if(Owner && alpha<=0){
+			Owner.takeInventory(getClassName(), 1);
+		}
+	}
+
+}
+
+class CarnageEffect  : HealEffect {}
+class CarnageEffect1  : HealEffect {}
+class DominationEffect  : HealEffect {}
+class SurvivalEffect  : HealEffect {}
+
+
+
+//https://github.com/ValveSoftware/source-sdk-2013/blob/master/mp/src/game/shared/gamemovement.cpp
+
+class CalebMovementModel : DoomPlayer
+{
+		const m_flMaxSpeed = 480.0 * ups;
+	const m_flMaxSpeedCrouch = 320 * ups;
+	const DBL_EPSILON =	2.2204460492503131e-016;
+	const JumpHeight = 56.0f;
+	const flMul = 268.3281572999747f;
+    const maxYaw = 65536.0;
+    const maxPitch = 65536.0;
+    const maxForwardMove = 12800;
+    const maxSideMove = 10240;
+    const maxUpMove = 768;
+	const ups = 1.0 / ticRate;
+
+	Default
+	{
+		Speed m_flMaxSpeed;
+	}
+
+	enum EWaterLevel
+	{
+		WL_NotInWater=0,
+		WL_Feet,
+		WL_Waist,
+		WL_Eyes
+	}
+
+	enum MoveType
+	{
+		MOVETYPE_WALK,
+		MOVETYPE_FLY,
+		MOVETYPE_NOCLIP
+	}
+
+	double sv_accelerate;
+	double sv_maxvelocity;
+	double sv_stopspeed;
+	double sv_friction;
+	double sv_airaccelerate;
+	double sv_noclipspeed;
+	double sv_noclipaccelerate;
+
+	bool isCrouching;
+
+	double GetCurrentGravity()
+	{
+		return CVar.GetCVar("sv_hlGravity").GetFloat();
+	}
+
+	double GetJumpHeight()
+	{
+		return sqrt(2 * GetCurrentGravity() * JumpHeight) * ups;
+	}
+
+	override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+
+		JumpZ = GetJumpHeight();
+		sv_accelerate 		= 	CVar.GetCVar("sv_accelerate").GetFloat() * ups;
+		sv_maxvelocity 		= 	CVar.GetCVar("sv_maxvelocity").GetFloat() * ups;
+		sv_stopspeed 		=  	CVar.GetCVar("sv_stopspeed").GetFloat() * ups;
+		sv_friction			= 	CVar.GetCVar("sv_friction").GetFloat();
+		sv_airaccelerate 	= 	CVar.GetCVar("sv_airaccelerate").GetFloat() * ups;
+		sv_noclipspeed		= 	CVar.GetCVar("sv_noclipspeed").GetFloat();
+		sv_noclipaccelerate =	CVar.GetCVar("sv_noclipaccelerate").GetFloat();
+	}
+
+	override void CheckCrouch(bool totallyfrozen)
+	{
+		isCrouching = CanCrouch() && level.IsCrouchingAllowed() && (IsPressed(BT_Crouch) || player.crouching < 0);
+		Super.CheckCrouch(totallyfrozen);
+	}
+
+    bool IsPressed(int bt)
+    {
+        return player.cmd.buttons & bt;
+    }
+
+    bool JustPressed(int bt)
+    {
+        return (player.cmd.buttons & bt) && !(player.oldButtons & bt);
+    }
+
+	bool CheckWater()
+	{
+		return waterlevel > WL_Feet;
+	}
+
+	int GetWaterLevel()
+	{
+		return waterlevel;
+	}
+
+	virtual bool GetGroundEntity()
+	{
+		return player.OnGround;
+	}
+
+	override void PlayerThink()
+	{
+		player.OnGround = (pos.z <= floorz) || bOnMobj || bMBFBouncer || (player.cheats & CF_NOCLIP2);
+		Super.PlayerThink();
+	}
+
+	virtual void HandleSpeed()
+	{
+		Speed = (isCrouching) ? m_flMaxSpeedCrouch : m_flMaxSpeed;
+		forwardMove2 = SideMove2 = (isCrouching) ? 0.5f : 1.0f;
+	}
+
+	override void HandleMovement()
+	{
+		HandleSpeed();
+		let player = self.player;
+		// [RH] Check for fast turn around
+		FixPlayerInput();
+		if (JustPressed(BT_TURN180))
+		{
+			player.turnticks = TURN180_TICKS;
+		}
+		// Handle movement
+		if (reactiontime)
+		{ // Player is frozen
+			reactiontime--;
+		}
+		else
+		{
+			CheckYaw();
+			switch(GetMoveType())
+			{
+				case MOVETYPE_NOCLIP:
+				FullNoClipMove(sv_noclipspeed, sv_noclipaccelerate);
+				break;
+				case MOVETYPE_FLY:
+				FullTossMove();
+				break;
+				case MOVETYPE_WALK:
+				FullWalkMove();
+				break;
+			}
+
+
+			CheckJump();
+		//	CheckMoveUpDown();
+		}
+	}
+
+    virtual void FixPlayerInput()
+    {
+        UserCmd cmd = player.cmd;
+
+		if(GetWaterLevel() >= WL_Feet || GetMoveType() == MOVETYPE_NOCLIP)
+		{
+            if (IsPressed(BT_Jump))
+            {
+                cmd.upMove = maxUpMove;
+            }
+
+            if (IsPressed(BT_Crouch))
+            {
+                cmd.upMove = -maxUpMove;
+            }
+		}
+    }
+
+
+    virtual void CheckYaw()
+    {
+		let player = self.player;
+		UserCmd cmd = player.cmd;
+
+		// [RH] 180-degree turn overrides all other yaws
+		if (player.turnticks)
+		{
+			player.turnticks--;
+			Angle += (180. / TURN180_TICKS);
+		}
+		else
+		{
+			Angle += cmd.yaw * (360./65536.);
+		}
+    }
+
+	void Normalize(Vector3 vec)
+	{
+		double length = vec.Length();
+		vec.x /= length;
+		vec.y /= length;
+		vec.z /= length;
+	}
+
+	double VectorNormalize(Vector3 vec)
+	{
+		double radius = vec.Length();
+
+		float iradius = 1.f / ( radius + DBL_EPSILON );
+
+		vec.x *= iradius;
+		vec.y *= iradius;
+		vec.z *= iradius;
+
+		return radius;
+	}
+
+	virtual bool CanAccelerate()
+	{
+		return true;
+	}
+
+	virtual double GetAirSpeedCap()
+	{
+		return 30.f;
+	}
+
+	virtual void AirAccelerate(Vector3 wishdir, float wishspeed, float accel)
+	{
+		double wishspd = wishSpeed;
+
+		if(wishspd > GetAirSpeedCap())
+			wishspd = GetAirSpeedCap();
+
+		double currentSpeed = vel dot wishdir;
+
+		double addSpeed = wishspd - currentSpeed;
+		if(addSpeed <= 0)
+			return;
+
+		double accelSpeed = accel * wishSpeed * GetFriction();
+		if(accelSpeed > addSpeed)
+			accelSpeed = addSpeed;
+
+		vel += accelSpeed * wishdir;
+	}
+
+	virtual void BobAirAccelerate(Vector3 wishdir, float wishspeed, float accel)
+	{
+		double wishspd = wishSpeed;
+
+		if(wishspd > GetAirSpeedCap())
+			wishspd = GetAirSpeedCap();
+
+		double currentSpeed = player.vel dot wishdir.xy;
+		double addSpeed = wishspd - currentSpeed;
+		if(addSpeed <= 0)
+			return;
+
+		double accelSpeed = accel * wishSpeed * GetFriction();
+		if(accelSpeed > addSpeed)
+			accelSpeed = addSpeed;
+
+		player.vel += accelSpeed * wishdir.xy;
+	}
+
+	virtual void Accelerate(Vector3 wishdir, float wishspeed, float accel)
+	{
+		if( !CanAccelerate() )
+			return;
+
+		double currentSpeed = vel dot wishdir;
+		double addSpeed = wishSpeed - currentSpeed;
+
+		if(addSpeed <= 0)
+			return;
+		double accelSpeed = accel * wishSpeed * GetFriction();
+		if(accelSpeed > addSpeed)
+			accelSpeed = addSpeed;
+
+		vel += accelSpeed * wishdir;
+	}
+
+    virtual void BobAccelerate(Vector3 wishDir, double wishSpeed, double accel)
+    {
+		if( !CanAccelerate() )
+			return;
+
+        double currentSpeed = player.vel dot wishDir.xy;
+        double addSpeed = wishSpeed - currentSpeed;
+
+        if (addSpeed <= 0) return;
+
+		double accelSpeed = accel * wishSpeed  * GetFriction();
+		if(accelSpeed > addSpeed)
+			accelSpeed = addSpeed;
+
+        player.vel += accelSpeed * wishDir.xy;
+    }
+
+	virtual void FullNoClipMove(double factor, double maxacceleration)
+	{
+		UserCmd cmd = player.cmd;
+		if (cmd.forwardMove || cmd.sideMove || cmd.upMove)
+		{
+			double fm = cmd.forwardmove;
+			double sm = cmd.sidemove;
+			double um = cmd.upMove;
+
+			[fm, sm, um] = TweakSpeeds3(fm, sm, um);
+            fm /= maxForwardMove;
+            sm /= maxSideMove;
+			um /= maxUpMove;
+
+            double scale = CmdScale();
+            fm *= scale;
+            sm *= scale;
+            um *= scale;
+
+			if(JustPressed(BT_SPEED))
+			{
+				factor /= 2.0f;
+			}
+
+			fm *= factor;
+			sm *= factor;
+			um *= factor;
+
+            Vector3 forward = (Cos(pitch) * Cos(angle), Cos(pitch) * Sin(angle), -Sin(pitch));
+            Vector3 right = (AngleToVector(angle - 90), 0);
+			Normalize(forward);
+			Normalize(right);
+
+			Vector3 wishVel = fm * forward + sm * right;
+			wishVel.z += um;
+
+            Vector3 wishDir = wishVel.Unit();
+			Normalize(wishDir);
+
+            double wishSpeed = wishVel.Length();
+			double maxSpeed = m_flMaxSpeed * factor;
+
+			if(wishSpeed > maxSpeed) {
+				wishVel *=  maxSpeed/wishSpeed;
+				wishSpeed = maxSpeed;
+			}
+			if(maxacceleration > 0) {
+				Accelerate(wishDir, wishSpeed, maxacceleration);
+				BobAccelerate(wishDir, wishSpeed,  maxacceleration);
+
+				double spd = Vel.Length();
+				if(spd < 1.0f) {
+					Vel = (0.0, 0.0, 0.0);
+					player.Vel = (0.0, 0.0);
+					return;
+				}
+
+				double control = (spd < maxSpeed/4.0) ? maxSpeed/4.0 : spd;
+				double friction = sv_friction * GetFriction();
+
+				double drop = control * friction;
+				double newspeed = spd - drop * ups;
+				if(newspeed < 0)
+					newspeed = 0;
+
+				newspeed /= spd;
+				Vel *= newSpeed;
+			}
+			else
+			{
+				vel = wishVel;
+			}
+
+			if (!(player.cheats & CF_PREDICTING) && (fm != 0 || sm != 0))
+			{
+				PlayRunning ();
+			}
+
+			if (player.cheats & CF_REVERTPLEASE)
+			{
+				player.cheats &= ~CF_REVERTPLEASE;
+				player.camera = player.mo;
+			}
+		}
+		else
+		{
+			Vel = (0.0, 0.0, 0.0);
+			player.Vel = (0.0, 0.0);
+		}
+	}
+
+	virtual void FullTossMove()
+	{
+		UserCmd cmd = player.cmd;
+
+		if (cmd.forwardMove || cmd.sideMove || cmd.upMove)
+		{
+			double fm = cmd.forwardmove;
+			double sm = cmd.sidemove;
+			double um = cmd.upMove;
+
+			[fm, sm, um] = TweakSpeeds3(fm, sm, um);
+            fm /= maxForwardMove;
+            sm /= maxSideMove;
+			um /= maxUpMove;
+
+            double scale = CmdScale();
+            fm *= scale;
+            sm *= scale;
+            um *= scale;
+
+            Vector3 forward = (Cos(pitch) * Cos(angle), Cos(pitch) * Sin(angle), -Sin(pitch));
+            Vector3 right = (AngleToVector(angle - 90), 0);
+
+			Normalize(forward);
+			Normalize(right);
+
+			Vector3 wishVel = fm * forward + sm * right;
+
+			wishVel.z += um;
+
+            Vector3 wishDir = wishVel.Unit();
+			Normalize(wishDir);
+            double wishSpeed = wishVel.Length();
+
+			if(wishSpeed > m_flMaxSpeed) {
+				wishVel *=  m_flMaxSpeed/wishSpeed;
+				wishSpeed = m_flMaxSpeed;
+			}
+
+			Accelerate(wishDir, wishSpeed, sv_accelerate);
+			BobAccelerate(wishDir, wishSpeed, sv_accelerate);
+
+			if (!(player.cheats & CF_PREDICTING) && (fm != 0 || sm != 0))
+			{
+				PlayRunning ();
+			}
+
+			if (player.cheats & CF_REVERTPLEASE)
+			{
+				player.cheats &= ~CF_REVERTPLEASE;
+				player.camera = player.mo;
+			}
+		}
+
+		if(vel.z > 0) {
+			player.OnGround = false;
+		}
+
+		CheckVelocity();
+	}
+
+	virtual void WalkMove()
+	{
+		UserCmd cmd = player.cmd;
+
+		if (cmd.forwardMove || cmd.sideMove) {
+
+			double fm = cmd.forwardmove;
+			double sm = cmd.sidemove;
+
+			[fm, sm] = TweakSpeeds(fm, sm);
+            fm /= maxForwardMove;
+            sm /= maxSideMove;
+			double scale = CmdScale();
+			fm *= scale;
+			sm *= scale;
+
+			Vector3 forward = (AngleToVector(angle), 0);
+			Vector3 right =  (AngleToVector(angle-90), 0);
+
+			Normalize(forward);
+			Normalize(right);
+
+            Vector3 wishVel = fm * forward + sm * right;
+
+            Vector3 wishDir = wishVel.Unit();
+			Normalize(wishDir);
+            double wishSpeed = wishVel.Length();
+
+			Accelerate(wishDir, wishSpeed,  sv_accelerate);
+			BobAccelerate(wishDir, wishSpeed,  sv_accelerate);
+
+			if (!(player.cheats & CF_PREDICTING) && (fm != 0 || sm != 0))
+			{
+				PlayRunning ();
+			}
+
+			if (player.cheats & CF_REVERTPLEASE)
+			{
+				player.cheats &= ~CF_REVERTPLEASE;
+				player.camera = player.mo;
+			}
+		}
+	}
+
+    virtual double CmdScale()
+    {
+		UserCmd cmd = player.cmd;
+        double fm = double(cmd.forwardMove) / maxForwardMove;
+        double sm = double(cmd.sideMove) / maxSideMove;
+        double um = double(cmd.upMove) / maxUpMove;
+
+        double maxCmd = Max(Abs(fm), Abs(sm), Abs(um));
+        double total = (fm, sm, um).Length();
+
+        double scale = total ? speed * maxCmd / total : 0;
+
+        //isRunning = scale > speed / 2;
+
+        return scale;
+    }
+
+    override void CheckJump()
+    {
+        if (JustPressed(BT_Jump))
+        {
+            if (level.IsJumpingAllowed() && player.onGround && player.jumpTics == 0)
+            {
+				//JumpZ = GetJumpHeight();
+                double jumpvelz = JumpZ * 35 / TICRATE;
+                double jumpfac = 0;
+
+                // [BC] If the player has the high jump power, double his jump velocity.
+                // (actually, pick the best factors from all active items.)
+                for (let p = Inv; p != null; p = p.Inv)
+                {
+                    let pp = PowerHighJump(p);
+                    if (pp)
+                    {
+                        double f = pp.Strength;
+                        if (f > jumpfac) jumpfac = f;
+                    }
+                }
+				if (jumpfac > 0) jumpvelz *= jumpfac;
+
+				if(GetWaterLevel() >= 2)
+				{
+					player.OnGround = false;
+
+					Vel.Z = 100;
+					player.jumpTics = -1;
+					return;
+				}
+				if(player.crouchoffset != 0)
+				{
+					Vel.Z = jumpvelz;
+				}
+				else
+				{
+					Vel.Z += jumpvelz;
+				}
+				CheckVelocity();
+                bOnMobj = false;
+                player.onGround = false;
+				player.jumpTics = -1;
+                if (!(player.cheats & CF_PREDICTING)) A_PlaySound("*jump", CHAN_BODY);
+            }
+        }
+    }
+/*
+	virtual void FinishGravity()
+	{
+		double ent_gravity = GetCurrentGravity();
+
+		Vel.Z -= (ent_gravity * 0.5 * ups);
+		CheckVelocity();
+	}
+
+	virtual void StartGravity()
+	{
+		double ent_gravity = GetCurrentGravity();
+
+		Vel.Z -= (ent_gravity * 0.5 * ups);
+		Vel.Z += GetJumpHeight();
+		CheckVelocity();
+	}
+	*/
+
+    virtual double, double, double TweakSpeeds3(double forward, double side, double up)
+    {
+        [forward, side] = TweakSpeeds(forward, side);
+
+        up *= 0.5;
+
+        return forward, side, up;
+    }
+
+
+	virtual void WaterMove()
+	{
+		UserCmd cmd = player.cmd;
+
+		if (cmd.forwardMove || cmd.sideMove || cmd.upMove)
+		{
+			double fm = cmd.forwardmove;
+			double sm = cmd.sidemove;
+			double um = cmd.upMove;
+
+			[fm, sm, um] = TweakSpeeds3(fm, sm, um);
+            fm /= maxForwardMove;
+            sm /= maxSideMove;
+			um /= maxUpMove;
+
+            double scale = CmdScale();
+            fm *= scale;
+            sm *= scale;
+            um *= scale;
+
+            Vector3 forward = (Cos(pitch) * Cos(angle), Cos(pitch) * Sin(angle), -Sin(pitch));
+            Vector3 right = (AngleToVector(angle - 90), 0);
+
+			Normalize(forward);
+			Normalize(right);
+            Vector3 wishVel = fm * forward + sm * right;
+
+			if (JustPressed(BT_Jump))
+			{
+				wishVel.z += 100;
+			}
+
+			if(!fm && !sm && !um)
+			{
+				wishVel.z -= 60;
+			}
+			else
+			{
+				double upwardMovememnt = fm * forward.z * 2;
+				upwardMovememnt = clamp(upwardMovememnt, 0.0f, 100 * ups);
+				wishVel.z += um + upwardMovememnt;
+			}
+            Vector3 wishDir = wishVel.Unit();
+			Normalize(wishDir);
+            double wishSpeed = wishVel.Length();
+
+			wishSpeed *= 0.8;
+
+			double speed = Vel.Length();
+			double newSpeed = 0;
+			if(speed) {
+				newSpeed = speed - speed * sv_friction * ups * GetFriction();
+				if(newSpeed < 0.1f) {
+					newSpeed = 0.0;
+				}
+				Vel *= newSpeed/speed;
+			}
+
+			if (wishspeed >= 0.1f) {
+				double addSpeed = wishSpeed - newSpeed;
+				if(addSpeed > 0)
+				{
+					double accelSpeed = sv_accelerate * wishSpeed * GetFriction();
+					if(accelSpeed > addSpeed) {
+						accelSpeed = addSpeed;
+					}
+
+					Vel.x += accelSpeed * wishDir.x;
+					Vel.y += accelSpeed * wishDir.y;
+					Vel.z += accelSpeed * wishDir.z;
+				}
+			}
+
+			if (!(player.cheats & CF_PREDICTING) && (fm != 0 || sm != 0))
+			{
+				PlayRunning ();
+			}
+
+			if (player.cheats & CF_REVERTPLEASE)
+			{
+				player.cheats &= ~CF_REVERTPLEASE;
+				player.camera = player.mo;
+			}
+		}
+	}
+
+	virtual void AirMove()
+	{
+		UserCmd cmd = player.cmd;
+
+		if (cmd.forwardMove || cmd.sideMove)
+		{
+			double fm = cmd.forwardmove;
+			double sm = cmd.sidemove;
+
+			[fm, sm] = TweakSpeeds(fm, sm);
+            fm /= maxForwardMove;
+            sm /= maxSideMove;
+			double scale = CmdScale();
+			fm *= scale;
+			sm *= scale;
+
+			Vector3 forward = (Cos(pitch) * Cos(angle), Cos(pitch) * Sin(angle), -Sin(pitch));
+			Vector3 right =  (AngleToVector(angle-90), 0);
+
+			forward.z = 0;
+			right.z = 0;
+
+			Normalize(forward);
+			Normalize(right);
+
+			Vector3 wishVel = fm * forward + sm * right;
+
+            Vector3 wishDir = wishVel.Unit();
+			Normalize(wishDir);
+            double wishSpeed = wishVel.Length();
+
+			if(wishSpeed != 0 && (wishSpeed > m_flMaxSpeed)) {
+				wishDir *= m_flMaxSpeed/wishSpeed;
+				wishSpeed = m_flMaxSpeed;
+			}
+
+			AirAccelerate(wishDir, wishSpeed, sv_airaccelerate);
+			BobAirAccelerate(wishDir, wishSpeed, sv_airaccelerate);
+
+			if (!(player.cheats & CF_PREDICTING) && (fm != 0 || sm != 0))
+			{
+				PlayRunning ();
+			}
+
+			if (player.cheats & CF_REVERTPLEASE)
+			{
+				player.cheats &= ~CF_REVERTPLEASE;
+				player.camera = player.mo;
+			}
+		}
+	}
+
+	virtual void FullWalkMove()
+	{
+		/*if(!CheckWater())
+		{
+			StartGravity();
+		}
+		*/
+		if(GetWaterLevel() >= WL_Waist)
+		{
+			WaterMove();
+
+			if(GetGroundEntity())
+			{
+				Vel.Z = 0;
+			}
+		}
+		else
+		{
+			if(player.cmd.buttons & BT_JUMP)
+			{
+				CheckJump();
+			}
+
+			if(GetGroundEntity())
+			{
+				Vel.z = 0;
+				Friction();
+			}
+
+			CheckVelocity();
+
+			if(GetGroundEntity())
+			{
+				WalkMove();
+			}
+			else
+			{
+				AirMove();
+			}
+
+			CheckVelocity();
+
+			if(GetGroundEntity())
+			{
+				Vel.Z = 0;
+			}
+		}
+	}
+
+	virtual void CheckVelocity()
+	{
+		double velArray[3];
+		velArray[0] = vel.x;
+		velArray[1] = vel.y;
+		velArray[2] = vel.z;
+		for(int i = 0; i < 3; ++i)
+		{
+			if(velArray[i] == double.NaN)
+			{
+				velArray[i] = 0;
+			}
+
+			if(velArray[i] > sv_maxvelocity)
+			{
+				velArray[i] = sv_maxvelocity;
+			}
+			else if(velArray[i] < -sv_maxvelocity)
+			{
+				velArray[i] = -sv_maxvelocity;
+			}
+		}
+
+		vel.x = velArray[0];
+		vel.y = velArray[1];
+		vel.z = velArray[2];
+
+		player.vel = vel.xy;
+	}
+
+	double RemapVal( double val, double A, double B, double C, double D)
+	{
+		if ( A == B )
+			return val >= B ? D : C;
+		return C + (D - C) * (val - A) / (B - A);
+	}
+
+	virtual void Friction()
+	{
+		double control;
+		double friction;
+		double speed = vel.Length();
+
+		if(speed < 0.1f) {
+			return;
+		}
+
+		double drop = 0;
+
+		if(GetGroundEntity())
+		{
+			friction = sv_friction / ticRate * GetFriction();
+
+			control = (speed < sv_stopspeed) ? sv_stopspeed : speed;
+
+			drop += control * friction;
+		}
+
+		double newSpeed = speed - drop;
+		if(newSpeed < 0)
+			newSpeed = 0;
+		if(newSpeed != speed)
+		{
+			newSpeed /= speed;
+			vel *= newSpeed;
+			player.vel *= newSpeed;
+		}
+	}
+
+	virtual int GetMoveType()
+	{
+		//bool bNoClip = (player.cheats & (CF_NOCLIP | CF_NOCLIP2) || Default.bNoClip);
+		if(bNoClip) return MOVETYPE_NOCLIP;
+		if(bNoGravity) return MOVETYPE_FLY;
+		return MOVETYPE_WALK;
+	}
+
+}

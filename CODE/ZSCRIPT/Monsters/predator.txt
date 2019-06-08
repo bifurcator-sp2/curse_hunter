@@ -1,0 +1,86 @@
+class z_Predator : SwitchableDecoration
+{
+
+	default{
+		+NOINTERACTION;
+		-NOGRAVITY;
+		scale 0.75;
+	}
+
+	states
+	{
+		Spawn:
+		Inactive:
+			TNT1 A 10;
+			Loop;
+		Active:
+			PRED A 1 {
+				if(target && target.InStateSequence(target.CurState, target.ResolveState("Spawn"))){
+					a_faceTarget();
+					A_SpawnProjectile("PredatorProjectile", 72);
+					a_playSound("predator/fireMissile");
+				}
+
+			}
+			PRED A 190;
+			PRED A 0 a_playSound("predator/yell");
+		Death:
+			PRED A 1 a_fadeOut(0.02);
+			loop;
+
+	}
+
+}
+
+
+Class PredatorProjectile: Tracer
+{
+	default
+	{
+		+BLOODSPLATTER;
+		+THRUGHOST;
+		-DONTSPLASH;
+		+NOGRAVITY;
+		+MISSILE;
+		speed 20;
+		damage 0;
+	}
+	States
+	{
+		Spawn:
+			TRAC A 1 BRIGHT;
+			Loop;
+		Crash:
+		Death:
+		XDeath: //bleeding actor
+			TNT1 A 1 {
+				for(int i = 0; i<50; i++){
+					A_SpawnItemEx("FlareSparks", 0, 0, 0, random(-16, 16), random(-16, 16), random(-16, 16), 0,SXF_NOCHECKPOSITION);
+				}
+				A_Explode(200, 96, XF_HURTSOURCE, true, 0, 0, 0, "", "Blast" );
+				A_SpawnItemEx("PredatorBurstFlare");
+				a_playSound("predator/missleExplode");
+
+			}
+		TNT1 A 70;
+		Stop;
+	}
+
+}
+Class PredatorBurstFlare: actor
+{
+	default
+	{
+		+NOINTERACTION;
+		+NOGRAVITY;
+		renderstyle "add";
+		scale 5.0;
+	}
+	States
+	{
+		Spawn:
+			PRFL A 1 BRIGHT light("PredatorProjectileBurst") a_fadeOut(0.05);
+			Loop;
+	}
+
+}

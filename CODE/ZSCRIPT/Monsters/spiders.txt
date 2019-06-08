@@ -1,0 +1,187 @@
+class z_SpiderRed :  CHmonster
+{
+
+	default
+	{
+
+		Obituary "$SPIDER_OBITUARY";
+		Health 24;
+		Radius 16;
+		Height 16;
+		Mass 10;
+		Speed 3;
+		fastspeed 5;
+		PainChance 128;
+		Damage 1;
+		GibHealth 50;
+		+FLOORCLIP;
+		+DONTSPLASH;
+		+AMBUSH;
+		+SLIDESONWALLS;
+		+DROPOFF;
+		-NODROPOFF;
+		+SHOOTABLE;
+		-NORADIUSDMG;
+		-THRUSPECIES;
+		-CANUSEWALLS;
+		MaxTargetRange 20;
+		MeleeRange 20;
+		scale .35;
+		Gravity .6;
+		radiusdamagefactor 1;
+		MaxStepHeight 64;
+		//translation "48:79=16:47","128:151=16:39","80:111=48:79","112:127=[96,48,32]:[32,16,0]";
+		DamageFactor "PlayerJumpDownDamage", 0.5;
+		BloodType "GreenBlood" ,"GreenBlood" ,"GreenBlood";
+
+		attacksound "dsdolstb";
+		painsound "SpiderPain";
+		deathsound "SpiderDie";
+		activesound "SpiderSee";
+		Species "Spiders";
+
+
+	}
+	override void SetNames(){
+		N_NAME = StringTable.Localize("$SPIDER_NAME");
+		N_DEATHNAME = StringTable.Localize("$SPIDER_DEATHNAME");
+		N_BURNDEATHNAME = StringTable.Localize("$SPIDER_BURNDEATHNAME");
+		N_GIBDEATHNAME = StringTable.Localize("$SPIDER_GIBDEATHNAME");
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		SetNames();
+		self.setTag(N_NAME);
+		GiveInventory("MenhirSkipMark", 1);
+		switch (random(0, 3)){
+			case 1:
+				A_SetTranslation("RedSpider");
+				break;
+			case 2:
+				A_SetTranslation("BrownSpider");
+				break;
+			case 3:
+				A_SetTranslation("BlackSpider");
+				break;
+			Default:
+				A_SetTranslation("GraySpider");
+		}
+
+	}
+
+	States
+	{
+	SetSprite:
+		BSDR A 1;//for DistanceSpawned
+	Spawn:
+		BSDR AB 10 A_Look;
+		Loop;
+	See:
+		BSDR A 20;
+		BSDR AAAABBBBCCCC 1 A_Chase;
+		BSDR DDDDEEEEFFFF 1 A_Chase;
+		BSDR A 0 {
+			if(waterlevel>2){
+				A_DamageSelf(5);
+			}
+			giveInventory("SeekPlayerController", 1);
+		 }
+		BSDR A 0 A_Jump(128,"Jump");
+		Goto See+1;
+	Jump:
+		BSDR A 0 {
+				if(CurrentDistance<256){
+					a_faceTarget();
+					ThrustThingZ(0,random(8,20),0,0);
+					a_recoil(-random(5,10));
+				}
+			}
+		Goto See+1;
+	Melee:
+
+	Missile:
+		BSDR G 3;
+		BSDR I 6 {
+			A_CustomMeleeAttack(random(1,2),"gore/hit","none","Turner",true);
+			if(target && !random(0, 2)) { if(distance3D(target)<=48){target.giveInventory("poisoningController", 1);} }
+			}
+		BSDR I 5;
+		Goto See+1;
+	Pain:
+		BSDR G 3;
+		BSDR G 3 A_Pain;
+		Goto See+1;
+	Pain.Fire:
+		BSDR G 0 { if(LastDamage>5){giveInventory("Burner", 1);} }
+		Goto Pain;
+	Death:
+		BSDR I 0 A_Scream;
+		BSDR IJKLMNO 4;
+		BSDR O 1;
+		Goto Corpse;
+	XDeath:
+		TNT1 A 0 GiveInventory("GibDeathMark", 1);
+		BSDR J 0 A_PlaySound("DSSLOP");
+		BSDR JKLMNO 4;
+		Goto Corpse;
+
+	Death.Fire:
+		SPBD A 0 { A_PlaySound("SpiderBurn"); BDSM(); }
+		SPBD ABEGHFECABEGHFEC 5 light("FirePlaceSmall");
+		SPBD IJK 5 light("FirePlaceSmall");
+		SPBD LMNLMNLMNLMNLMNLMNLMNLMNLMN 15 light("FirePlaceSmall");
+		SPBD O 0 A_Scream;
+		Goto Corpse;
+	Corpse:
+		"####" "#" 1 {
+			//A_setSize(16, 8);
+			setTag(N_DEATHNAME);
+			bSHOOTABLE = 1;
+			bSOLID = 1;
+		}
+		"####" "#" -1;
+		Stop;
+	Raise:
+		BSDR ONMLKJI 4;
+		Goto See;
+	}
+}
+
+
+class poisoningController : Undroppable
+{
+	int Counter;
+	float Vangle;
+	float amount;
+	int second;
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		amount = 1.0;
+
+
+	}
+	override void DoEffect()
+	{
+		if(!Owner.checkInventory("TotalTimeFreezer", 1)){
+			if(Counter<35*10){
+				Counter++;
+				Vangle+=8;
+				Owner.angle += cos(Vangle)*amount;
+				Owner.pitch += -sin(Vangle)*amount;
+			} else {
+				if(Owner){ Owner.takeInventory("poisoningController", 1);}
+			}
+			if(second<35){
+				second++;
+			} else {
+				second = 0;
+				if(Owner){
+					Owner.A_DamageSelf (2, "poison");
+				}
+			}
+		}
+	}
+}
+

@@ -1,0 +1,659 @@
+
+
+
+class ShellWeapon : CHWeapon
+{
+
+	action void DoubleShellTrace(int num =1){
+		num = !num?1:num;
+		let player = player;
+		if (!player) return;
+		let pawn = PlayerPawn(self);
+
+		FLineTraceData RemoteRay;
+        player.mo.LineTrace(
+               player.mo.angle,
+               96,
+               player.mo.pitch,
+               offsetz: 32,
+               data: RemoteRay
+        );
+
+
+
+        if (RemoteRay.HitType == TRACE_HitActor){
+			actor Pointed = RemoteRay.HitActor;
+			if(Pointed && Pointed.checkInventory("MonsterShellXDeathController", 1)){
+				Pointed.giveInventory("ShellDamage", num);
+			}
+		}
+	}
+
+
+}
+
+class ShellDamage : Undroppable {
+	//mark an actor for it was doubleshotgunned from close range
+	Default	{ Inventory.MaxAmount 99999; }
+
+}
+
+
+
+Class z_Sawedoff : ShellWeapon
+{
+	bool fromReload;
+	int AmmoInWeapon;
+	default
+	{
+	   decal "ZBloodBulletChip1";
+	   obituary "$SAWEDOFF_obituary";
+	   TAG "$SAWEDOFF_NAME";
+	   Weapon.AmmoType "Bshell";
+	   Weapon.AmmoType2 "Bshell";
+	   inventory.pickupmessage "$SAWEDOFF_TAKED";
+	   inventory.pickupsound "PICKWEAP";
+	   inventory.maxamount 1;
+	   Weapon.SelectionOrder 1300;
+	   weapon.kickback 24;
+	   Weapon.AmmoGive 12;
+	   Weapon.AmmoUse 1;
+	   Weapon.AmmoUse2 1;
+	   //Weapon.SisterWeapon "DoubleSawedoff";
+	   //Weapon.SlotPriority 0;
+	   //Weapon.SlotNumber 3;
+
+	   Xscale 0.8;
+	   YScale 0.9;
+	   +ThruGhost;
+	   -NOGRAVITY;
+	   +WEAPON.NOAUTOAIM;
+
+
+		+SHOOTABLE;
+		+NOBLOOD;
+		+NOBLOODDECALS;
+		+INVULNERABLE;
+
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		GiveInventory("Pointable", 1);
+		AmmoInWeapon = 2;
+	}
+	Override void Tick()
+	{
+		Super.tick();
+		if(!Owner && players[consoleplayer].mo.CheckInventory("Sawedoff", 1) && !players[consoleplayer].mo.CheckInventory("z_SawedoffDouble", 1)){
+			a_SpawnItem("z_SawedoffDouble");
+			self.destroy();
+		}
+	}
+
+
+   states
+   {
+
+      Spawn:
+		SOSP A -1;
+		Loop;
+      Ready:
+
+		WP01 A 1 { A_WeaponReady(WRF_ALLOWRELOAD|WRF_ALLOWUSER1); GiveInventory("HaveSavedOff", 1);}
+		Loop;
+      DeSelect:
+		  WP01 AAA 1 A_Lower;
+		  Loop;
+	   Select:
+		  TNT1 A 0 {Invoker.HandlingControl();}
+		  WP01 A 1 A_Raise();
+		  Loop;
+	   Fire:
+		  TNT1 A 0 A_JumpIf(invoker.AmmoInWeapon==0,"Reload");
+		  TNT1 A 0 A_JumpIf(invoker.AmmoInWeapon==1,"Fire2");
+		  TNT1 A 0 {
+			A_Gunflash();
+			A_QuakeEx (0, 0, 6, 5, 0, 32);
+			A_recoil (4);
+			A_PlaySound("dsSAWFIR", CHAN_WEAPON);
+			//a_logfloat(PlayerPawn(self).Height);
+			for(int i = 0; i<10; i++){
+				A_FireProjectile ("PlayerShellTracer", frandom(-8, 8), false, 2.5, 0.0, FPF_NOAUTOAIM, frandom(-3, 3));
+			}
+			invoker.takeInventory("Bshell", 1);
+			A_FireProjectile("ShotGunSmoke", 0, 0, 16, -8, FPF_NOAUTOAIM );
+			A_FireProjectile("GunFireLight", 0, 0, 16, -8, FPF_NOAUTOAIM );
+			invoker.AmmoInWeapon--;
+		  }
+		  ANIM DEFG 1 Bright A_WeaponReady(14);
+		  TNT1 HI 4 A_WeaponReady(14);
+		  Goto ready;
+	   Fire2:
+		  TNT1 A 0 A_JumpIf(invoker.AmmoInWeapon==0,"Reload");
+		  TNT1 A 0 {
+			A_Gunflash();
+			A_QuakeEx (0, 0, 6, 5, 0, 32);
+			A_recoil (4);
+			A_PlaySound("dsSAWFIR", CHAN_WEAPON);
+			for(int i = 0; i<10; i++){
+				A_FireProjectile ("PlayerShellTracer", frandom(-8, 8), false, 2.5, 0.0, FPF_NOAUTOAIM, frandom(-3, 3));
+			}
+			invoker.takeInventory("Bshell", 1);
+			A_FireProjectile("ShotGunSmoke", 0, 0, 16, -8, FPF_NOAUTOAIM );
+			A_FireProjectile("GunFireLight", 0, 0, 16, -8, FPF_NOAUTOAIM );
+			invoker.AmmoInWeapon--;
+		  }
+		  ANIM DEFG 1 Bright A_WeaponReady(14);
+		  TNT1 HI 4 A_WeaponReady(14);
+		  //TNT1 A 0 A_TakeInventory("sawedoffcheck",1);
+		  //TNT1 A 0 A_JumpIfNoAmmo("Ready");
+		  Goto Reload;
+
+
+	   AltFire:
+		  //TNT1 A 0 A_PlaySound("dsSAWFIR", CHAN_WEAPON);
+		  //TNT1 A 0 A_JumpIfInventory("sawedoffcheck",1,"Fire2");
+			TNT1 A 0 A_JumpIf(invoker.AmmoInWeapon==0,"Reload");
+			TNT1 A 0 A_JumpIf(invoker.AmmoInWeapon==1,"Fire2");
+			TNT1 A 0 A_JumpIf(countInv("Bshell")==1, "Fire2");
+			TNT1 A 0 A_JumpIfNoAmmo("Reload");
+			//a_log("alt");
+		  //Goto Fire;
+
+		  TNT1 A 0 {
+			A_Gunflash();
+			A_QuakeEx (0, 0, 7, 5, 0, 0);
+			A_recoil (8);
+			A_PlaySound("SAWNALT", CHAN_WEAPON);
+			DoubleShellTrace();
+
+
+			for(int i = 0; i<20; i++){
+				A_FireProjectile ("PlayerShellTracer", frandom(-12, 12), false, 2.5, 0.0, FPF_NOAUTOAIM, frandom(-6, 6));
+			}
+			invoker.takeInventory("Bshell", 2);
+
+
+			A_FireProjectile("ShotGunSmoke", 0, 0, 16, -8, FPF_NOAUTOAIM );
+			A_FireProjectile("GunFireLight", 0, 0, 16, -8, FPF_NOAUTOAIM );
+
+			A_FireProjectile("ShotGunSmoke", 0, 0, 16, -8, FPF_NOAUTOAIM );
+			A_FireProjectile("GunFireLight", 0, 0, 16, -8, FPF_NOAUTOAIM );
+			invoker.AmmoInWeapon = 0;
+		  }
+			ANIM DEFG 1 Bright A_SetPitch(pitch-1.0, 1);
+			ANIM HIII 1 Bright A_SetPitch(pitch-1.0, 1);
+			//TNT1 A 0 A_JumpIfNoAmmo("Ready");
+		 Goto Reload;
+
+		 Altflash:
+			SWF2 ABC 1 Bright;
+			Stop;
+	  Flash:
+			SWFL ABC 1 Bright;
+		Stop;
+	  Flash2:
+			SWFL DEF 1 Bright;
+		Stop;
+
+
+	Reload:
+		TNT1 A 0 A_JumpIfNoAmmo("Ready");
+		TNT1 A 0 A_JumpIf(invoker.AmmoInWeapon==2, "Ready");
+
+		WP01 EF 2;
+		WP01 G 1;
+		TNT1 A 0 a_jumpif(invoker.AmmoInWeapon==1, 2);
+		TNT1 A 0 A_FireProjectile("ShotgunCasing",-45+random(-8,8),0,1,7+random(-2,2),0);
+		TNT1 A 0 A_FireProjectile("ShotgunCasing",-45+random(-8,8),0,1,7+random(-2,2),0);
+		TNT1 A 0 A_PlaySound("weapons/sawedofreload1", CHAN_AUTO);
+		WP01 HIJKLMNOPQ 2;
+		WP01 RRSS 1;
+		TNT1 A 0 A_PlaySound("weapons/sawedoffload", CHAN_AUTO);
+		WP01 T 3;
+		TNT1 A 0 { invoker.AmmoInWeapon=2; }
+		Goto Ready;
+
+
+   }
+}
+
+
+Class z_SawedoffDouble : ShellWeapon
+{
+	bool fromReload;
+	int AmmoInWeapon1;
+	int AmmoInWeapon2;
+	default
+	{
+	   decal "ZBloodBulletChip1";
+	   obituary "$SAWEDOFF_obituary";
+	   TAG "$SAWEDOFF_NAME";
+	   Weapon.AmmoType "Bshell";
+	   Weapon.AmmoType2 "Bshell";
+	   Weapon.AmmoUse 1;
+	   Weapon.AmmoUse2 1;
+	   inventory.pickupmessage "$SAWEDOFF_TAKED";
+	   inventory.pickupsound "PICKWEAP";
+	   Weapon.SelectionOrder 400;
+	   weapon.kickback 24;
+	   //Weapon.AmmoGive 12;
+	  // Weapon.SlotNumber 3;
+
+	   Xscale 0.8;
+	   YScale 0.9;
+	   +ThruGhost;
+	   -NOGRAVITY;
+	   +WEAPON.NOAUTOAIM;
+
+
+		+SHOOTABLE;
+		+NOBLOOD;
+		+NOBLOODDECALS;
+		+INVULNERABLE;
+
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		GiveInventory("Pointable", 1);
+		AmmoInWeapon1 = 2;
+		AmmoInWeapon2 = 2;
+	}
+
+
+   states
+   {
+		Spawn:
+			SOSP A -1;
+			Loop;
+		Ready:
+			TNT1 A 0 A_jumpif(invoker.AmmoInWeapon1<=0 && invoker.AmmoInWeapon2<=0, "Reload");
+			TNT1 A 0 {if(countInv("Bshell")<3){  A_SelectWeapon("Sawedoff"); }}
+			SAKM A 1 { A_WeaponReady(WRF_ALLOWRELOAD|WRF_ALLOWUSER1); GiveInventory("Have2SavedOff", 1);}
+			Loop;
+		DeSelect:
+		  SAKM AAA 1 A_Lower;
+		  Loop;
+		Select:
+		  TNT1 A 0 {Invoker.HandlingControl();}
+		  SAKM A 1 A_Raise();
+		  Loop;
+		Fire:
+			//shot left barrel 1
+			TNT1 A 0 A_jumpif(invoker.AmmoInWeapon1<=0, "Fire2");
+			SAKF A 0 {
+				A_Gunflash("Flash");
+				A_QuakeEx (0, 0, 6, 5, 0, 32);
+				A_recoil (2);
+				A_PlaySound("dsSAWFIR", CHAN_WEAPON);
+
+
+				//A_FireBullets(8.0, 4.0, 10, 5, "ShellPuff", 1, 8192, "none", 32, -16);
+				for(int i = 0; i<10; i++){
+					A_FireProjectile ("PlayerShellTracer", frandom(-6, 6), false, -8.0, 0.0, FPF_NOAUTOAIM, frandom(-2, 2));
+				}
+				invoker.takeInventory("Bshell", 1);
+
+
+				A_FireProjectile("ShotGunSmoke", 0, 0, -16, -8, FPF_NOAUTOAIM );
+				A_FireProjectile("GunFireLight", 0, 0, -16, -8, FPF_NOAUTOAIM );
+				invoker.AmmoInWeapon1--;
+			}
+			SAKF AB 1;
+			SAKF B 2;
+		Fire2:
+			//shot left barrel 2
+			TNT1 A 0 A_jumpif(invoker.AmmoInWeapon2<=0, "Reload");
+
+			SAKF A 0 {
+				A_Gunflash("Flash1");
+				A_QuakeEx (0, 0, 6, 5, 0, 32);
+				A_recoil (2);
+				A_PlaySound("dsSAWFIR", CHAN_WEAPON);
+				//A_FireBullets(8.0, 4.0, 10, 5, "ShellPuff", 1, 8192, "none", 32, 16);
+
+				for(int i = 0; i<10; i++){
+					A_FireProjectile ("PlayerShellTracer", frandom(-6, 6), false, 8.0, 0.0, FPF_NOAUTOAIM, frandom(-2, 2));
+				}
+				invoker.takeInventory("Bshell", 1);
+
+				A_FireProjectile("ShotGunSmoke", 0, 0, 16, -8, FPF_NOAUTOAIM );
+				A_FireProjectile("GunFireLight", 0, 0, 16, -8, FPF_NOAUTOAIM );
+				invoker.AmmoInWeapon2--;
+			}
+			SAKF CEF 1;
+			SAKF GH 1;
+			SAKM A 6;
+			Goto ready;
+
+		AltFire:
+			TNT1 A 0 A_JumpIfNoAmmo("Ready");
+			TNT1 A 0 A_jumpif(invoker.AmmoInWeapon1+invoker.AmmoInWeapon2<4, "Fire");
+			//alt quadro shot
+			TNT1 A 0 {
+				DoubleShellTrace(2);
+				A_Gunflash("Flash2");
+			}
+			TNT1 A 0 {
+				A_recoil (6);
+				A_PlaySound("SAWNALT", CHAN_WEAPON);
+				A_QuakeEx (3, 3, 10, 10, 0, 48);
+				A_FireProjectile("ShotGunSmoke", 0, 0, -16, -8, FPF_NOAUTOAIM );
+				A_FireProjectile("GunFireLight", 0, 0, -16, -8, FPF_NOAUTOAIM );
+				A_FireProjectile("ShotGunSmoke", 0, 0, -16, -8, FPF_NOAUTOAIM );
+				A_FireProjectile("GunFireLight", 0, 0, -16, -8, FPF_NOAUTOAIM );
+				invoker.AmmoInWeapon1 = 1;
+				invoker.AmmoInWeapon2 = 1;
+			}
+			SAKM BC 1 A_SetPitch(pitch-4.0, 1);
+			TNT1 A 0 {
+
+				A_recoil (6);
+				A_PlaySound("SAWNALT", CHAN_WEAPON);
+
+				A_FireProjectile("ShotGunSmoke", 0, 0, 16, -8, FPF_NOAUTOAIM );
+				A_FireProjectile("GunFireLight", 0, 0, 16, -8, FPF_NOAUTOAIM );
+				A_FireProjectile("ShotGunSmoke", 0, 0, 16, -8, FPF_NOAUTOAIM );
+				A_FireProjectile("GunFireLight", 0, 0, 16, -8, FPF_NOAUTOAIM );
+				invoker.AmmoInWeapon1 = 0;
+				invoker.AmmoInWeapon2 = 0;
+			}
+			SAKM DE 1 A_SetPitch(pitch-4.0, 1);
+			SAKM EDCA 2;
+		Reload:
+			TNT1 A 0 A_JumpIfNoAmmo("Ready");
+			TNT1 A 0 A_JumpIf(invoker.AmmoInWeapon1==2, "Ready");
+			TNT1 A 0 A_JumpIf(invoker.AmmoInWeapon2==2, "Ready");
+			TNT1 A 0 {
+				if(countInv("Bshell")<3){  A_SelectWeapon("Sawedoff"); }
+				//A_JumpIf(countInv("Bshell")==1, "Fire2");
+			}
+		ReloadRight:
+			WP01 EF 2;
+			WP01 G 1;
+			TNT1 A 0 a_jumpif(invoker.AmmoInWeapon2 == 1, 2);
+			TNT1 A 0 A_FireProjectile("ShotgunCasing",-45+random(-8,8),0,1,7+random(-2,2),0);
+			TNT1 A 0 A_FireProjectile("ShotgunCasing",-45+random(-8,8),0,1,7+random(-2,2),0);
+			TNT1 A 0 A_PlaySound("weapons/sawedofreload1", CHAN_AUTO);
+			WP01 HIJKLMNOPQ 3;
+			WP01 RRSS 1;
+			TNT1 A 0 A_PlaySound("weapons/sawedoffload", CHAN_AUTO);
+			WP01 T 5;
+			TNT1 A 0 {
+				if(countInv("Bshell")>1){
+					invoker.AmmoInWeapon2 = 2;
+				} else {
+					invoker.AmmoInWeapon2 = 1;
+				}
+			}
+			TNT1 A 0 A_JumpIf(countInv("Bshell")<=2, "Ready");
+		ReloadLeft:
+			WP02 EF 1;
+			WP02 G 1;
+			TNT1 A 0 a_jumpif(invoker.AmmoInWeapon1 == 1, 2);
+			TNT1 A 0 A_FireProjectile("ShotgunCasing",-45+random(-8,8),0,1,7+random(-2,2),0);
+			TNT1 A 0 A_FireProjectile("ShotgunCasing",-45+random(-8,8),0,1,7+random(-2,2),0);
+			TNT1 A 0 A_PlaySound("weapons/sawedofreload1", CHAN_AUTO);
+			WP02 HIJKLMNOPQ 2;
+			WP02 RRSS 1;
+			TNT1 A 0 A_PlaySound("weapons/sawedoffload", CHAN_AUTO);
+			WP01 T 3;
+			TNT1 A 0 {
+				if(countInv("Bshell")==3){
+					invoker.AmmoInWeapon1 = 1;
+				}
+				else {
+					invoker.AmmoInWeapon1 = 2;
+				}
+			}
+			Goto ready;
+		Flash:
+			SWFL JKL 1;
+			Stop;
+		Flash1:
+			SWFL GHI 1;
+			Stop;
+
+		Flash2:
+			SAFF A 1 BRIGHT {
+				for(int i = 0; i<20; i++){
+					A_FireProjectile ("PlayerShellTracer", frandom(-10, 10), false, -8.0, 0.0, FPF_NOAUTOAIM, frandom(-4, 4));
+					//invoker.takeInventory("Bshell", 2);
+				}
+			}
+			SAFF B 1 BRIGHT {
+				for(int i = 0; i<20; i++){
+					A_FireProjectile ("PlayerShellTracer", frandom(-10, 10), false, 8.0, 0.0, FPF_NOAUTOAIM, frandom(-4, 4));
+					//invoker.takeInventory("Bshell", 2);
+				}
+			}
+
+				/*A_FireBullets(14.0, 4.0, 10, 5, "ShellPuff", 1, 8192, "none", 32, -16);
+				A_FireBullets(14.0, 4.0, 10, 5, "ShellPuff", 1, 8192, "none", 32, -16);
+				A_FireBullets(14.0, 4.0, 10, 5, "ShellPuff", 1, 8192, "none", 32, -16);
+				A_FireBullets(14.0, 4.0, 10, 5, "ShellPuff", 1, 8192, "none", 32, -16);*/
+
+			SAFF C 1 BRIGHT {invoker.takeInventory("Bshell", 4);}
+			Stop;
+	}
+
+
+}
+
+
+
+
+class HaveSavedOff : Undroppable {
+
+	Default	{ Inventory.MaxAmount 2; }
+
+	override void DoEffect(){
+		if(Owner.CountInv(self.GetClassName())==1){
+			Owner.a_playSound("player/sawedOffPickup", CHAN_VOICE );
+		}
+	}
+}
+class Have2SavedOff : Undroppable {
+
+	Default	{ Inventory.MaxAmount 2; }
+
+	override void DoEffect(){
+		if(Owner.CountInv(self.GetClassName())==1){
+			Owner.a_playSound("player/sawedOff2Pickup", CHAN_VOICE );
+		}
+	}
+}
+
+class ShotgunCasing : DistanceSpawned
+{
+	default
+	{
+	   Height 1;
+	   Radius 3;
+	   Speed 4;
+	   Scale 0.2;
+	   Gravity 0.7;
+	   +DOOMBOUNCE;
+	   maxstepheight 0;
+	   bouncefactor 0.5;
+	   bouncecount 3;
+	   PROJECTILE;
+	   +DONTSPLASH;
+	   +SOLID;
+	   -NOGRAVITY;
+	   +FLOORCLIP;
+	   +WINDTHRUST;
+	   -CANBOUNCEWATER;
+	   +EXPLODEONWATER;
+	   -NOLIFTDROP;
+	   +ClientSideOnly;
+	   +CannotPush;
+	   SeeSound "Shotgun/Shells";
+	   DeathSound "Shotgun/Shells";
+		Damage 0.0;
+   }
+
+	override int getRenderDistance(){
+		return Cvar.GetCVar("z_natue_renderdistance_grass", players[consoleplayer]).GetInt();
+	}
+
+   States
+   {
+   SetSprite://for DistanceSpawned
+   Spawn:
+	  CASS AA 0 A_Recoil(RandoM(0,-2));
+	  CASS A 0 THRUSTTHINGZ(0,random(3,5),0,0);
+      CASS A 0 A_Jump(192,1,2,3,4);
+      CASS BCDFABCDFABCDFABCDFABCDFABCDFABCDFABCDFABCDFABCDFABCDFABCDFABCDFABCDFABCDFABCDFA 1;
+      Stop;
+   Death:
+      CASS A 0 A_Jump(127,8);
+      CASS A 160 A_Fall;
+	  CASS AAAAAA 200 A_FadeOut(0.15);
+      Stop;
+      CASS E 600 A_Fall;
+      Stop;
+   }
+}
+
+
+class ShotGunSmoke : Actor
+{
+	int RollSpeed;
+	default
+	{
+		+NOINTERACTION;
+		RENDERSTYLE "translucent";
+		alpha 1.0;
+		Speed 4;
+		scale 0.25;
+		+Rollsprite;
+		+FORCEXYBILLBOARD;
+	}
+	Override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+		if(random(1, 0)){
+			RollSpeed = Random(-6, -2);
+		} else {
+			RollSpeed = Random(2, 6);
+		}
+	}
+	virtual void ParticleLife()
+	{
+		A_SetScale(scale.x+0.08);
+		A_fadeOut(0.025, FTF_REMOVE);
+		A_SetRoll(roll+RollSpeed,SPF_INTERPOLATE);
+
+	}
+	States
+	{
+		Spawn:
+			TNT1 A 5;
+		Smoke:
+			S1MK A 1 ParticleLife();
+			Loop;
+
+	}
+}
+
+/*
+ACTOR DoubleSawedoff : Sawedoff
+{
+  +POWERED_UP
+  +ThruGhost
+  +WEAPON.BFG
+  weapon.ammouse 1
+  weapon.ammouse2 1
+  Weapon.SisterWeapon Sawedoff
+  states
+  {
+  Ready:
+    SAKM A 1 A_WeaponReady
+    loop
+  Deselect:
+	TNT1 AA 0 A_Lower
+    SAKM A 1 A_Lower
+    loop
+  Select:
+	TNT1 AA 0 A_Raise
+    SAKM A 1 A_Raise
+    loop
+  Fire:
+    TNT1 A 0 A_GunFlash
+	SWFL JK 2 Bright A_WeaponReady(14)
+	SWFL L 1 Bright A_WeaponReady(14)
+	TNT1 A 0 A_JumpIfInventory("Bshell", 1, 1)
+	Goto Ready // Go back if no ammo, this is needed since this works with flash state.
+	SWFL GH 2 Bright A_WeaponReady(14)
+	SWFL I 1 Bright A_WeaponReady(14)
+	TNT1 A 7 A_WeaponReady(14)
+    goto Ready
+  AltFire:
+	TNT1 A 0 A_JumpIfInventory("Bshell", 4, 1)
+  Goto Fire
+	TNT1 A 0 A_GunFlash
+    SAFF ABC 2 Bright A_WeaponReady(14)
+	TNT1 A 18 A_WeaponReady(14)
+    goto Ready
+  Flash:
+    SAKF A 3 Bright A_WeaponReady(14)
+			  		  	  TNT1 A 0 A_FireCustomMissile("ShotgunCasing",-45+random(-8,8),0,1,7+random(-2,2),0)
+	TNT1 A 0 A_FireBullets (7.6, 4.1, 10, 5, "ShellPuff")
+	TNT1 A 0 A_PlaySound ("dsSAWFIR")
+	SAKF B 3 A_WeaponReady(14)
+	TNT1 A 0 A_JumpIfInventory("Bshell", 1, 1)
+	Stop
+	SAKF C 3 Bright A_WeaponReady(14)
+			  		  	  TNT1 A 0 A_FireCustomMissile("ShotgunCasing",45+random(-8,8),0,-4,7+random(-2,2),0)
+	TNT1 A 0 A_FireBullets (7.6, 4.1, 10, 5, "ShellPuff")
+	TNT1 A 0 A_PlaySound ("dsSAWFIR")
+	SAKF EFGH 2 A_WeaponReady(14)
+    stop
+  AltFlash:
+	TNT1 A 0 A_JumpIfInventory("Bshell", 4, 1)
+	Goto Flash
+    SAKM B 3 Bright A_WeaponReady(14)
+	TNT1 AA 0 A_FireCustomMissile("ShotgunCasing",-45+random(-8,8),0,1,7+random(-2,2),0)
+	TNT1 AA 0 A_FireCustomMissile("ShotgunCasing",45+random(-8,8),0,-4,7+random(-2,2),0)
+
+	TNT1 A 0 A_FireBullets (12.2, 8.1, 40, 5, "ShellPuff")
+	TNT1 A 0 A_TakeInventory("Bshell", 3)
+	TNT1 A 0 A_SetPitch(pitch-5.0)
+	TNT1 AA 0 A_PlayWeaponSound ("SAWNALT")
+	TNT1 A 0 A_SetPitch(pitch+0.5)
+	SAKM C 1 A_WeaponReady(14)
+	TNT1 A 0 A_SetPitch(pitch+0.5)
+	SAKM C 1 A_WeaponReady(14)
+	TNT1 A 0 A_SetPitch(pitch+0.5)
+	SAKM C 1 A_WeaponReady(14)
+	TNT1 A 0 A_SetPitch(pitch+0.5)
+	SAKM C 1 A_WeaponReady(14)
+	TNT1 A 0 A_SetPitch(pitch+0.5)
+	SAKM D 1 A_WeaponReady(14)
+	TNT1 A 0 A_SetPitch(pitch+0.5)
+	SAKM D 1 A_WeaponReady(14)
+	TNT1 A 0 A_SetPitch(pitch+0.5)
+	SAKM D 1 A_WeaponReady(14)
+	TNT1 A 0 A_SetPitch(pitch+0.5)
+	SAKM D 1 A_WeaponReady(14)
+	TNT1 A 0 A_SetPitch(pitch+0.5)
+	SAKM E 1 A_WeaponReady(14)
+	TNT1 A 0 A_SetPitch(pitch+0.5)
+	SAKM E 3 A_WeaponReady(14)
+	SAKM CF 4 A_WeaponReady(14)
+	SAKM A 4 A_WeaponReady(14)
+    stop
+  }
+}
+*/
+class sawedoffcheck : inventory
+{
+	default
+	{
+	inventory.amount 1;
+	inventory.maxamount 1;
+	}
+}

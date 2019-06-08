@@ -1,0 +1,428 @@
+class z_sleeping_gargoyle : z_gargoyle
+{
+	//args[0] activation distance. 0 - pain activaton
+	Default
+	{
+		Tag  "$GARGOYLE_STATUE_NAME";
+		+INVULNERABLE;
+		+ALLOWPAIN;
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		Waked = 0;
+	}
+	virtual void Activate(){setStateLabel("Wake");}
+	States
+	{
+		SetSprite:
+			GARS D 1 ;//for DistanceSpawned
+		Spawn:
+			GARS D 5 {
+				if(Args[0] && CurrentDistance && CurrentDistance<Args[0]){
+					setStateLabel("Wake");
+				}
+			}
+			Loop;
+
+	}
+}
+
+
+class z_gargoyle : CHmonster
+{
+	int cntr;
+	bool init;
+	bool seePlayer;
+	int jump;
+	actor Marker;
+	int MarkerDelay;
+	bool Waked;
+
+	default
+	{
+		Health 1000;
+		Speed 8;
+		Radius 31;
+		Height 56;
+		PainChance 20;
+		Mass 400;
+		Meleedamage 5;
+		MeleeRange 72;
+		REACTIONTIME 8;
+		+NOGRAVITY;
+		+FLOAT;
+		+FLOORCLIP;
+		+ALLOWPAIN;
+		//+MISSILEMORE;
+		FloatSpeed 16;
+		Monster;
+		Species "gargoyle";
+		Scale 0.58;
+		MissileHeight 30;
+		SeeSound "GargoyleSee";
+		DeathSound "GargoyleDie";
+		PainSound "GargoylePain";
+		ActiveSound "GargoyleAct";
+		Obituary "$GARGOYLE_OBITUARY";
+		Tag  "$GARGOYLE_NAME";
+		PainChance "Fire", 64;
+		DamageFactor "Fire", 2;
+		DamageFactor "Blast", 2.0;
+	}
+	override void SetNames(){
+		N_NAME = StringTable.Localize("$GARGOYLE_NAME");
+		N_DEATHNAME = StringTable.Localize("$GARGOYLE_DEATHNAME");
+		N_BURNDEATHNAME = StringTable.Localize("$GARGOYLE_BURNDEATHNAME");
+		N_GIBDEATHNAME = StringTable.Localize("$GARGOYLE_GIBDEATHNAME");
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		init = 1;
+		SetNames();
+		self.giveInventory("QuickKillReady", 1);
+		self.giveInventory("SubordinatedReady", 1);
+		Waked = 1;
+		putOutFireChance = 50;
+	}
+	override void Tick(){
+		super.tick();
+
+		if(!init && seePlayer && !bFLOAT && health>0){
+			if( CurrentDistance>384 || ItIsTooHigh()){
+				FlyUp();
+				setStateLabel("See");
+				////a_log("autofloat");
+			}
+		}
+		if(jump>0 && jump < 70){
+			jump ++;
+		} else	if(jump == 70){
+			jump = 0;
+			a_stop();
+		}
+
+		if(Marker){
+			if(MarkerDelay<175){
+				MarkerDelay++;
+			} else {
+				MarkerDelay = 0;
+				Marker = null;
+			}
+		}
+
+		init = 0;
+	}
+
+	virtual bool IamStuck(){
+		if(MarkerDelay>35 || vel.x+vel.y<4){
+			return true;
+		}
+		return false;
+	}
+	virtual float ItIsTooHigh(){
+		return pos.z>GetZAt(pos.x, pos.y, 0, GZF_ABSOLUTEPOS)+256.0;
+	}
+	virtual void FlyUp(){
+		if(!bFLOAT){
+			A_PlaySound("GargoyleWingFlap");
+			bNOGRAVITY=1; bFLOAT=1;
+			ThrustThingZ(0, 32,0,0); jump = 1;
+		}
+	}
+
+
+	States
+	{
+	SetSprite:
+		BGAR A 1;//for DistanceSpawned
+	Spawn:
+		BGAR ABCD 4 A_Look;
+		Loop;
+	See:
+		BGAR A 0 {
+			seePlayer = 1;
+			Waked = 1;
+			bINVULNERABLE = 0;
+		}
+		BGAR AAABBBCCCDDD 1 {
+			//try to spawn landing marke behind a player
+			if(CurrentDistance<512 && !random(0, 5) && !Marker){
+				if(Target){
+					FLineTraceData RemoteRay;
+
+					float TraceAngle;
+					float traceDist;
+					if(Target.vel.x+Target.vel.y < 4){
+						TraceAngle = Target.angle+180;
+						traceDist = 256;
+					} else {
+						TraceAngle = Target.angle;
+						traceDist = (Target.vel.x+Target.vel.y)*32;
+					}
+
+					Target.LineTrace(
+					   TraceAngle,
+					   traceDist,
+					   0.0,//pitch
+					   offsetz: Target.height+128,
+					   data: RemoteRay
+					);
+					//if (RemoteRay.HitType == TRACE_HitNone || RemoteRay.HitType == TRACE_HitWall){
+						vector3 markPos = RemoteRay.HitLocation;
+						int ZatMark = GetZAt(markPos.x, markPos.y, 0, GZF_ABSOLUTEPOS);
+						if(markPos.z>ZatMark){
+							markPos.z = ZatMark;
+							Marker = self.spawn("GargLandingMarker", markPos);
+							Master = Marker;
+							FlyUp();
+							ThrustThingZ(0, 32,0,0); jump = 1;
+							setStateLabel("GotoMarker");
+						}
+					//}
+
+				}
+			}
+			if(CurrentDistance>384 || ItIsTooHigh() ){
+				A_Chase(null, null);
+			} else {
+				A_Chase("Melee", "Missile");
+			}
+		}
+		Loop;
+	GotoMarker:
+		BGAR AAABBBCCCDDD 1 {
+			if(Master){
+				//setOrigin(Master.pos, 1);
+				//a_log("goto marker");
+				if(distance2D(Master)>32){
+					A_FaceMaster();
+					A_recoil(-6);
+				} else {
+					MarkerDelay = 0;
+					Marker = null;
+					a_stop();
+					setStateLabel("Missile");
+				}
+
+
+				if(Target && distance2D(Target)<96){
+					//a_stop();
+					//setStateLabel("Melee");
+				}
+				if(IamStuck()){
+					a_stop();
+					setStateLabel("See");
+				}
+
+			} else {
+				a_stop();
+				setStateLabel("See");
+			}
+		}
+		Loop;
+	Melee:
+		BGAR E 0  {
+			if(CurrentDistance>192 || ItIsTooHigh()){
+				FlyUp();
+				//a_log("flyFom melee");
+				setStateLabel("See");
+			} else {
+				bNOGRAVITY=0; bFLOAT=0;
+				//a_log("land melee");
+			}
+		 }
+		BGAR EFG 4 A_FaceTarget;
+		BGAR H 3{
+			if(CurrentDistance<96){
+				A_CustomMeleeAttack(5*random(1,8),"GargoyleMelee"); a_recoil(-4);
+			} else {
+				A_ThrowGrenade("GargoyleBone",0,20,4,0);
+			}
+		}
+		BGAR I 3;
+		//BGAR I 0 a_jump(128, "Melee");
+		Goto Melee;
+	Missile:
+		BGAR F 0 {
+			if(ItIsTooHigh()){
+				FlyUp();
+				setStateLabel("See");
+			} else {
+				bNOGRAVITY=0; bFLOAT=0;
+				//a_log("land missile");
+			}
+
+		}
+		BGAR A 6;
+		BGAR F 6 A_FaceTarget;
+		BGAR EG 6;
+		BGAR H 6  A_ThrowGrenade("GargoyleBone",0,20,6,0);
+		BGAR I 6;
+		BGAR I 0 a_jump(192, "Missile");
+		Goto See;
+	Wake:
+		GARS A 0 {
+				a_playSound("GargoyleSee");
+				Waked = 1;
+				setTag(N_NAME);
+				bINVULNERABLE = 0;
+			}
+		GARS ABC 8;
+		Goto See;
+	Pain.Blast:
+		BGAR J 0 a_jumpIf(!Waked, "Wake");
+		BGAR J 0;//additional Blasd Damage for Xdeath ability in player.zsc
+		Goto Pain;
+	Pain.Fire:
+		BGAR J 0 a_jumpIf(!Waked, "Wake");
+		BGAR J 0 { if(LastDamage>5){ giveInventory("Burner", 1); } }
+		Goto Pain;
+	Pain:
+		BGAR J 0 a_jumpIf(!Waked, "Wake");
+		BGAR JA 3;
+		BGAR J 3 A_Pain;
+		Goto See ;
+    Death:
+		BGAR K 6;
+		BGAR L 6 A_Scream;
+		BGAR M 6 setTag(N_DEATHNAME);
+		TNT1 A 0 {
+			actor BC = self.spawn("GargBodyBlowTarget", self.pos);BC.Master = self;//this is works
+			for(int i = 0; i<random(3, 7); i++){
+				A_SpawnItemEx("BloodTrail", random(-2, 2), random(-2, 2), random(24, 32), frandom(1.0, 2.0), frandom(-4.0, 4.0), frandom(1.0, 8.0), 0,SXF_NOCHECKPOSITION|SXF_TRANSFERPOINTERS|SXF_TRANSFERTRANSLATION);
+			}
+			A_SetSize(12, 24);
+			A_SpawnItemEx ("LifeEssence", 0, 0, 0, frandom(-2.0, 2.0), frandom(-2.0, 2.0), frandom(4.0, 8.0), 0,SXF_NOCHECKPOSITION, 192);
+
+		}
+		BGAR NO 6;
+		BGAR P 6;
+		Goto Corpse;
+    Death.Fire:
+		GARF ABCDABCDABCD 5 bright light("FirePlace");
+		TNT1 A 0  A_Scream;
+		GARF ABCD 5 bright light("FirePlace");
+		TNT1 A 0 { a_playSound("human/BodyFall"); BDSM(); }
+		GARF EFG 5;
+		TNT1 A 0 { setTag(N_BURNDEATHNAME); burned = 1; }
+		GARF HIJHIGHIGK 5;
+		Goto Corpse;
+	XDeath:
+		TNT1 A 0 GiveInventory("GibDeathMark", 1);
+		BGAR Q 2 A_XScream;
+		BGAR Q 0 { self.GiveInventory("GargXDeathGibs", 1); self.setTag(N_GIBDEATHNAME); }
+		BGAR RST 3;
+		BGAR U 3;
+		Goto Corpse;
+	Corpse:
+		"####" "#" 1 {
+			self.takeInventory("QuickKillReady", 1);
+			self.takeInventory("SubordinatedReady", 1);
+			A_setSize(16, 8);
+			bSHOOTABLE = 1;
+			bSOLID = 1;
+			bGHOST = 1;
+			if(!random(0,1) && !burned){
+				self.giveInventory("Bleeder", 1);
+			}
+		}
+		"####" "#" -1;
+		Stop;
+
+	Raise:
+		BGAR PONMLK 6;
+		Goto See;
+	}
+
+
+}
+
+
+
+Class GargoyleBone : Actor
+{
+	default
+	{
+		radius 6;
+		height 4;
+		Scale 0.5;
+		PROJECTILE;
+
+		+RANDOMIZE;
+		+NOBOUNCESOUND;
+		+PUSHABLE;
+		-NOGRAVITY;
+		-NOTELEPORT;
+		+ThruGhost;
+		//Gravity 0.56;
+		damage 4;
+		+ThruSpecies;
+		+BOUNCEONCEILINGS;
+		+BOUNCEONWALLS;
+		+BOUNCEAUTOOFF;
+		+EXPLODEONWATER;
+		SeeSound "Cultists/Toss";
+	}
+  states
+  {
+
+	Spawn:
+		PTNT E 0;
+		goto see;
+	See:
+		GARF LMNOPQRS 4;
+		Loop;
+	Death:
+		GARF TUV 4 a_playsound("stone/impact");
+		stop;
+  }
+}
+
+
+
+Class GargLandingMarker : Actor
+{
+	default {
+		+NOINTERACTION;
+		+NOGRAVITY;
+	}
+	  states
+	{
+	Spawn:
+		TNT1 A 175;
+		Stop;
+	}
+
+}
+
+
+
+Class GargBodyBlowTarget :  BodyBlowTarget
+{
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		a_setHealth(50);
+	}
+	states
+	{
+		Death:
+			TNT1 A 1{
+				self.GiveInventory("GargXDeathGibs" , 1);
+				if(master){master.destroy();}
+			}
+			TNT1 A -1 A_FadeOut(0.01, FTF_REMOVE);
+			loop;
+		Xdeath:
+			TNT1 A 1{
+				self.GiveInventory("GargXDeathGibs" , 1);
+				if(master){master.destroy();}
+			}
+			TNT1 A -1 A_FadeOut(0.01, FTF_REMOVE);
+			loop;
+	}
+}
+
+

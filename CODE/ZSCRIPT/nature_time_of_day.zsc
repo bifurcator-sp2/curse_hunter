@@ -1,0 +1,109 @@
+Class Z_Nature_MOON : Z_Nature_SUN
+{
+	Default
+	{
+		Scale 0.5;
+	}
+	override void SetSunOnTime(int SunTime){
+
+		TimeAngle = SunTime*( 1000000*360/(24*60*60));
+		SunPos.y = pos.y;
+		SunPos.z = cos(TimeAngle/1000000)*Zenith + Zorigin;
+		SunPos.x = sin(TimeAngle/1000000)*Zenith*3 + Xorigin;
+		SetOrigin(SunPos, true);
+	}
+	States
+	{
+		Spawn:
+			MOON A 1 NODELAY {
+				Zenith = floorz?floorz:Zenith;
+
+			}
+			GOTO SunLife;
+		SunLife:
+			MOON A 1 sunlife();
+			LOOP;
+
+	}
+}
+
+Class Z_Nature_SUN : Actor
+{
+	//Args[0]:Zenith Z. Floor-relative z of sun at 12.00 (12*60*60).
+	//Actually this is radius of sun rotating in skybox around start position
+	//Put this actor in skybox in Zenith position
+
+	int Zenith;
+	int PreviousTime;
+	double SunTime;//suntime in  seconds!
+	int Time;
+	int TimeDelay;
+	int Xorigin;
+	int Yorigin;
+	int Zorigin;
+	double TimeAngle;
+	vector3 SunPos;
+
+	Default
+	{
+		+NoInteraction;
+		+ClientSideOnly;
+		+FORCEXYBILLBOARD;
+		Renderstyle "Add";
+		Scale 0.5;
+		Alpha 1.0;
+	}
+
+	Override void PostBeginPlay()
+		{
+			Zenith = Args[0]?Args[0]:(pos.z - floorz);
+			Xorigin = pos.x;
+			Yorigin = pos.y;
+			Zorigin = floorz;
+			PreviousTime = 0;
+			SunTime = 0;
+			Super.PostBeginPlay();
+
+		}
+	void sunlife()
+	{
+		Time = CallACS("GetTime",0,0,0);
+		if(Time!=PreviousTime){
+			//minute changed from ACS. Force sun position
+				SunTime = Time*60;
+				SetSunOnTime(SunTime);
+				PreviousTime = Time;
+		} else {
+			//interpolate sun position
+			TimeDelay = CallACS("GetTimeDelay",0,0,0);
+			SunTime = (SunTime*100 + (60*100/(TimeDelay?TimeDelay:1)))/100;
+			SetSunOnTime(SunTime);
+		}
+	}
+
+	virtual	void  SetSunOnTime(int SunTime){
+		//if(SunTime>24*60*60){SunTime=0;}
+
+		TimeAngle = SunTime*( 1000000*360/(24*60*60) );
+		SunPos.y = pos.y;
+		SunPos.z = cos(TimeAngle/1000000+180)*Zenith + Zorigin;
+		SunPos.x = sin(TimeAngle/1000000+180)*Zenith*3 + Xorigin;
+		SetOrigin(SunPos, true);
+	}
+
+	States
+	{
+		Spawn:
+			SHNE B 1 NODELAY {
+				Zenith = floorz?floorz:Zenith;
+
+			}
+			GOTO SunLife;
+		SunLife:
+			SHNE B 1 sunlife();
+			LOOP;
+
+	}
+
+
+}

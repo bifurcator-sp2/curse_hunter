@@ -1,0 +1,624 @@
+// 
+
+graphic SMFNT010, 2, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// !
+graphic SMFNT033, 7, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// "
+graphic SMFNT034, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// #
+graphic SMFNT035, 19, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// $
+graphic SMFNT036, 16, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// %
+graphic SMFNT037, 21, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// '
+graphic SMFNT039, 9, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// (
+graphic SMFNT040, 10, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// )
+graphic SMFNT041, 10, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// *
+graphic SMFNT042, 13, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// +
+graphic SMFNT043, 16, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// ,
+graphic SMFNT044, 9, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// -
+graphic SMFNT045, 16, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// .
+graphic SMFNT046, 9, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// /
+graphic SMFNT047, 18, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// 0
+graphic SMFNT048, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// 1
+graphic SMFNT049, 10, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// 2
+graphic SMFNT050, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// 3
+graphic SMFNT051, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// 4
+graphic SMFNT052, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// 5
+graphic SMFNT053, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// 6
+graphic SMFNT054, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// 7
+graphic SMFNT055, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// 8
+graphic SMFNT056, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// 9
+graphic SMFNT057, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// :
+graphic SMFNT058, 9, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// ;
+graphic SMFNT059, 9, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// <
+graphic SMFNT060, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// =
+graphic SMFNT061, 16, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// >
+graphic SMFNT062, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// ?
+graphic SMFNT063, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// A
+graphic SMFNT065, 21, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// B
+graphic SMFNT066, 21, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// C
+graphic SMFNT067, 16, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// D
+graphic SMFNT068, 21, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// E
+graphic SMFNT069, 21, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// F
+graphic SMFNT070, 21, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// G
+graphic SMFNT071, 16, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// H
+graphic SMFNT072, 18, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// I
+graphic SMFNT073, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// J
+graphic SMFNT074, 18, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// K
+graphic SMFNT075, 18, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// L
+graphic SMFNT076, 16, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// M
+graphic SMFNT077, 23, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// N
+graphic SMFNT078, 16, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// O
+graphic SMFNT079, 16, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// P
+graphic SMFNT080, 20, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// Q
+graphic SMFNT081, 16, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// R
+graphic SMFNT082, 22, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// S
+graphic SMFNT083, 16, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// T
+graphic SMFNT084, 21, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// U
+graphic SMFNT085, 17, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// V
+graphic SMFNT086, 16, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// W
+graphic SMFNT087, 21, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// X
+graphic SMFNT088, 17, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// Y
+graphic SMFNT089, 16, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// Z
+graphic SMFNT090, 18, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// [
+graphic SMFNT091, 9, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// \
+graphic SMFNT092, 18, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// ]
+graphic SMFNT093, 9, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// ^
+graphic SMFNT094, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// _
+graphic SMFNT095, 17, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// `
+graphic SMFNT096, 9, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// a
+graphic SMFNT097, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// b
+graphic SMFNT098, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// c
+graphic SMFNT099, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// d
+graphic SMFNT100, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// e
+graphic SMFNT101, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// f
+graphic SMFNT102, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// g
+graphic SMFNT103, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// h
+graphic SMFNT104, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// i
+graphic SMFNT105, 9, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// j
+graphic SMFNT106, 7, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// k
+graphic SMFNT107, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// l
+graphic SMFNT108, 9, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// m
+graphic SMFNT109, 20, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// n
+graphic SMFNT110, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// o
+graphic SMFNT111, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// p
+graphic SMFNT112, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// q
+graphic SMFNT113, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// r
+graphic SMFNT114, 13, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// s
+graphic SMFNT115, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// t
+graphic SMFNT116, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// u
+graphic SMFNT117, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// v
+graphic SMFNT118, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// w
+graphic SMFNT119, 20, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// x
+graphic SMFNT120, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// y
+graphic SMFNT121, 14, 34
+{
+    XScale 4
+    YScale 4
+}
+
+// z
+graphic SMFNT122, 12, 34
+{
+    XScale 4
+    YScale 4
+}
+

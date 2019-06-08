@@ -1,0 +1,129 @@
+splash Swamp
+{
+	smallclass		SwampDropWave
+	smallclip		16
+	smallsound		dsploosh
+	baseclass		SwampSplash
+	chunkclass		SwampSplashChunk
+	chunkxvelshift	4
+	chunkyvelshift	4
+	chunkzvelshift	4
+	chunkbasezvel	1
+	sound			terrain/swampsplash
+}
+splash Water
+{
+	smallclass		WaterDropWave
+	smallclip		16
+	smallsound		dsploosh
+	baseclass		WaterSplsh
+	//chunkclass		SwampSplashChunk
+	chunkxvelshift	4
+	chunkyvelshift	4
+	chunkzvelshift	4
+	chunkbasezvel	1
+	sound			player/inWater
+}
+terrain Swamp
+{
+	splash			Swamp
+	footclip		16
+	friction 0.7
+	liquid
+}
+
+terrain Water
+{
+	splash			Water
+	footclip		8
+	liquid
+}
+terrain WaterSmall
+{
+	splash			Water
+	footclip		4
+	liquid
+}
+
+
+
+terrain Carpet {}
+terrain Granit {}
+terrain Ground {}
+terrain Metall {}
+terrain Mud {}
+terrain Rock {}
+terrain Wood {}
+terrain Bones {}
+
+
+
+
+
+splash StandartSplash
+{
+	//sound	terrain/jumpdown
+}
+terrain Standart
+{
+	splash	StandartSplash
+}
+
+defaultterrain Standart
+
+
+
+floor  POOL3D Water
+floor  RIVER Water
+
+floor OSOK Swamp
+floor SLUDGE_1 Swamp
+floor SLUDGE_2 Swamp
+floor SLUDGE_3 Swamp
+floor SLUDGE_4 Swamp
+floor SLUDGE_5 Swamp
+floor SLUDGE_6 Swamp
+floor SLUDGE_7 Swamp
+
+
+floor GRBASE Ground
+floor BLUD0227 Ground
+floor BLUD0855 Ground
+floor BLUD030_ Ground
+floor BLUD0300 Ground
+floor UDYDCLFL Ground
+
+
+floor CAVEFLR Rock
+floor NBR Rock
+floor BLUD0095 Rock
+floor BLD0428 Rock
+floor B0318 Rock
+floor B0356 Rock
+floor BLUD0423 Rock
+floor BLD227C Rock
+floor BLUD0242 Rock
+floor B02027 Rock
+floor B0002 Rock
+floor B0138B Rock
+floor B000139 Rock
+floor B010113 Rock
+floor BLD04281 Rock
+floor BLUD0302 Rock
+floor BLUD0430 Rock
+floor BLUD0428 Rock
+
+
+
+floor STEPWAY2 Mud
+floor BLUD030W Mud
+
+floor BLUD0042 Granit
+floor BLUD0609 Granit
+
+floor BLUD0020 Wood
+floor BLUD0027 Wood
+floor BLUD0016 Wood
+floor BLUD0019 Wood
+
+floor UDYDCLFL Bones

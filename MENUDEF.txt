@@ -1,0 +1,114 @@
+LISTMENU "MainMenu"
+{
+	StaticPatch 94, -5, "M_DOOM"
+	Position 97,90
+		IfOption(ReadThis)
+		{
+			Position 97, 64
+		}
+		PatchItem "M_NGAME", "n", "PlayerclassMenu"
+		ifOption(SwapMenu)
+		{
+			PatchItem "M_LOADG", "l", "LoadGameMenu"
+			PatchItem "M_SAVEG", "s", "SaveGameMenu"
+			PatchItem "M_OPTION","o", "OptionsMenu"
+		}
+		else
+		{
+			PatchItem "M_OPTION","o", "OptionsMenu"
+			PatchItem "M_LOADG", "l", "LoadGameMenu"
+			PatchItem "M_SAVEG", "s", "SaveGameMenu"
+		}
+		ifOption(ReadThis)
+		{
+			PatchItem "M_RDTHIS","r", "ReadThisMenu"
+		}
+		PatchItem "M_QUITG", "q", "QuitMenu"
+}
+
+AddOptionMenu "OptionsMenu"
+{
+	Submenu "Curse Hunter Options", "ModMenu"
+
+}
+	OptionValue MovementModels
+	{
+		0, "Engine default"
+		1, "BLOOD style"
+	}
+OptionMenu "ModMenu"
+{
+	Title "Curse Hunter options"
+	StaticText ""
+
+
+
+	//Option "Player Movement model", PlayerMovementModel, MovementModels
+	Option "Draw plants", z_natue_draw_plants, "OnOff"
+	//Option "Draw grass", z_natue_draw_grass, "OnOff"
+	//Slider "Grass density", z_natue_grass_density, 10, 200, 10.0
+	//Slider "Tree density", z_natue_tree_density, 1, 100, 1.0
+	//Option "Draw bushes", z_natue_draw_bushes, "OnOff"
+
+	Option "Draw rain", z_natue_render_rain, "OnOff"
+	Option "Draw fog", z_natue_draw_fog, "OnOff"
+	Option "Draw extra decorations", z_natue_draw_extra_decor, "OnOff"
+	//Slider "Extra decorations density", z_natue_draw_extra_decor_dinsity, 0.1, 2, 0.1
+
+
+	//Slider "Dinamic details", z_natue_vegetation_density, 500, 5000, 100.0
+	//Slider "Render distance", z_natue_renderDistCoeff, 0.5, 2, 0.1
+
+	//Slider "Trees renderdistance", z_natue_renderdistance_tree, 1024, 10000, 256.0
+	//Slider "Bushes renderdistance", z_natue_renderdistance_bush, 512, 10000, 128.0
+	//Slider "Grass renderdistance", z_natue_renderdistance_grass, 256, 10000, 64.0
+
+	StaticText ""
+
+	Option "Show bounding rectangles", HUD_SHOW_BOUNDINGBOXES, "OnOff"
+	Option "Show startup tips", HUD_DISPLAY_SPLASHSCREEN, "OnOff"
+	Option "Show tutorial", HUD_DISPLAY_TUTORIAL, "OnOff"
+
+
+	StaticText ""
+	StaticText "Rendering options"
+	StaticText ""
+
+	Option "Unreal-style light coronas", RENDER_CORONAS, "OnOff"
+	Option "Dirty Lens Flares Effect", RENDER_DIRTY_LENS, "OnOff"
+	Option "Sun&Moon Lens Flare Effect", RENDER_SUN_LENS_FLARE, "OnOff"
+	Option "Other Chainflares Effect", RENDER_CHAINFLARES, "OnOff"
+
+	Option "Filmic Tonemap", dpwh_filmictonemap, "OnOff"
+	Option "Film Grain",dpwh_filmgrain, "OnOff"
+	Option "Cubic Chromatic Aberration", dpwh_chromaticAberration, "OnOff"
+	Option "Vignette", dpwh_naturalVignette, "OnOff"
+	Option "Motion Blur", "mblur", YesNo
+
+}
+
+
+
+AddOptionMenu "ModMenu"
+{
+	Submenu "Motion Blur Options", "MBlurOpts"
+}
+
+OptionMenu "MBlurAdvOpts"
+{
+
+	Title "Motion Blur Advanced Settings"
+	Option "Auto Stop", "mblur_autostop", OnOff
+	Slider "Stop Recovery", "mblur_recovery2", 0, 100, 5, 2
+	Slider "Stop Threshold", "mblur_threshold", 0, 100, 10, 2
+}
+
+OptionMenu "MBlurOpts"
+{
+	//Position -15
+	Title "Motion Blur Options"
+	Slider "Samples", "mblur_samples", 1, 100, 1, 0
+	Slider "Strength", "mblur_strength", 1, 500, 8, 2
+	Slider "Recovery", "mblur_recovery", 4, 100, 4, 1
+	Submenu "Advanced", "MBlurAdvOpts"
+}

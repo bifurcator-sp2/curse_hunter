@@ -1,0 +1,169 @@
+
+Class WaterSplsh : Actor
+{
+	Default
+	{
+		+DONTSPLASH;
+		+NOINTERACTION;
+		+ClientSideOnly;
+	}
+	States
+	{
+		Spawn:
+			TNT1 A 1 NODELAY A_SpawnitemEx("WaterSplashUp",0,0,1,0,0,0,0,SXF_NOCHECKPOSITION,0);
+			TNT1 A 1 A_SpawnitemEx("WaterDropWave",0,0,1,0,0,0,0,SXF_NOCHECKPOSITION,0);
+			BW1E B 0 { self.Destroy(); }
+		Stop;
+	}
+}
+
+Class SwampSplash : Actor
+{
+	Default
+	{
+		+DONTSPLASH;
+		+NOINTERACTION;
+		+ClientSideOnly;
+	}
+	States
+	{
+		Spawn:
+			TNT1 A 1 NODELAY A_SpawnitemEx("SwampSplashUp",0,0,1,0,0,0,0,SXF_NOCHECKPOSITION,0);
+			TNT1 A 1 A_SpawnitemEx("SwampDropWave",0,0,1,0,0,0,0,SXF_NOCHECKPOSITION,0);
+			BW1E B 0 { self.Destroy(); }
+		Stop;
+	}
+}
+
+
+Class SwampDropWave : LiquidDropWave
+{
+	States
+	{
+		Spawn:
+		 SW1E A 5 A_fadeOut(0.33);
+		 SW1E B 5;
+		 SW1E C 5;
+		Loop;
+	}
+}
+Class WaterDropWave : LiquidDropWave
+{
+	States
+	{
+		Spawn:
+		 WT1E A 5 A_fadeOut(0.33);
+		 WT1E B 5;
+		 WT1E C 5;
+		Loop;
+	}
+}
+
+Class WaterDropWaveGreat : WaterDropWave
+{
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		ScaleSpeed = 0.15;
+		if(Master){
+			A_SetScale(Master.scale.x);
+			ScaleSpeed = ScaleSpeed*Master.scale.x;
+		}
+
+	}
+
+	States
+	{
+		Spawn:
+		 WT1E C 5 A_fadeOut(0.05);
+		Loop;
+	}
+}
+
+
+Class SwampSplashUp : actor
+{
+	Default
+	{
+		+DONTSPLASH;
+		+NOINTERACTION;
+		+ClientSideOnly;
+	}
+	States
+	{
+		Spawn:
+			SSPH EFGHIJ 5;
+			TNT1 A 0 { self.Destroy(); }
+		Loop;
+	}
+}
+Class WaterSplashUp : actor
+{
+	Default
+	{
+		+DONTSPLASH;
+		+NOINTERACTION;
+		+ClientSideOnly;
+	}
+	States
+	{
+		Spawn:
+			WSPH EFGHIJ 5;
+			TNT1 A 0 { self.Destroy(); }
+		Loop;
+	}
+}
+
+Class SwampSplashChunk : actor
+{
+	Default
+	{
+		+DONTSPLASH;
+		+NOINTERACTION;
+		+ClientSideOnly;
+	}
+	States
+	{
+		Spawn:
+			SSPH ABCD 5;
+			TNT1 A 0 { self.Destroy(); }
+		Loop;
+	}
+
+}
+
+
+Class LiquidDropWave : Actor
+{
+
+	float Scale;
+	float ScaleSpeed;
+
+	Override void PostBeginPlay()
+	{
+		//Scale = 0.3;
+		ScaleSpeed = 0.03;
+	}
+
+	virtual void ParticleLife()
+	{
+		Scale = Scale+ScaleSpeed;
+		A_SetScale(Scale);
+
+	}
+	Override void Tick()
+	{
+		ParticleLife();
+		Super.Tick();
+	}
+	Default
+	{
+		Alpha 1.0;
+		Scale 0.25;
+		+DONTSPLASH;
+		+NOINTERACTION;
+		+FLATSPRITE;
+		Renderstyle "Translucent";
+	}
+
+}

@@ -1,0 +1,1495 @@
+
+
+actor Nature_SUN : Z_Nature_SUN 22000 {
+//$sprite SUNLA0
+//$Category Nature
+}
+actor Nature_MOON : Z_Nature_MOON 22001 {
+//$sprite MOONA0
+//$Category Nature
+}
+actor nature_HeavyClouds : Z_nature_HeavyClouds 22002 {
+//$sprite HCLDA0
+//$Category Nature
++FLATSPRITE
+}
+
+actor nature_grass : z_nature_grass 22003 {
+//$sprite SWMPA0
+//$Category Nature
+}
+
+
+actor nature_haze : z_nature_haze 22004 {
+//$sprite HZMRA0
+//$Category Nature
+}
+
+actor fx_fireplace : z_fx_fireplace 22005 {
+//$sprite FL1MA0
+//$Category FX
+}
+
+actor AxeZombie : Z_AxeZombie 22006 {
+//$sprite BZOMB8B2
+//$Category CH Monsters
+//$Title AxeZombie
+scale 0.45
+radius 16
+}
+
+actor LifeEssence : HeartHealth 22007 {
+//$sprite BHRTA0
+//$Category Pickups
+//$Title Life Essence
+inventory.pickupsound "items/heartpickup"
+}
+
+actor D_CarnageGiver : CarnageGiver 22008 {
+//$sprite AM01A0
+//$Category Pickups
+//$Title Carnage Amulet Giver
+}
+actor D_DominationGiver : DominationGiver 22009 {
+//$sprite AM02A0
+//$Category Pickups
+//$Title Domination Amulet Giver
+}
+actor D_SurvivalGiver : SurvivalGiver 22010 {
+//$sprite AM03A0
+//$Category Pickups
+//$Title Survival Amulet Giver
+}
+
+actor fire_AxeZombie : z_fire_AxeZombie 22011 {
+//$sprite BZOMB8B2
+//$Category CH Monsters
+//$Title Fire AxeZombie
+}
+
+actor OutdoorFloorLamp : z_OutdoorFloorLamp 22012 {
+//$sprite TLP1A0
+//$Category Light sourses
+//$Title Outdoor Floor Lamp
+}
+actor OutdoorFloorLamp_off : z_OutdoorFloorLamp_off 22013 {
+//$sprite TLP1B0
+//$Category Light sourses
+//$Title Outdoor Floor Lamp OFF
+}
+actor DeathAwaiting : z_DeathAwaiting 22014 {
+//$sprite COL6A0
+//$Category Light sourses
+//$Title Death Awaiting
+}
+
+actor CeilOilLamp : z_CeilOilLamp 22015 {
+//$sprite TGRNC0
+//$Category Light sourses
+//$Title Ceil Oil Lamp
+}
+actor smallCandleHolder : z_smallCandleHolder 22016 {
+//$sprite CANDA0
+//$Category Light sourses
+//$Title Small Candle holder
+}
+actor bigCandleHolder : z_bigCandleHolder 22017 {
+//$sprite CBRAA0
+//$Category Light sourses
+//$Title Big Candle holder
+}
+
+actor skullCandleHolder : z_skullCandleHolder 22018 {
+//$sprite SKLCA0
+//$scale 0.25
+//$Category Light sourses
+//$Title Skull Candle holder
+}
+
+actor SmallTorch : z_SmallTorch 22019 {
+//$sprite SMBTA0
+//$scale 0.3
+//$Category Light sourses
+//$Title Small Torch
+}
+actor BigTorch : z_BigTorch 22020 {
+//$sprite SMBTB0
+//$scale 0.3
+//$Category Light sourses
+//$Title Big Torch
+}
+
+actor EyeKeyGiver: z_EyeKeyGiver 22021{
+//$sprite EKEYA0
+//$scale 0.25
+//$Category CH Keys
+//$Title Eye Key
+}
+actor DaggerKeyGiver: z_DaggerKeyGiver 22022{
+//$sprite DKEYA0
+//$scale 0.25
+//$Category CH Keys
+//$Title Dagger Key
+}
+actor FireKeyGiver: z_FireKeyGiver 22023{
+//$sprite FKEYA0
+//$scale 0.25
+//$Category CH Keys
+//$Title Fire Key
+}
+actor SkullKeyGiver: z_SkullKeyGiver 22024{
+//$sprite SKEYA0
+//$scale 0.25
+//$Category CH Keys
+//$Title Skull Key
+}
+actor SpiderKeyGiver: z_SpiderKeyGiver 22025{
+//$sprite SPEYA0
+//$scale 0.25
+//$Category CH Keys
+//$Title Spider Key
+}
+actor MoonKeyGiver: z_MoonKeyGiver 22026{
+//$sprite MKEYA0
+//$scale 0.25
+//$Category CH Keys
+//$Title Moon Key
+}
+actor FireBug: z_FireBug 22027{
+//$sprite BUGLA0
+//$scale 0.25
+//$Category Pickups
+//$Title FireBug
+}
+
+actor ButtonSwitch: z_ButtonSwitch 22028{
+//$sprite SWT4A0
++wallsprite
+scale 0.5
+//$Category Switches
+//$Title Button Switch
+}
+actor randomStone: z_randomStone 22029{
+//$sprite STNEA0
+//$scale 0.5
+//$Category Decor
+//$Title Stone
+}
+actor stone_Spawner: z_stone_Spawner 22030{
+//$sprite STNEA0
+//$scale 0.5
+//$Category Decor
+//$Title Stone Spawner
+}
+
+actor tree_Spawner: z_tree_Spawner 22031{
+//$sprite BTR1A0
+//$scale 0.5
+//$Category Decor
+//$Title Tree Spawner
+}
+
+actor randomStalagmite: z_randomStalagmite 22032{
+//$sprite STALA0
+//$scale 0.5
+//$Category Decor
+//$Title Stalagmite
+}
+actor Stalagmite_Spawner: z_Stalagmite_Spawner 22033{
+//$sprite STALA0
+//$scale 0.5
+//$Category Decor
+//$Title Stalagmite Spawner
+}
+
+actor laminaria: z_laminaria 22034{
+//$sprite LAMIA0
+//$scale 0.5
+//$Category Decor
+//$Title Laminaria
+}
+actor bubbles: z_bubbles 22035{
+//$sprite BBL1A0
+//$scale 0.5
+//$Category Decor
+//$Title Bubbles
+}
+actor underwarter_decor_spawner: z_underwarter_decor_spawner 22036{
+//$scale 0.5
+//$Category Decor
+//$Title Underwater Decor Spawner
+}
+actor ceilChain: z_ceilChain 22037{
+//$sprite CHINA0
+//$scale 0.5
+//$Category Decor
+//$Title Ceiling Chain
+}
+
+actor Sawedoff: z_Sawedoff 22038{
+//$sprite SOSPA0
+//$scale 0.5
+//$Category Blood Weapons
+//$Title Sawed Off
+}
+
+
+
+actor Bshells: z_Bshells 22039{
+//$sprite SHELA0
+//$scale 0.5
+//$Category Blood Ammo
+//$Title Shells
+}
+
+
+actor TNTBundle: z_TNTBundle 22040{
+//$sprite TBNDA0
+//$scale 0.4
+//$Category Blood Weapons
+//$Title TNT
+}
+actor TNTAmmoBox: z_TNTAmmoBox 22041{
+//$sprite TBOXA0
+//$scale 0.5
+//$Category Blood Weapons
+//$Title TNT box
+}
+/*
+actor DTNTBOX: z_DTNTBOX 22042{
+//$sprite PROXA0
+//$scale 0.5
+//$Category Blood Weapons
+//$Title PROX TNT
+}
+*/
+
+actor WhiteDeath: z_WhiteDeath 22043{
+//$sprite STATA0
+//$Category Decor
+//$Title Statue White Death
+}
+
+actor Objective : z_Objective 22044
+{
+//$sprite OBJTA0
+//$Category GamePlay
+//$Title Primary Objective
+
+}
+
+actor secondary_objective : z_secondary_objective 22045
+{
+//$sprite OBJTB0
+//$Category GamePlay
+//$Title Secondary Objective
+
+}
+
+actor ProximitySwitchOnce : z_ProximitySwitchOnce 22046
+{
+//$sprite
+//$Category Switches
+//$Title Proximity Switch Once 0-359
+
+}
+
+actor ThornBush: z_ThornBush 22047{
+//$sprite TORNA0
+//$Category Decor
+//$Title Thorn Bush
+radius 48
+}
+
+actor ButtonSwitch2: z_ButtonSwitch2 22048{
+//$sprite SWT5A0
++wallsprite
+scale 0.5
+//$Category Switches
+//$Title Button Switch 2
+}
+
+actor chainSwitchLock: z_chainSwitchLock 22049{
+//$sprite LOCKA0
++wallsprite
+//$Category Switches
+//$Title Chain switch lock
+}
+
+actor nature_tree_1: z_nature_tree_1 22050{
+//$sprite BTR1A0
+//$Category Nature
+//$Title Tree 1
+}
+actor nature_tree_2: z_nature_tree_2 22051{
+//$sprite BTR2A0
+//$Category Nature
+//$Title Tree 2
+}
+actor nature_tree_3: z_nature_tree_3 22052{
+//$sprite BTR3A0
+//$Category Nature
+//$Title Tree 3
+}
+actor nature_tree_4: z_nature_tree_4 22053{
+//$sprite BTR4A0
+//$Category Nature
+//$Title Tree 4
+}
+actor nature_tree_5: z_nature_tree_5 22054{
+//$sprite BTR5A0
+//$Category Nature
+//$Title Tree 5
+}
+actor nature_tree_6: z_nature_tree_6 22055{
+//$sprite BTR6A0
+//$Category Nature
+//$Title Tree 6
+}
+actor nature_tree_4_flat: actor 22056{
+//$sprite BTR4A0
+//$Category Nature
+//$Title Flat Tree 4
++WALLSPRITE
++NOINTERACTION
++NOGRAVITY
+states{
+spawn: BTR4 A -1
+stop
+}
+}
+
+actor bullets: Z_bullets 22057{
+//$sprite BULLA0
+//$scale 0.5
+//$Category Blood Ammo
+//$Title Bullets
+}
+
+
+actor TommyGun: z_TommyGun 22058{
+//$sprite TOMMA0
+//$scale 0.6
+//$Category Blood Weapons
+//$Title Tommygun
+}
+
+actor nature_HeavyLight : Z_nature_HeavyLight 22059 {
+//$sprite HWLTA0
+//$Category Nature
++FLATSPRITE
+}
+
+actor  Ladder :  z_Ladder 22060 {
+//$Category GamePlay
+//$sprite LADDA0
++WALLSPRITE
+radius 16
+Height 128
+}
+
+actor  FakeLadder1 :  z_FakeLadder1 22061 {
+//$Category Decor
+//$sprite LADDA0
++WALLSPRITE
+radius 16
+Height 16
+}
+
+actor WEB1 22062
+{
+//$Category Decor
+
++WALLSPRITE
+radius 16
+Height 0
++spawnceiling
++NOINTERACTION
++NOGRAVITY
+RenderStyle Translucent
+Alpha 0.7
+
+	States
+	{
+		Spawn:
+			WEB1 A -1
+			Stop
+	}
+
+}
+actor WEB2 : WEB1 22063
+{
+	States
+	{
+		Spawn:
+			WEB1 B -1
+			Stop
+	}
+}
+actor WEB3 : WEB1 22064
+{
+	States
+	{
+		Spawn:
+			WEB1 C -1
+			Stop
+	}
+}
+
+actor  randomArtifact :  z_randomArtifact 22065 {
+//$Category Decor
+//$sprite ARTIA0
+//$Title Random Artifact
+Scale 0.25
+}
+
+actor  Ereshkigal_statue :  z_Ereshkigal_statue 22066 {
+//$Category Switches
+//$sprite ITM1A0
+//$Title Ereshkigal statue
+Scale 0.25
+}
+
+actor  Rope :  z_Rope 22067 {
+//$Category Decor
+//$sprite ROPEA0
+//$Title Vertical Rope
+}
+
+actor  takerSwitch :  z_takerSwitch 22068 {
+//$Category Switches
+//$Title Item taking switch
+}
+
+actor  Dust_Gen :  z_Dust_Gen 22069 {
+//$Category FX
+//$sprite DUSTA0
+//$Title Dust Generator
+}
+actor  RockDebris_Gen :  z_RockDebris_Gen 22070 {
+//$Category FX
+//$sprite ROC1A0
+//$Title Rock Debris Generator
+}
+
+actor WhiteMonk : z_WhiteMonk 22071 {
+//$Category Decor
+//$sprite STATB0
+//$Title Statue White Monk
+}
+
+actor WhiteFigure : z_WhiteFigure 22072 {
+//$Category Decor
+//$sprite STATC0
+//$Title Statue White Figure
+}
+actor Chest : z_Chest 22073 {
+//$Category Pickups
+//$sprite CHSTA0
+//$Title Chest of random Ammunition
+}
+
+actor EnLevelSwitch : z_EnLevelSwitch 22074 {
+//$sprite S666B0
++wallsprite
+//$Category Switches
+//$Title End Level Svitch
+}
+
+actor Earth_AxeZombie : z_Earth_AxeZombie 22075 {
+//$sprite UGZZD0
+//$Category CH Monsters
+//$Title Earth AxeZombie
+scale 0.45
+radius 16
+}
+
+actor DoctorBag : DoctorBagGiver 22076 {
+//$sprite DBAGA0
+//$Category Pickups
+//$Title Doctor Bag
+}
+actor DustUrn : z_DustUrn 22077 {
+//$Category Pickups
+//$sprite VASEA0
+//$Title Urn of random Ammunition
+}
+
+
+actor CultistShotgun : z_CultistShotgun 22078 {
+//$sprite YCUFA1
+//$Category CH Monsters
+//$Title Cultist with shotgun
+Scale 0.53
+radius 20
+}
+actor SpiderRed : z_SpiderRed 22079 {
+//$sprite BSDRA1
+//$Category CH Monsters
+//$Title Spider Red
+Scale 0.35
+}
+
+
+
+actor Bat : z_Bat 22080 {
+//$sprite BATBB0
+//$Category CH Monsters
+//$Title Bat
+Scale 0.5
+}
+actor Bat_Sleeping : z_Bat_Sleeping 22081 {
+//$sprite BATBA0
+//$Category CH Monsters
+//$Title Bat Sleeping
+Scale 0.5
+}
+
+actor Eel : z_eel 22082 {
+//$sprite BNELA3A7
+//$Category CH Monsters
+//$Title Bone Eel
+Scale 0.5
+}
+
+actor gargoyle : z_gargoyle 22083 {
+//$sprite BGARA1
+//$Category CH Monsters
+//$Title Gargoyle
+Scale 0.58
+}
+actor sleeping_gargoyle : z_sleeping_gargoyle 22084 {
+//$sprite GARSA0
+//$Category CH Monsters
+//$Title Gargoyle Sleeping
+Scale 0.58
+}
+
+actor IndoorCeilingLamp : z_IndoorCeilingLamp 22085 {
+//$sprite TLMPA0
+//$Category Light sourses
+//$Title Ceil candle Lamp
+}
+actor floorBigTorch : z_floorBigTorch 22086 {
+//$sprite TREDA0
+//$Category Light sourses
+//$Title Beeg Floor Torch
+}
+
+actor floorBigScullTorch : z_floorBigScullTorch 22087 {
+//$sprite TREDB0
+//$Category Light sourses
+//$Title Beeg Floor Scull Torch
+}
+
+actor Flares : Ammo 22088
+{
+//$Category Blood Ammo
+//$Title Flares
+  //spawnid 12
+  radius 20
+  height 8
+  Scale 0.85
+  inventory.pickupmessage "$FLAREBOX_PICKED"
+  inventory.pickupsound "dsammoup"
+  inventory.icon "FGRDA0"
+  inventory.amount 8
+  inventory.maxamount 100
+  ammo.backpackamount 4
+  ammo.backpackmaxamount 100
+  states
+  {
+  Spawn:
+	FGRD A -1
+	Stop
+  }
+}
+
+Actor FlareBox2 : Flares 22089
+{
+//$Category Blood Ammo
+//$Title Flares Box 2
+  inventory.pickupmessage "$FLAREBOX_PICKED"
+  inventory.pickupsound "dsammoup"
+  inventory.amount 12
+  inventory.maxamount 100
+  ammo.backpackamount 4
+  ammo.backpackmaxamount 100
+  States
+  {
+	Spawn:
+		FGR2 A -1
+	Stop
+  }
+}
+
+Actor FlareBox3 : Flares 20090
+{
+//$Category Blood Ammo
+//$Title Flares Box 3
+  inventory.pickupmessage "$FLAREBOX_PICKED"
+  inventory.pickupsound "dsammoup"
+  inventory.amount 16
+  inventory.maxamount 100
+  ammo.backpackamount 4
+  ammo.backpackmaxamount 100
+  States
+  {
+	Spawn:
+		FGR3 A -1
+	Stop
+  }
+}
+
+
+actor FlareGun: z_FlareGun 22091{
+//$sprite FGRNA0
+//$scale 0.8
+//$Category Blood Weapons
+//$Title Flare Gun
+}
+
+
+actor GargoileStatue : z_GargoileStatue 22092 {
+//$sprite GARSD0
+//$Category Decor
+//$Title Gargoyle Statue
+Scale 0.58
+}
+
+
+actor Rat : z_Rat 22093 {
+//$sprite RATWA1
+//$Category CH Monsters
+//$Title Rat
+Scale 0.34
+}
+actor RatNest : z_RatNest 22094 {
+//$Category CH Monsters
+//$Title Rat Nest
+}
+actor SpiderNest : z_SpiderNest 22095 {
+//$sprite SPDNB0
+//$Category CH Monsters
+//$Title Spiders Nest
+}
+actor WEB4 : z_WEB4 22096 {
+//$sprite WEB2A0
+//$Category Decor
+//$Title Web Big
++WALLSPRITE
+}
+actor WEB5 : z_WEB5 22097 {
+//$sprite WEB3A0
+//$Category Decor
+//$Title Web Big Flat
++FLATSPRITE
+}
+
+actor SpiderNest2 : z_SpiderNest2 22098 {
+//$sprite SPDNA0
+//$Category CH Monsters
+//$Title Spiders Nest Big
+}
+
+actor corpse1 : z_corpse 22099 {
+//$sprite CRP0A0
+//$Category Decor / Corpses
+//$Title Hanged corpse 1
+scale 0.75
+}
+
+actor randomHangingCorpse : z_randomHangingCorpse 22100 {
+//$sprite CRP7C0
+//$Category Decor / Corpses
+//$Title Random Hanged corpse
+scale 0.75
+}
+actor randomHangingSkeleton : z_randomHangingSceleton 22101 {
+//$sprite CRP7A0
+//$Category Decor / Corpses
+//$Title Random Hanged skeleton
+scale 0.75
+}
+actor classicCorpse1 : z_classicCorpse1 22102 {
+//$sprite CRP1A0
+//$Category Decor / Corpses
+//$Title Classic Corpse 1
+scale 0.6
+}
+actor classicCorpse2 : z_classicCorpse2 22103 {
+//$sprite CRP1B0
+//$Category Decor / Corpses
+//$Title Classic Corpse 2
+scale 0.6
+}
+actor classicCorpse3 : z_classicCorpse3 22104 {
+//$sprite CRP1C0
+//$Category Decor / Corpses
+//$Title Classic Corpse 3
+scale 0.6
+}
+
+actor Defiler : z_Defiler 22105 {
+//$sprite DFLRA0
+//$Category CH Monsters
+//$Title Defiler
+Scale 0.7
+}
+
+actor defilerSpot : z_defilerSpot 22106 {
+//$Category CH Monsters
+//$Title Defiler Spot
+}
+
+actor defilerDefender : z_defilerDefender 22107 {
+//$sprite DFNDA0
+//$Category CH Monsters
+//$Title Defiler Defender
+Scale 0.35
+}
+
+actor Curse : z_Curse 22108 {
+//$sprite CRSEA0
+//$Category Pickups
+//$Title The Curse
+Scale 0.25
+}
+
+actor BodyArmor : z_BodyArmor 22109 {
+//$sprite ARM1A0
+//$Category Pickups/Armor
+//$Title Body Armor
+}
+actor FireArmor : z_FireArmor 22110 {
+//$sprite ARMFA0
+//$Category Pickups/Armor
+//$Title Fire Armor
+}
+
+actor SpiritArmor : z_SpiritArmor 22111 {
+//$sprite SARMA0
+//$Category Pickups/Armor
+//$Title Spirit Armor
+}
+
+actor SuperArmor : z_SuperArmor 22112 {
+//$sprite ARM2A0
+//$Category Pickups/Armor
+//$Title Super Armor
+}
+
+//22113 - 22212 - info marekers defined in zmapinfo
+
+
+
+
+actor intro_fire : switchabledecoration  22213 {
+//$sprite INTRA0
+//$Category INTROS
+	+NOINTERACTION
+	+NOGRAVITY
+	+WALLSPRITE
+	renderstyle "add"
+	alpha 0.0
+
+	States
+	{
+		Spawn:
+			TNT1 A 1
+			GOTO Inactive
+		Inactive:
+			TNT1 A 1
+			Loop
+		Active:
+			INTR AAAA 1 A_FadeIn(0.25)
+			INTR A 1
+			Loop
+
+	}
+
+}
+
+actor intro_caleb_0 : switchabledecoration  22214 {
+//$sprite ICLBA0
+//$Category INTROS
+	+NOINTERACTION
+	+NOGRAVITY
+	+WALLSPRITE
+	alpha 1.0
+	RenderStyle "Translucent"
+
+	States
+	{
+		Spawn:
+			TNT1 A 1
+			Goto Inactive
+		Inactive:
+			ICLB A 1 A_FadeOut(0.05, FTF_CLAMP)
+			Loop
+		Active:
+			ICLB A 1 A_FadeTo(0.7, 0.05, FTF_CLAMP)
+			Loop
+
+	}
+
+}
+actor intro_caleb_1 : switchabledecoration  22215 {
+//$sprite ICLBB0
+//$Category INTROS
+	+NOINTERACTION
+	+NOGRAVITY
+	+WALLSPRITE
+	alpha 1.0
+	RenderStyle "Translucent"
+
+	States
+	{
+		Spawn:
+			TNT1 A 1
+			GOTO Inactive
+		Inactive:
+			ICLB B 1 A_FadeOut(0.05, FTF_CLAMP)
+			Loop
+		Active:
+			ICLB B 1 A_FadeTo(1.0, 0.05, FTF_CLAMP)
+			Loop
+
+	}
+
+}
+actor intro_caleb_2 : switchabledecoration  22216 {
+//$sprite ICLBC0
+//$Category INTROS
+	+NOINTERACTION
+	+NOGRAVITY
+	+FORCEYBILLBOARD
+	alpha 1.0
+	RenderStyle "Translucent"
+
+	States
+	{
+		Spawn:
+			TNT1 A 1
+			GOTO Inactive
+		Inactive:
+			ICLB C 1 A_FadeOut(0.05, FTF_CLAMP)
+			Loop
+		Active:
+			ICLB C 1 A_FadeTo(1.0, 0.05, FTF_CLAMP)
+			Loop
+
+	}
+
+}
+actor intro_moonhalo : actor  22217 {
+//$sprite LEFLZ0
+//$Category INTROS
+	+NOINTERACTION
+	+NOGRAVITY
+	+WALLSPRITE
+	alpha 1.0
+	RenderStyle "ADD"
+
+	States
+	{
+		Spawn:
+			LEFL Z 1
+			Loop
+	}
+
+}
+
+actor intro_crossGlow : actor  22218 {
+//$sprite CRGLA0
+//$Category INTROS
+	+NOINTERACTION
+	+NOGRAVITY
+	+WALLSPRITE
+	alpha 1.0
+	xscale 0.35
+	yscale 0.35
+	RenderStyle "ADD"
+
+	States
+	{
+		Spawn:
+			CRGL A 1
+			Loop
+	}
+
+}
+
+
+actor IntoCrossGlow : z_IntoCrossGlow  22219 {
+//$Category INTROS
+}
+actor intro_moonhaloFloor : actor  22220 {
+//$sprite LEFLZ0
+//$Category INTROS
+	+NOINTERACTION
+	+NOGRAVITY
+	+FLATSPRITE
+	alpha 1.0
+	RenderStyle "ADD"
+
+	States
+	{
+		Spawn:
+			LEFL Z 1
+			Loop
+	}
+
+}
+
+
+
+
+actor introGraveCover : z_introGraveCover  22221 {
+//$sprite IGCOA0
+//$Category INTROS
+	+NOINTERACTION
+	+NOGRAVITY
+	+FLATSPRITE
+	alpha 1.0
+	radius 256
+	RenderRadius 512
+	//RenderStyle Subtract
+}
+
+actor intro_ganzir_intrance : switchabledecoration  22222 {
+//$sprite GANZA0
+//$Category INTROS
+	+NOINTERACTION
+	+NOGRAVITY
+	+WALLSPRITE
+	alpha 0.0
+	RenderStyle "Translucent"
+
+	States
+	{
+		Spawn:
+			TNT1 A 1
+			GOTO Inactive
+		Inactive:
+			TNT1 A 1
+			Loop
+		Active:
+			GANZ A 1 Bright A_FadeTo(0.8, 0.01, FTF_CLAMP)
+			Loop
+
+	}
+
+}
+actor intro_kigal : switchabledecoration  22223 {
+//$sprite IKIGA0
+//$Category INTROS
+	+NOINTERACTION
+	+NOGRAVITY
+	+WALLSPRITE
+	alpha 0.0
+	RenderStyle "Translucent"
+
+	States
+	{
+		Spawn:
+			TNT1 A 1
+			GOTO Inactive
+		Inactive:
+			TNT1 A 1
+			Loop
+		Active:
+			IKIG AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA 1 Bright A_FadeTo(1.0, 0.025, FTF_CLAMP)
+			IKIG AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA 8
+			IKIG AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA 1 Bright A_FadeOut(0.025)
+			Goto Inactive
+
+	}
+
+}
+
+actor intro_CH_LOGO : switchabledecoration  22224 {
+//$sprite BTCHA0
+//$Category INTROS
+	+NOINTERACTION
+	+NOGRAVITY
+	+FORCEXYBILLBOARD
+	alpha 0.0
+	RenderStyle "Translucent"
+
+	States
+	{
+		Spawn:
+			TNT1 A 1
+			GOTO Inactive
+		Inactive:
+			TNT1 A 1
+			Loop
+		Active:
+			BTCH A 1 Bright A_FadeIn(0.01, FTF_CLAMP)
+			Loop
+
+	}
+
+}
+
+
+actor SawedoffDouble: z_SawedoffDouble 22225{
+//$sprite SOSPA0
+//$scale 0.5
+//$Category Blood Weapons
+//$Title Double Sawed Off
+}
+
+
+actor CultistTommy : z_CultistTommy 22226 {
+	//$sprite BCULA8A2
+	//$Category CH Monsters
+	//$Title Cultist with tommygun
+	//translation "112:120=[128,128,128]:[48,48,48]","120:127=[48,48,48]:[8,8,8]","209:223=193:207","192:200=[192,192,192]:[64,64,64]","200:207=[64,64,64]:[16,16,16]","240:247=[16,16,16]:[0,0,0]"
+
+	Scale 0.53
+	radius 20
+}
+
+
+actor bullets_drum: Z_bullets_drum 22227{
+//$sprite TOMAA0
+//$scale 0.5
+//$Category Blood Ammo
+//$Title Drum of Bullets
+}
+
+actor Zombie_Head: Actor 22228{
+//$sprite ZHEDA0
+//$scale 0.5
+//$Category Decor
+//$Title Zombie Head
+	states
+	{
+		spawn:
+			TNT1 A 1 NODELAY A_SpawnItemEx("ZombieHead")
+			Stop
+
+	}
+
+}
+
+
+
+
+actor DustUrnSpawner : z_DustUrnSpawner 22229 {
+//$Category Pickups
+//$sprite VASEA0
+//$Title Spawner: Urn of random Ammunition
+}
+
+actor kickup : z_kickup 22230 {
+//$Category decor
+//$sprite TNT1A0
+//$Title Kickuper
+}
+
+
+
+actor Nolegs_AxeZombie : z_Nolegs_AxeZombie 22231 {
+//$sprite R066B1
+//$Category CH Monsters
+//$Title No Legs AxeZombie
+scale 0.45
+radius 16
+}
+
+
+
+actor nature_decor_haze_particle : Z_nature_decor_haze_particle 22232 {
+//$sprite FOGYB0
+//$Category Decor
+//$Title Distant Haze
+scale 10.0
+radius 16
+}
+
+actor ch_MovingCamera : z_ch_MovingCamera 22233 {
+//$Category Gameplay
+//$Title Moving Camera
+}
+
+actor intro_caleb_3   22234 {
+//$sprite ICLBD0
+//$Category INTROS
+	+NOINTERACTION
+	+NOGRAVITY
+	+FORCEYBILLBOARD
+	alpha 1.0
+	RenderStyle "Translucent"
+
+	States
+	{
+		Spawn:
+			ICLB D -1
+			STOP
+	}
+
+}
+
+
+
+actor  ColorGlass_Gen :  z_ColorGlass_Gen 22235 {
+//$Category FX
+//$sprite SGSAE0
+//$Title Colored Glass Generator
+}
+
+
+actor nature_decor_haze_particle_wall : Z_nature_decor_haze_particle 22236 {
+//$sprite FOGYB0
+//$Category Decor
+//$Title Distant Haze Wall
++WALLSPRITE
+scale 10.0
+radius 16
+}
+
+actor Stalagmite_SpawnerBIG: z_Stalagmite_SpawnerBIG 22237{
+//$sprite STALA0
+//$scale 1.5
+//$Category Decor
+//$Title Stalagmite Spawner Big
+}
+
+
+
+actor randomFloorSceleton: z_randomFloorSceleton 22238{
+//$sprite SCL1A0
+//$scale 0.5
+//$Category Decor
+//$Title Floor Sceleton
+}
+
+actor randomFloorSceleton_spawner: z_randomFloorSceleton_spawner 22239{
+//$sprite SCL1B0
+//$scale 0.5
+//$Category Decor
+//$Title Floor Sceleton spawner
+}
+
+actor WaterFallSpray: z_fx_WaterFallSpray 22240{
+//$sprite FWLBA0
+//$scale 0.5
+//$Category Decor
+//$Title WaterFall Spray
+}
+
+
+actor Mengir: z_Mengir 22241{
+//$sprite MNGRA0
+//$Category Decor
+//$Title Mengir
+}
+
+
+actor randomLightMoss: z_randomLightMoss 22242{
+//$sprite LMOSA0
+//$Category Light sourses
+//$Title Light Moss
+}
+actor randomLightMossCeiling: z_randomLightMossCeiling 22243{
+//$sprite LMOSA0
+//$Category Light sourses
+//$Title Light Moss Ceiling
+}
+
+actor BloodStone: z_BloodStone 22244{
+//$sprite BSTNA0
+//$Category Decor
+//$scale 0.5
+//$Title Random Blood stone
+}
+
+
+actor CeilingMoss1: z_CeilingMoss1 22245{
+//$sprite MOSSA0
+//$Category Decor
+//$Title Ceiling Moss1
++WALLSPRITE
++NOINTERACTION
+height 1
+}
+actor CeilingMoss2: CeilingMoss1 22246{
+//$sprite MOSSB0
+//$Title Ceiling Moss2
+	States
+	{
+		Spawn:
+			MOSS B -1
+			Stop
+	}
+}
+
+actor CeilingMoss3: CeilingMoss1 22247{
+//$sprite MOSSC0
+//$Title Ceiling Moss3
+	States
+	{
+		Spawn:
+			MOSS C -1
+			Stop
+	}
+}
+actor CeilingMoss4: CeilingMoss1 22248{
+//$sprite MOSSD0
+//$Title Ceiling Moss1
+	States
+	{
+		Spawn:
+			MOSS D -1
+			Stop
+	}
+}
+actor CeilingMoss5: CeilingMoss1 22249{
+//$sprite MOSSE0
+//$Title Ceiling Moss5
+	States
+	{
+		Spawn:
+			MOSS E -1
+			Stop
+	}
+}
+
+
+actor Pod : z_Pod 22250 {
+//$sprite GPODA0
+//$Category CH Monsters
+//$Title Green Pod
+scale 0.5
+}
+
+actor PodSeeding : z_PodSeeding 22251 {
+//$sprite GVINA0
+//$Category CH Monsters
+//$Title Green Pod Seeding
+scale 0.5
+}
+
+actor PodSeed : z_PodSeed 22252 {
+//$sprite GPODR0
+//$Category CH Monsters
+//$Title Green Pod Seed
+}
+
+
+
+actor CultistShotgunInactive : z_CultistShotgunInactive 22253 {
+//$sprite YCUFA1
+//$Category CH Monsters
+//$Title Inactive Cultist with shotgun
+Scale 0.53
+radius 20
+}
+
+actor CultistTommyInactive : z_CultistTommyInactive 22254 {
+	//$sprite BCULA8A2
+	//$Category CH Monsters
+	//$Title Inactive Cultist with tommygun
+
+	Scale 0.53
+	radius 20
+}
+actor SpiderBig : z_SpiderBig 22255 {
+//$sprite SPDBG1
+//$Category CH Monsters
+//$Title Spider Big
+Scale 0.35
+}
+
+actor TNTremote: z_TNTremote 22256{
+//$sprite REPKA0
+//$scale 0.5
+//$Category Blood Weapons
+//$Title TNT remote
+}
+
+actor PredatorPointer : z_PredatorPointer 22257
+{
+//$sprite PNTRB0
+//$scale 0.5
+//$Category Gameplay
+//$Title Predator pointer
+}
+
+actor Predator : z_Predator 22258
+{
+//$sprite PREDA0
+//$Category Gameplay
+//$Title Predator ghost
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+actor D_HeartHealthEidos : HeartHealthEidos 22009
+{
+//$sprite BHRTA0
+//$Category Pickups
+//$Title Life Essence Eidos
+
+}
+*/
+
+//Z bloody hell decorate graves
+actor Grave1 : ZombieGrave 6510
+{
+//$Category Blood Props
+ Radius 16
+ Height 68
+ ProjectilePassHeight -16
+ +SOLID
+ +NOGRAVITY
+ States
+ {
+ Spawn:
+ GRA1 A 4
+ Loop
+ }
+}
+
+actor Grave2 : ZombieGrave 6511
+{
+//$Category Blood Props
+ Radius 16
+ Height 68
+ ProjectilePassHeight -16
+ +SOLID
+ +NOGRAVITY
+ States
+ {
+ Spawn:
+ GRA2 A 4
+ Loop
+ }
+}
+
+actor Grave3 : ZombieGrave 6512
+{
+//$Category Blood Props
+ Radius 16
+ Height 68
+ ProjectilePassHeight -16
+ +SOLID
+ +NOGRAVITY
+ States
+ {
+ Spawn:
+ GRA3 A 4
+ Loop
+ }
+}
+
+actor Grave4 : ZombieGrave 6513
+{
+//$Category Blood Props
+ Radius 16
+ Height 68
+ ProjectilePassHeight -16
+ +SOLID
+ +NOGRAVITY
+ States
+ {
+ Spawn:
+ GRA4 A 4
+ Loop
+ }
+}
+
+actor Grave5 : ZombieGrave 6514
+{
+//$Category Blood Props
+ Radius 16
+ Height 68
+ ProjectilePassHeight -16
+ +SOLID
+ +NOGRAVITY
+ States
+ {
+ Spawn:
+ GRA5 A 4
+ Loop
+ }
+}
+
+actor Grave6 : ZombieGrave 6515
+{
+//$Category Blood Props
+ Radius 16
+ Height 68
+ ProjectilePassHeight -16
+ +SOLID
+ +NOGRAVITY
+ States
+ {
+ Spawn:
+ GRA6 A 4
+ Loop
+ }
+}
+
+actor Grave7 : ZombieGrave 6516
+{
+//$Category Blood Props
+ Radius 16
+ Height 68
+ ProjectilePassHeight -16
+ +SOLID
+ +NOGRAVITY
+ States
+ {
+ Spawn:
+ GRA7 A 4
+ Loop
+ }
+}
+
+actor Grave8 : ZombieGrave 6517
+{
+//$Category Blood Props
+ Radius 16
+ Height 68
+ ProjectilePassHeight -16
+ +SOLID
+ +NOGRAVITY
+ States
+ {
+ Spawn:
+ GRA8 A 4
+ Loop
+ }
+}
+
+

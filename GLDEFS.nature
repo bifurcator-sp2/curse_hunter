@@ -1,0 +1,124 @@
+flickerlight NatureLightning
+{
+    color 0.8 0.8 1.0
+    size 96
+    secondarySize 96
+    chance 0.2
+	attenuate 1
+	offset 0 0 0
+}
+
+Object Z_nature_Lightning
+{
+FRAME TNDRA { light NatureLightning }
+FRAME TNDRB { light NatureLightning }
+FRAME TNDRC { light NatureLightning }
+}
+
+
+HardwareShader Sprite BTRGA0
+{
+	Shader "shaders/grass.shader"
+	Speed 4.0
+}
+HardwareShader Sprite BTRGB0
+{
+	Shader "shaders/grass.shader"
+	Speed 4.2
+}
+HardwareShader Sprite BTRGC0
+{
+	Shader "shaders/grass.shader"
+	Speed 4.4
+}
+
+HardwareShader Sprite BUH1A0
+{
+	Shader "shaders/grass.shader"
+	Speed 4.0
+}
+HardwareShader Sprite BUH1B0
+{
+	Shader "shaders/grass.shader"
+	Speed 4.2
+}
+HardwareShader Sprite BUH1C0
+{
+	Shader "shaders/grass.shader"
+	Speed 4.4
+}
+
+HardwareShader Sprite BTR1A0
+{
+	Shader "shaders/trees.fp"
+	Speed 2.0
+}
+HardwareShader Sprite BTR2A0
+{
+	Shader "shaders/trees.fp"
+	Speed 2.2
+}
+HardwareShader Sprite BTR3A0
+{
+	Shader "shaders/trees.fp"
+	Speed 2.4
+}
+HardwareShader Sprite BTR4A0
+{
+	Shader "shaders/trees.fp"
+	Speed 2.6
+}
+HardwareShader Sprite BTR5A0
+{
+	Shader "shaders/trees.fp"
+	Speed 2.8
+}
+HardwareShader Sprite BTR6A0
+{
+	Shader "shaders/trees.fp"
+	Speed 3.0
+}
+
+HardwareShader Sprite CHINA0
+{
+	Shader "shaders/Chain.fp"
+	Speed 2.0
+}
+HardwareShader Sprite CHINB0
+{
+	Shader "shaders/Chain.fp"
+	Speed 2.5
+}
+HardwareShader Sprite CHINC0
+{
+	Shader "shaders/Chain.fp"
+	Speed 3.0
+}
+
+/*
+HardwareShader Sprite LMOSA0
+{
+	Shader "shaders/grass.shader"
+	Speed 1.0
+}
+HardwareShader Sprite LMOSB0
+{
+	Shader "shaders/grass.shader"
+	Speed 1.5
+}
+HardwareShader Sprite LMOSC0
+{
+	Shader "shaders/grass.shader"
+	Speed 2.0
+}
+HardwareShader Sprite LMOSD0
+{
+	Shader "shaders/grass.shader"
+	Speed 2.5
+}
+HardwareShader Sprite LMOSE0
+{
+	Shader "shaders/grass.shader"
+	Speed 3.0
+}
+*/

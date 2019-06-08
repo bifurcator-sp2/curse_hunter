@@ -1,0 +1,2629 @@
+class playerBasicEvent : EventHandler
+
+{
+
+	override void PlayerEntered(PlayerEvent e)
+	{
+		Super.PlayerEntered(e);
+
+		PlayerInfo player = players[e.PlayerNumber];
+		player.mo.giveInventory("playerPauseController", 1);
+		player.mo.giveInventory("playerJumpSoundsController", 1);
+		player.mo.giveInventory("playerIdleTalkingController", 1);
+		player.mo.giveInventory("PlayerBlowLaughController", 1);
+
+		player.mo.giveInventory("AbilityController", 1);
+
+		player.mo.giveInventory("z_PointController", 1);
+		player.mo.giveInventory("playerLaddingController", 1);
+		player.mo.giveInventory("PlayerArmorController", 1);
+		player.mo.giveInventory("PlayerStaminaController", 1);
+
+		player.mo.giveInventory("playerMarkingController", 1);
+		player.mo.giveInventory("playerSunFlareController", 1);
+		player.mo.giveInventory("playerMoonFlareController", 1);
+		//player.mo.giveInventory("SupressFireController", 1);
+
+		//player.mo.giveInventory("playerPickupWeaponWoiceController", 1);
+
+
+		//player.mo.giveInventory("poisoningController", 1);
+
+		//player.mo.giveInventory("FireBug", 1);
+		//player.mo.giveInventory("Ability_QuickKill", 1);
+		//player.mo.giveInventory("Ability_LeapKill", 1);
+		//player.mo.giveInventory("Ability_Subordinate", 1);
+		//player.mo.giveInventory("Ability_SixSence", 1);
+
+		//player.mo.giveInventory("InfoScreen", 1);
+		//player.mo.giveInventory("info_0", 1);
+		//player.mo.giveInventory("info_1", 1);
+		//player.mo.giveInventory("info_2", 1);
+		//player.mo.giveInventory("note_0", 1);
+
+
+
+		//z_Pointer Pointer = z_Pointer(player.mo.spawn("z_Pointer", player.mo.pos));
+		//Pointer.Master = player.mo;
+	}
+
+    override void WorldThingDied(WorldEvent e)
+    {
+		//players[consoleplayer].mo.a_log(e.DamageType);
+		/*if(e.DamageType == "Fire"){
+			actor BDSM = e.Thing.spawn("z_BurnDeathSmoke", e.Thing.pos);
+			BDSM.Master = e.Thing;
+			e.Thing.a_log("bdsm");
+		}*/
+	}
+    override void WorldThingDamaged(WorldEvent e)
+    {
+		let BulletRecoilDist = 384;
+
+        let plr = PlayerPawn(e.DamageSource);
+		let PlayerDamaged = PlayerPawn(e.Thing);
+
+        if (plr && e.Thing.Health <= 0 && ( e.Thing is "CHmonster" || e.Thing is "HeadShotTarget" )  /*e.Thing.bISMONSTER && e.Thing.bCOUNTKILL*/ ){
+				plr.giveInventory("PlayerLaugh", 1);
+        }
+
+		if ( plr && !e.Thing.bNODAMAGETHRUST && e.Thing is "CHmonster" && ( e.DamageType == "Bullet" ||  e.DamageType == "Shell" ||  e.DamageType == "PitchFork") ){
+
+			DistanceSpawned Monster = DistanceSpawned(e.Thing);
+
+			float force = e.Damage;
+			if(e.Thing.bFLOAT){force=force*0.1;} else {force=force*0.5;}
+			float RD = BulletRecoilDist-Monster.CurrentDistance;
+			RD = RD>0 ? RD : BulletRecoilDist;
+			force = force * ( (BulletRecoilDist-RD) / BulletRecoilDist);
+
+			e.Thing.vel.x = e.Thing.vel.x + cos(plr.angle)*force;
+			e.Thing.vel.y = e.Thing.vel.y + sin(plr.angle)*force;
+			e.Thing.vel.z = e.Thing.vel.z - sin(plr.pitch)*force;
+
+
+
+		 }
+
+		if(plr && e.Thing.Health <= 0){
+			if(e.Thing is "CHmonster"){
+				let Monst = CHmonster(e.Thing);
+				Monst.killedByPlayer = true;
+				//e.Thing.a_log("Caleb kills");
+
+			}
+			//e.Thing.a_log(String.Format("%s %s %i", e.Thing.getClassName(), e.DamageType, e.Damage));
+
+		}
+		if(e.DamageType == "Shell" && e.Thing.Health <= 0){
+
+			//MonsterShellXDeathController
+			if(e.Thing.countInv("ShellDamage")>1 && e.DamageSource.distance3D(e.Thing)<=96){
+				e.Thing.takeInventory("ShellDamage", e.Thing.countInv("ShellDamage"));
+				MonsterShellXDeathController controller = MonsterShellXDeathController(e.thing.findinventory("MonsterShellXDeathController"));
+				if(controller){
+					//e.Thing.ResolveState("Xdeath.Shells");
+					controller.doIt();
+				}
+
+			}
+		}
+
+		if(e.DamageType == "Fire"){
+			//e.Thing.a_LogInt(e.Damage);
+			//if(PlayerDamaged || e.Thing is "CHmonster"){}
+
+		}
+
+		if(e.Thing.Health <= 0 && e.DamageType == "Fire"){
+			e.Thing.giveInventory("FireDeathMark", 1);
+			//e.Thing.a_log("FireDeath");
+		}
+
+		if(e.DamageType == "Blast" && (e.Thing is "gargoyle" || e.Thing is "sleeping_gargoyle")){
+			//additional blast damage for Gargoyle
+			e.Thing.a_damageSelf(e.Damage*4.5);
+		}
+    }
+
+	override void WorldThingSpawned(WorldEvent e)
+	{
+		//Super.WorldThingSpawned(WorldEvent e);
+
+		if(!players[consoleplayer].mo.FindInventory("SixVision") || !players[consoleplayer].mo.FindInventory("Ability_SixSence")){return;}
+
+		if (e.Thing is "CHmonster"){
+		//if (e.Thing.bISMONSTER){
+			e.Thing.a_spawnItemEx("VisionMarker", 0, 0, 0, 0, 0, 0, 0, SXF_SETMASTER);
+		}
+	}
+
+
+
+}
+
+class Undroppable  : CustomInventory
+{
+	Default
+	{
+		+INVENTORY.AUTOACTIVATE;
+		+INVENTORY.HUBPOWER;
+		+INVENTORY.PERSISTENTPOWER;
+		+INVENTORY.UNDROPPABLE;
+		Inventory.MaxAmount 1;
+	}
+
+	States
+	{
+		Spawn:
+			TNT1 A -1;
+			Stop;
+		Use:
+			TNT1 A 1;
+			Loop;
+	}
+}
+/*
+class playerPickupWeaponWoiceController : Undroppable
+{
+	bool HaveSawedOff;
+	override void DoEffect()
+	{
+		if(Owner.checkInventory("Sawedoff", 1) && !HaveSawedOff){
+			HaveSawedOff = 1;
+			Owner.a_playSound("player/sawedOffPickup");
+		}
+	}
+}
+*/
+
+
+
+/*class InfoScreen  : Undroppable
+{
+	Default
+	{
+		-INVENTORY.AUTOACTIVATE;
+	}
+
+
+
+	virtual void ToggleInfoScreen(){
+		CALLacs("InfoScreen", 0, 0, 0, 0);
+	}
+
+	States
+	{
+		Use:
+			TNT1 A 1 {invoker.ToggleInfoScreen();}
+			Loop;
+	}
+}*/
+
+
+class NoTutorial : Undroppable {
+	int Counter;
+	override void DoEffect(){
+		Counter++;
+		if(Counter>=35 && Owner){
+			Owner.TakeInventory("NoTutorial", 1);
+		}
+	}
+}
+
+class DrawHUD : Inventory //Player draw hud factor
+{
+	Default
+	{
+		+INVENTORY.UNDROPPABLE;
+		Inventory.MaxAmount 1;
+	}
+}
+
+class TotalTimeFreezer : PowerTimeFreezer
+{
+	default{
+		Powerup.Duration -3500000000;
+	}
+	override void InitEffect()
+	{
+		super.InitEffect();
+		S_ResumeSound(false);
+	}
+
+}
+class TotalTimeFreezerNosound : PowerTimeFreezer
+{
+	default{
+		Powerup.Duration -3500000000;
+	}
+	override void InitEffect()
+	{
+		super.InitEffect();
+		S_ResumeSound(true);
+	}
+
+}
+/*
+class TimeFreezeSounds : Actor
+{
+	states
+	{
+		Spawn:
+			TNT1 A 1 a_log("misc/i_pkup");
+			LOOP;
+	}
+
+}
+*/
+
+
+class playerPauseController : Undroppable
+{
+	bool OldHasFreeze;
+	vector3 PlayerVel;
+
+	override void DoEffect()
+	{
+		bool NowHasFreeze = Owner.checkInventory("TotalTimeFreezer", 1);
+		if(NowHasFreeze && NowHasFreeze!=OldHasFreeze){
+			//just freezed
+			PlayerVel = Owner.vel;
+			Owner.a_stop();
+		}
+		if(!NowHasFreeze && NowHasFreeze!=OldHasFreeze){
+			Owner.A_ChangeVelocity(PlayerVel.x, PlayerVel.y, PlayerVel.z);
+		}
+		OldHasFreeze = Owner.checkInventory("TotalTimeFreezer", 1);
+	}
+}
+
+class PlayerStaminaController : Undroppable
+{
+	int Counter;
+
+	virtual int getCurrentMaxStamina(){
+		int AM_count;
+		AM_count+=Owner.CountInv("AM_Carnage");
+		AM_count+=Owner.CountInv("AM_Domination");
+		AM_count+=Owner.CountInv("AM_Survival");
+		return Owner.default.stamina + AM_count*11.15;
+	}
+
+	override void DoEffect()
+	{
+		if(Owner.stamina<0){Owner.stamina=0;}
+		if(Counter==35){
+			if(Owner.stamina<getCurrentMaxStamina()){
+				Owner.stamina+=5+Owner.Countinv("Curse");
+			}
+			Counter=0;
+		}
+		Counter++;
+		if(Owner.stamina>getCurrentMaxStamina()){ Owner.stamina = getCurrentMaxStamina(); }
+	}
+}
+
+class PlayerArmorController : Undroppable
+{
+	int PosDeathRoll;
+	virtual int CHplayerDamegeModel(string ArmorType, int damage, Name damageType){
+				int arm = Owner.CountInv(ArmorType);
+				int CalcDamage = damage;
+				int Roll;
+				//Owner.a_logint(damage);
+				if(arm){
+					if(arm>=100){
+						if(damage<=100){
+							CalcDamage = 0;
+						} else {
+							CalcDamage = max(0, ApplyDamageFactors(GetClass(), damageType, damage, (damage-100)*(1.0-arm*0.01)));
+						}
+					} else {
+						CalcDamage = max(0, ApplyDamageFactors(GetClass(), damageType, damage, damage*(1.0-arm*0.01)));
+					}
+					//Owner.a_logint(newdamage);
+					Owner.a_TakeInventory(ArmorType, damage);
+				}
+
+				if(CalcDamage>0){
+					roll = CalcDamage*3;
+					roll = (roll<=45)?roll:45;
+					Owner.roll = random(-1, 1)*roll;
+					Owner.giveInventory("PlayerDamagedMarker", 1);
+				}
+				PosDeathRoll = random(-1, 1);
+				return CalcDamage;
+	}
+
+	override void ModifyDamage (int damage, Name damageType, out int newdamage, bool passive)
+	{
+		if(passive){
+			if(damage>0){
+				if(damageType == "Fire"){
+					if(damage<5){
+						newdamage = 0;
+						return;
+					}
+				}
+			}
+		}
+
+		if(passive){
+			if(damage>0){
+				if(damageType!="Fire" && damageType!="Spirit"){
+					newdamage = CHplayerDamegeModel("BodyArmor", damage, damageType);
+				}
+				if(damageType == "Fire"){
+					if(damage>5){
+						newdamage = CHplayerDamegeModel("FireArmor", damage, damageType);
+					} else {
+						newdamage = 0;
+					}
+				}
+				if(damageType == "Spirit"){
+					newdamage = CHplayerDamegeModel("SpiritArmor", damage, damageType);
+				}
+			}
+		}
+	}
+	override void DoEffect()
+	{
+		if(Owner && Owner.health>0){
+			Owner.roll+= (0-Owner.roll)/6;
+			if(abs(roll)<2){
+				Owner.TakeInventory("PlayerDamagedMarker", 1);
+			}
+		} else {
+			Owner.roll+= (45*PosDeathRoll-Owner.roll)/6;
+		}
+	}
+
+}
+
+class PlayerDamagedMarker : Undroppable {}
+
+
+
+
+class playerLaddingController : CustomInventory
+{
+	bool PlayerIsLadding;
+	actor Ladder;
+	float friction;
+	int HelpID;
+
+	Weapon ReadyWeapon;
+	string PreviousWeapon;
+
+	Property Friction:friction;
+	Property HelpID:HelpID;
+
+	Default
+	{
+		+INVENTORY.AUTOACTIVATE;
+		+INVENTORY.HUBPOWER;
+		+INVENTORY.PERSISTENTPOWER;
+		+INVENTORY.UNDROPPABLE;
+		Inventory.MaxAmount 1;
+		playerLaddingController.friction  0.8;
+		playerLaddingController.HelpID 5;
+
+	}
+	override void DoEffect()
+	{
+		if(!Owner && Owner.health<0){ return; }
+		PlayerInfo player = players[consoleplayer];
+		if ((player.cmd.buttons & BT_JUMP) && PlayerIsLadding){
+			PlayerIsLadding = false;
+			Owner.bFLY = false;
+			Owner.bNoGravity = false;
+			Owner.a_recoil(-2);
+			Owner.A_ChangeVelocity(0, 0, 4*sin(-Owner.pitch), CVF_RELATIVE);
+		}
+
+		if(!PlayerIsLadding){
+			BlockThingsIterator it = BlockThingsIterator.Create(Owner, 8);
+			while (it.Next())
+			{
+				if (!(it.thing is "Ladder")) { continue; }
+
+
+				if(HelpID){
+					CALLacs("Tutorial", HelpID, 0, 0, 0);
+					HelpID = 0;
+				}
+
+				if(Owner.distance2D(it.thing)<=Owner.radius+it.thing.radius+8 &&  Owner.pos.z<it.thing.pos.z+it.thing.height && Owner.pos.z+Owner.height>it.thing.pos.z){
+					Ladder = it.thing;
+					PlayerIsLadding = true;
+					Owner.bFLY = true;
+					Owner.bNoGravity = True;
+				}
+			}
+
+		} else {
+			vector3 newpos = Owner.pos;
+
+			if(Owner.pos.z<Ladder.pos.z+Ladder.height && Owner.pos.z+Owner.height>ladder.pos.z){
+				AnimatePlayerPOS(Owner, Ladder);
+			} else {
+				PlayerIsLadding = false;
+				Owner.bFLY = false;
+				Owner.bNoGravity = false;
+			}
+
+
+
+		}
+
+	}
+
+	virtual void AnimatePlayerPOS(Actor mo, Actor ladder){
+		vector3 newpos  = mo.pos;
+		float deltaX = ladder.pos.x-mo.pos.x;
+		float deltaY = ladder.pos.y-mo.pos.y;
+
+		newpos.x += (deltaX)/4;
+		newpos.y += (deltaY)/4;
+
+		if(abs(deltaX)>mo.radius+ladder.radius){newpos.x=ladder.x;}//floor portals xy fix
+		if(abs(deltaY)>mo.radius+ladder.radius){newpos.y=ladder.y;}//floor portals xy fix
+		mo.setOrigin(newpos, 1);
+
+		mo.vel.x = mo.vel.x*friction;
+		mo.vel.y = mo.vel.y*friction;
+		mo.vel.z = mo.vel.z*friction;
+
+		float La = ladder.angle%=360;
+		float Pa = mo.angle%=360;
+
+		//float deltaAngle = La-Pa;
+		//-90 -260
+		//a_logfloat(deltaAngle);
+		//if(deltaAngle<-250){
+			//mo.angle-=deltaAngle/10;
+		//}
+		/*if(abs(deltaAngle)>90){
+			if(deltaAngle>0){
+
+			} else {
+				//mo.angle+=deltaAngle/10;
+			}
+		}*/
+
+	}
+
+	States
+	{
+		Spawn:
+			TNT1 A -1;
+			Stop;
+		Use:
+			TNT1 A -1;
+			Stop;
+	}
+
+}
+
+
+class playerJumpSoundsController : CustomInventory
+{
+	bool PlayerJumped;
+	bool PlayerFolling;
+	int VL;
+	bool inWater;
+	float velo;
+
+	Default
+	{
+		+INVENTORY.AUTOACTIVATE;
+		+INVENTORY.HUBPOWER;
+		+INVENTORY.PERSISTENTPOWER;
+		+INVENTORY.UNDROPPABLE;
+		Inventory.MaxAmount 1;
+	}
+	override void DoEffect()
+	{
+
+		PlayerInfo player = players[consoleplayer];
+		if (player.cmd.buttons & BT_JUMP){
+			if(!PlayerJumped){
+				//S_Sound("player/PlayerJump",CHAN_BODY);
+				PlayerJumped = true;
+			}
+
+		}
+		if(owner.Vel.z <=-8){
+			PlayerJumped = true;
+			PlayerFolling = true;
+		}
+		if(owner.Vel.z == 0 && PlayerFolling){
+			PlayerJumped = true;
+		}
+
+		if(owner.Vel.z == 0 && PlayerFolling){
+			PlayerJumped = false;
+			PlayerFolling = false;
+			actor LND =  spawn("PlayerLanded", owner.pos);
+			LND.master = Owner;
+		}
+		//
+		if(owner.waterlevel>2 && VL<3){
+			S_Sound("player/inWater",CHAN_BODY);
+			inWater = 1;
+
+		}
+		if(owner.waterlevel==0 && VL>0 && inWater){
+			inWater =0;
+			S_Sound("player/outWater",CHAN_BODY);
+		}
+		VL = owner.waterlevel;
+		////foot step controll
+		velo+=abs(Owner.vel.x+Owner.vel.y);
+		if(velo>=80 && Owner.pos.z == Owner.floorZ && owner.waterlevel<=1){
+			spawn("PlayerStep", owner.pos);
+			velo = 0;
+		}
+		if(velo>=80 && owner.waterlevel ==2){
+			spawn("PlayerSwim", owner.pos);
+			velo = 0;
+		}
+		//a_log(owner.GetFloorTerrain().TerrainName);
+	}
+
+	States
+	{
+		Spawn:
+			TNT1 A -1;
+			Stop;
+		Use:
+			TNT1 A -1;
+			Stop;
+	}
+
+}
+
+class PlayerSwim : actor
+{
+	Default
+	{
+		+DONTSPLASH;
+		+NOINTERACTION;
+	}
+	States
+	{
+		Spawn:
+			TNT1 A 1 NODELAY {
+				A_PlaySound("Player/Swim", CHAN_BODY, 1.0, false, ATTN_NORM);
+			}
+			TNT1 A 1;
+			stop;
+	}
+}
+
+
+class PlayerStep : actor
+{
+	Default
+	{
+		+DONTSPLASH;
+		+NOINTERACTION;
+	}
+	States
+	{
+		Spawn:
+			TNT1 A 1 NODELAY {
+
+				string ThisTerrain = GetFloorTerrain().TerrainName;
+				bool Liquid = GetFloorTerrain().IsLiquid;
+				string SoundName;
+
+				if(ThisTerrain=="Standart" && !Liquid){
+					SoundName = "Player/StepDefault";
+				}
+				if(ThisTerrain=="Carpet"){
+					SoundName = "Player/StepCarpet";
+				}
+				if(ThisTerrain=="Granit"){
+					SoundName = "Player/StepGranit";
+				}
+				if(ThisTerrain=="Ground"){
+					SoundName = "Player/StepGround";
+				}
+				if(ThisTerrain=="Metall"){
+					SoundName = "Player/StepMetall";
+				}
+				if(ThisTerrain=="Mud"){
+					SoundName = "Player/StepMud";
+				}
+				if(ThisTerrain=="ROCK"){
+
+					SoundName = "Player/StepStone";
+
+				}
+				if(ThisTerrain=="Water" || ThisTerrain=="Swamp"){
+					SoundName = "Player/StepWater";
+				}
+				if(ThisTerrain=="Wood"){
+					SoundName = "Player/StepWood";
+				}
+				if(ThisTerrain=="Bones"){
+					SoundName = "Player/StepBone";
+				}
+				//a_log(ThisTerrain);
+				A_PlaySound(SoundName, CHAN_BODY, 1.0, false, ATTN_NORM);
+			}
+			TNT1 A 1;
+			stop;
+	}
+}
+
+class PlayerLanded : actor
+{
+	Default
+	{
+		+DONTSPLASH;
+		+NOINTERACTION;
+	}
+	States
+	{
+		Spawn:
+			TNT1 A 1 NODELAY {
+				string ThisTerrain = GetFloorTerrain().TerrainName;
+				bool Liquid = GetFloorTerrain().IsLiquid;
+				string SoundName;
+
+				if(ThisTerrain=="Standart" && !Liquid){
+					SoundName = "Player/JumpDownDefault";
+				}
+				if(ThisTerrain=="Carpet"){
+					SoundName = "Player/JumpDownCarpet";
+				}
+				if(ThisTerrain=="Granit"){
+					SoundName = "Player/JumpDownGranit";
+				}
+				if(ThisTerrain=="Ground"){
+					SoundName = "Player/JumpDownGround";
+				}
+				if(ThisTerrain=="Metall"){
+					SoundName = "Player/JumpDownMetall";
+				}
+				if(ThisTerrain=="Mud"){
+					SoundName = "Player/JumpDownMud";
+				}
+				if(ThisTerrain=="ROCK"){
+					SoundName = "Player/JumpDownStone";
+				}
+				if(ThisTerrain=="Water" || ThisTerrain=="Swamp"){
+					SoundName = "Player/JumpDownWater";
+				}
+				if(ThisTerrain=="Wood"){
+					SoundName = "Player/JumpDownWood";
+				}
+
+				A_PlaySound(SoundName, CHAN_BODY, 1.0, false, ATTN_NORM);
+
+				Master.A_Explode(10, 16, XF_NOSPLASH, 0, 16, 0, 0, "none", "PlayerJumpDownDamage");
+
+			}
+			TNT1 A 1;
+			stop;
+	}
+}
+
+
+
+class AdvancedCustomInventory : Undroppable
+{
+	int UseABdelay;
+	actor PointedA;
+	string ActivateText;
+	Weapon ReadyWeapon;
+	string PreviousWeapon;//factical weapon in hands
+	string PlayerPreviuosWeapon;//REAL not fakeWeapon
+
+	bool USE;
+	bool USEHOLD;
+	bool FIRE;
+	int UseDelay;
+	int UseHoldDelay;
+	bool olduse;
+	int resultedUSEDELAY;
+	//int currentHOLDUSE;
+	void getinput(){
+			resultedUSEDELAY=0;
+			USEHOLD = false;
+			FIRE = false;
+			if(Owner.GetPlayerInput(INPUT_BUTTONS) & BT_USE){
+				if(olduse){
+					UseHoldDelay++;
+				}
+				//currentHOLDUSE++;
+				olduse = true;
+			} else {
+				if(UseHoldDelay>=15){
+					resultedUSEDELAY = UseHoldDelay<25 ? UseHoldDelay : 25;
+					//a_log("USEHOLD");
+					USEHOLD = true;
+				} else {
+					if(UseHoldDelay>0){
+						//a_log("use");
+						USE = true;
+					} else {
+						USE = false;
+					}
+				}
+				//currentHOLDUSE = 0;
+				UseHoldDelay = 0;
+				//
+				olduse = false;
+			}
+			if(Owner.GetPlayerInput(INPUT_BUTTONS) & BT_ATTACK || Owner.GetPlayerInput(INPUT_BUTTONS) & BT_ALTATTACK ){
+				FIRE = true;
+			}
+			if(UseDelay){UseDelay--;}
+	}
+
+	bool getcurrentHOLDUSE(){return UseHoldDelay;}
+	bool getUSE(){return USE;}
+	bool getUSEHOLD(){return USEHOLD;}
+}
+
+class z_PointController : AdvancedCustomInventory
+{
+	Actor HoldedItem;
+	Actor NullHoldedItem;
+	vector3 followerPos;
+	int GandsOffsetZ;
+	int HandDistance;
+	int DropDelay;
+	vector3 OldItemPos;
+	string ActorName;
+	string PointerText;
+	bool DOdropItem;
+
+
+	override void PostBeginPlay(){
+		GandsOffsetZ = 8;
+		HandDistance = 32;
+		DropDelay = 0;
+
+	}
+
+	override void DoEffect()
+	{
+
+
+			bool Handable, Usable, SubordinatAble;
+			bool QuickKillReady;
+			bool LeapKillReady;
+			bool SubordinateReady;
+			ActorName = "";
+			PointerText = "";
+
+			getinput();
+
+            FLineTraceData RemoteRay;
+            Owner.LineTrace(
+               Owner.angle,
+               1024,
+               Owner.pitch,
+               offsetz: Owner.height-16,
+               data: RemoteRay
+            );
+
+        if (RemoteRay.HitType == TRACE_HitActor){//player points the actor
+			//
+			//a_log("ray hitactor");
+			//a_logint(Owner.countinv("Ability_QuickKill"));
+
+			actor Pointed = RemoteRay.HitActor;
+			ActorName = Pointed.GetTag();
+			int Dist = Owner.distance3d(Pointed)-Pointed.radius-Owner.radius;
+			bool ABready;
+
+
+			float OA = Owner.angle%=360;
+			float PA = Pointed.angle%=360;
+
+			if(Pointed && Pointed.bWALLSPRITE && ( abs(PA-OA)<90 || abs(PA-OA)>270)){ return;}
+
+
+
+			if(!HoldedItem){//no item in hands
+
+				if(players[consoleplayer].ReadyWeapon.GetClassName()=="Noweapon" || !players[consoleplayer].ReadyWeapon.GetClassName()){
+					//PlayerPreviuosWeapon
+					if(PreviousWeapon){
+						if(!PlayerPreviuosWeapon){
+							Owner.A_SelectWeapon(PreviousWeapon);
+						} else {
+							Owner.A_SelectWeapon(PlayerPreviuosWeapon);
+						}
+					} else {
+						if(PlayerPreviuosWeapon){
+							Owner.A_SelectWeapon(PlayerPreviuosWeapon);
+						} else {
+							Owner.A_SelectWeapon("PitchFork");
+						}
+					}
+				}
+
+				if(Dist<CVar.FindCVar('USER_HAND_DISTANCE').getInt()){
+					//closest distance for manual actions
+					if(Pointed is "inventory" && USE){
+						inventory(Pointed).Touch(Owner);
+					}
+					if(Pointed is "Rat" && USE && Pointed.health>0){
+						string PreviousWeaponClassname = players[consoleplayer].ReadyWeapon.GetClassName();
+						if(PreviousWeaponClassname){
+							CHWeapon Prev = CHWeapon(players[consoleplayer].ReadyWeapon);
+							PlayerPreviuosWeapon = PreviousWeaponClassname;
+							owner.GiveInventory("RatWeapon", 1);
+							Owner.A_SelectWeapon("RatWeapon");
+							Pointed.destroy();
+							return;
+						}
+					}
+
+
+					if( RemoteRay.HitActor.checkInventory("Pointable", 1) ){
+						PointerText = " ";
+					}
+					if( RemoteRay.HitActor.checkInventory("Usable", 1) || RemoteRay.HitActor.checkInventory("PickupAble", 1) ){
+						if(RemoteRay.HitActor.checkInventory("Usable", 1)){
+							//if Usable
+							Usable UsableItem = Usable(Pointed.findInventory("Usable"));
+							if(UsableItem){
+								PointerText = UsableItem.HoverText;
+							}
+							if(USE){
+								//try to pickup
+								PointUsable(Pointed).DoIt(playerPawn(Owner));
+							}
+						}
+						if(RemoteRay.HitActor.checkInventory("PickupAble", 1)){
+							if(USE){
+								RemoteRay.HitActor.target = players[consoleplayer].mo;
+								RemoteRay.HitActor.a_faceTarget();
+								RemoteRay.HitActor.a_recoil(-8);
+								if(!RemoteRay.HitActor.bNOGRAVITY){
+									RemoteRay.HitActor.a_changeVelocity(0, 0, 6, CVF_RELATIVE );
+								}
+							}
+						}
+					}
+					else
+					if(!Pointed.checkInventory("Unhandable", 1) && Pointed.radius<=Owner.radius	){
+
+							//if Handable
+							PointerText = String.Format("%s%s", PointerText, StringTable.Localize("$USETOPICKUP"));
+							//take in hands action
+							if(USE && !HoldedItem){
+								//plaer take item in hands
+								Pointed.giveInventory("itemInHands", 1);
+								int p = 2*Pointed.radius*Pointed.height;
+								if(p>16*16){
+									Pointed.A_SetRenderStyle(0.5, STYLE_Translucent);
+								}
+
+								Pointed.giveInventory("FallDownSoundController", 1);
+
+								HoldedItem = Pointed;
+								USE = false;
+								PreviousWeapon = players[consoleplayer].ReadyWeapon.GetClassName();
+								if( ! (players[consoleplayer].ReadyWeapon is "CHfakeWeapon")){
+									PlayerPreviuosWeapon = players[consoleplayer].ReadyWeapon.GetClassName();
+								}
+								Owner.A_SelectWeapon("Noweapon");
+							}
+
+
+					}
+
+					if(Owner.checkInventory("Ability_Subordinate", 1) ){
+						Ability_Subordinate AB = Ability_Subordinate(Owner.FindInventory ("Ability_Subordinate"));
+						if(AB && AB.Check(Pointed)){
+							PointerText = String.Format("%s\n", AB.ActivateText);
+						}
+						AB = NULL;
+					}
+					if(Owner.checkInventory("Ability_Raise", 1) ){
+						Ability_Raise AB = Ability_Raise(Owner.FindInventory ("Ability_Raise"));
+						if(AB && AB.Check(Pointed)){
+							PointerText = String.Format("%s\n", AB.ActivateText);
+						}
+						AB = NULL;
+					}
+
+
+
+
+
+				}//if(Dist<=CVar.FindCVar('USER_HAND_DISTANCE').getInt()){
+
+				else
+
+				if(Dist<=CVar.FindCVar('USER_QUICKKILL_DISTANCE').getInt() && Owner.countinv("Ability_QuickKill")>0){
+						//a_log("dist+ab");
+						Ability_QuickKill AB = Ability_QuickKill( Owner.FindInventory("Ability_QuickKill") );
+						if(AB && AB.Check(Pointed)){
+							//a_log("text");
+							PointerText = String.Format("%s%s", PointerText, AB.ActivateText);
+						}
+						else
+						{
+							Ability_LeapKill AB = Ability_LeapKill(Owner.FindInventory ("Ability_LeapKill"));
+							if(AB && AB.Check(Pointed)){
+								PointerText = String.Format("%s%s", PointerText, AB.ActivateText);
+							}
+						}
+						AB = NULL;
+
+				}
+
+				else
+
+				if(Dist<=CVar.FindCVar('USER_LEAPKILL_DISTANCE').getInt() && Dist>CVar.FindCVar('USER_QUICKKILL_DISTANCE').getInt() && Owner.checkInventory("Ability_LeapKill", 1) ){
+						Ability_LeapKill AB = Ability_LeapKill(Owner.FindInventory ("Ability_LeapKill"));
+						if(AB.Check(Pointed)){
+							PointerText = String.Format("%s%s", PointerText, AB.ActivateText);
+						}
+						AB = NULL;
+
+				}
+				//if(Owner.countinv("Ability_QuickKill")>0){ a_log("cc");}
+
+			}//if(!HoldedItem){//no item in hands
+
+
+			if(PointerText){
+				//setup pointer if any action avaliable
+				vector3 pos = Pointed.pos;
+				z_Pointer pointer = z_Pointer(Owner.spawn("z_Pointer", pos));
+				pointer.A_SetScale(Pointed.radius/32*2, Pointed.height/64*2);
+
+				//Owner.A_Print(String.Format("%s\n%s", ActorName, PointerText), 1.0/35.0);
+
+
+			}
+
+		}
+
+		if(HoldedItem){//item in hands
+				OldItemPos = HoldedItem.pos;
+
+				HoldedItem.bNogravity = 1;
+				followerPos = Owner.Vec3Angle(
+					Owner.Radius+HandDistance,
+					Owner.angle,
+					GandsOffsetZ * Owner.player.crouchfactor,
+					true);
+				followerPos.z = followerPos.z+Owner.Radius+HandDistance*sin(-Owner.pitch);
+
+					HoldedItem.vel.x =  followerPos.x-OldItemPos.x+Owner.vel.x;
+					HoldedItem.vel.y =  followerPos.y-OldItemPos.y+Owner.vel.y;
+					HoldedItem.vel.z =  followerPos.z-OldItemPos.z+Owner.vel.z;
+
+				//HoldedItem.setOrigin(followerPos, 1);
+
+				//HoldedItem.vel.x = Owner.vel.x;
+				//HoldedItem.vel.y = Owner.vel.y;
+			//try to check if wall is close t oprevent stucking
+            FLineTraceData WallCheckRay;
+            Owner.LineTrace(
+               Owner.angle,
+               128,
+               Owner.pitch,
+			   flags:TRF_THRUACTORS,
+               offsetz: Owner.height-24,
+               data: WallCheckRay
+            );
+			if (WallCheckRay.HitType == TRACE_HitWall){
+				if(WallCheckRay.Distance < Owner.Radius+HandDistance+HoldedItem.radius){
+					//move item close to player
+					followerPos = Owner.Vec3Angle(
+						WallCheckRay.Distance-HoldedItem.radius-8,
+						Owner.angle,
+						GandsOffsetZ * Owner.player.crouchfactor,
+						true);
+					followerPos.z = followerPos.z+Owner.Radius+HandDistance*sin(-Owner.pitch);
+					HoldedItem.setOrigin(followerPos, true);
+
+					vector2 myXY;
+                    myXY.x = HoldedItem.pos.x;
+                    myXY.y = HoldedItem.pos.y;
+                    //check collision with walls
+					int n=1;
+                    while(!HoldedItem.TryMove(myXY, PCM_NOACTORS)){
+						n++;
+						int NormalDist = WallCheckRay.Distance-HoldedItem.radius-1*n;
+						followerPos = Owner.Vec3Angle(
+							NormalDist>0?NormalDist:0,
+							Owner.angle,
+							GandsOffsetZ * Owner.player.crouchfactor,
+							true);
+						followerPos.z = followerPos.z+Owner.Radius+HandDistance*sin(-Owner.pitch);
+						HoldedItem.setOrigin(followerPos, true);
+
+						myXY.x = HoldedItem.pos.x;
+						myXY.y = HoldedItem.pos.y;
+
+						if(n>50)break;
+                    }
+				}
+				//TryMove(vec2)
+			}
+
+
+			if(Owner.distance3d(HoldedItem)>96 || !Owner.checkSight(HoldedItem) || DOdropItem){
+				USE = 1;
+			}
+
+			if(USEHOLD){
+				HoldedItem.target = Owner;
+				HoldedItem.a_faceTarget();
+				HoldedItem.a_recoil(25);
+				HoldedItem.A_ChangeVelocity(0, 0, resultedUSEDELAY*sin(-Owner.pitch), CVF_RELATIVE);
+				Owner.A_SelectWeapon(PreviousWeapon);
+				PreviousWeapon = "";
+
+			}
+			if(USE || USEHOLD || FIRE){//pressed or holded USE
+				HoldedItem.takeInventory("itemInHands", 1);
+				int p = 2*HoldedItem.radius*HoldedItem.height;
+				if(p>16*16){
+					HoldedItem.alpha = HoldedItem.default.alpha;
+				}
+
+				HoldedItem.bNogravity = 0;
+				HoldedItem = null;
+				Owner.a_playSound("player/dropThing");
+				Owner.A_SelectWeapon(PreviousWeapon);
+				PreviousWeapon = "";
+			}
+			DOdropItem = 0;
+		} else {
+			OldItemPos.x=0;
+			OldItemPos.y=0;
+		}
+
+
+	}
+
+
+
+}
+
+class Ability_QuickKill : AdvancedCustomInventory
+{
+	int Cost;
+
+
+	override void PostBeginPlay(){
+		super.PostBeginPlay();
+		ActivateText = StringTable.Localize("$USETOQUICKKILL");
+		Cost = 50;
+	}
+
+	virtual bool Check (actor Pointed){
+
+
+		float OA = Owner.angle%=360;
+		float PA = Pointed.angle%=360;
+
+		if(abs(Owner.angle - Pointed.angle)<35 && Pointed.checkInventory("QuickKillReady", 1)  && !UseABdelay){
+			if(USE){
+
+				if(Owner.stamina < Cost){
+					Owner.a_log(StringTable.Localize("$NOTENOUGHSTAMINA"));
+					Owner.a_PlaySound("player/NoStamina", CHAN_7);
+					return false;
+				}
+
+				UseABdelay = 70;
+				PointedA = Pointed;
+				Owner.Target = Pointed;
+				Owner.A_faceTarget();
+				players[consoleplayer].setFOV(20);
+				Owner.a_playSound("player/carnage");
+				Owner.stamina-=Cost;
+				Owner.giveInventory("CarnageEffect1", 1);
+			}
+
+			return true;
+		} else {
+
+			return false;
+		}
+	}
+
+	override void doEffect(){
+		getinput();
+
+		if(UseABdelay){
+			UseABdelay--;
+			if(UseABdelay > 60){
+				Owner.A_faceTarget();
+			}
+			if(Owner.Target && UseABdelay == 60){
+				if(!Owner.Target.CheckInventory("Curse", 1)){
+					//Owner.A_Warp(AAPTR_PLAYER_GETTARGET);
+					Owner.A_DamageTarget(1000, "QuickKill");
+				} else {
+					Owner.a_log(StringTable.Localize("$CUREDRESISTTHISMAGICK"));
+				}
+			}
+			if(UseABdelay < 60){
+				if(Owner.CameraFOV < Owner.default.CameraFOV){
+					players[consoleplayer].setFOV(Owner.CameraFOV+1);
+				} else {
+					players[consoleplayer].setFOV(Owner.default.CameraFOV);
+				}
+			}
+
+		}
+	}
+
+
+}
+
+class Ability_LeapKill : Ability_QuickKill
+{
+
+
+	override void PostBeginPlay(){
+		ActivateText = StringTable.Localize("$USETOLEAPKILL");
+		Cost = 100;
+	}
+
+	override bool Check (actor Pointed){
+		if(Pointed.checkInventory("QuickKillReady", 1)  && !UseABdelay){
+
+			if(USE){
+				UseABdelay = 70;
+				if(Owner.stamina < Cost){
+					Owner.a_log(StringTable.Localize("$NOTENOUGHSTAMINA"));
+					Owner.a_PlaySound("player/NoStamina", CHAN_7);
+					Owner.Target = null;
+					UseABdelay = 0;
+					return false;
+				} else {
+					Owner.stamina-=Cost;
+				}
+				PointedA = Pointed;
+				Owner.Target = Pointed;
+				Owner.A_faceTarget();
+				players[consoleplayer].setFOV(20);
+				Owner.a_playSound("player/carnage2");
+				Owner.giveInventory("CarnageEffect1", 1);
+			}
+
+			return true;
+		} else {
+
+			return false;
+		}
+	}
+
+	override void doEffect(){
+		getinput();
+
+		if(UseABdelay){
+
+			UseABdelay--;
+			if(UseABdelay > 60){
+				Owner.A_faceTarget();
+			}
+			if(Owner.Target && UseABdelay == 60){
+
+				if(!Owner.Target.CheckInventory("Curse", 1)){
+					float ANG = Owner.angle;
+					//Owner.setOrigin(Owner.Target.pos, 1);
+					Owner.A_Warp(AAPTR_PLAYER_GETTARGET);
+					Owner.angle = ANG;
+					Owner.A_DamageTarget(1000, "QuickKill");
+				} else {
+					Owner.a_log(StringTable.Localize("$CUREDRESISTTHISMAGICK"));
+				}
+			}
+			if(UseABdelay < 60){
+				if(Owner.CameraFOV < Owner.default.CameraFOV){
+					players[consoleplayer].setFOV(Owner.CameraFOV+1);
+				} else {
+					players[consoleplayer].setFOV(Owner.default.CameraFOV);
+				}
+			}
+		}
+	}
+
+}
+
+class Ability_Subordinate : AdvancedCustomInventory
+{
+
+	int Cost;
+
+	override void PostBeginPlay(){
+		super.PostBeginPlay();
+		ActivateText = StringTable.Localize("$USETOSUBORDINATE");
+		Cost = 50;
+	}
+
+	virtual bool Check (actor Pointed){
+		if(abs(Owner.angle - Pointed.angle)<35 && Pointed.checkInventory("SubordinatedReady", 1)  && !UseABdelay && !Pointed.checkInventory("Subordinator", 1)){
+			if(Owner.stamina < Cost){
+				Owner.a_log(StringTable.Localize("$NOTENOUGHSTAMINA"));
+				Owner.a_PlaySound("player/NoStamina", CHAN_7);
+				return false;
+			}
+			if(UseHoldDelay>15){Owner.A_playsound("player/subordinate");}
+			if(UseHoldDelay>35 && !UseABdelay){
+				UseABdelay = 70;
+				///////////////SUBORDINATE
+				Owner.stamina-=Cost;
+				Pointed.giveInventory("Subordinator", 1);
+				Subordinator Subord = Subordinator(Pointed.FindInventory("Subordinator"));
+				Owner.giveInventory("DominationEffect", 1);
+				//todo set subordinate time depends of level
+
+			}
+
+
+			return true;
+		} else {
+
+			return false;
+		}
+	}
+	override void doEffect(){
+		getinput();
+		if(UseABdelay){
+			UseABdelay--;
+
+		}
+	}
+
+
+
+}
+
+class Ability_Raise : AdvancedCustomInventory
+{
+
+	int Cost;
+	override void PostBeginPlay(){
+		super.PostBeginPlay();
+		ActivateText = StringTable.Localize("$USETORAISE");
+		Cost = 100;
+	}
+	virtual bool Check (actor Pointed){
+		if(!Pointed.checkInventory("BurnDeathMark", 1) && Pointed.Health<=0 && Pointed.checkInventory("RaiseReady", 1)  && !UseABdelay && !Pointed.checkInventory("Raiser", 1)){
+			if(Owner.stamina < Cost){
+				Owner.a_log(StringTable.Localize("$NOTENOUGHSTAMINA"));
+				Owner.a_PlaySound("player/NoStamina", CHAN_7);
+				return false;
+			}
+			if(UseHoldDelay>35 && !UseABdelay){
+				Ability_Necromancy NEC = Ability_Necromancy(Owner.findInventory("Ability_Necromancy"));
+				if(Owner.checkInventory("Ability_Necromancy", 1) && Owner.stamina >= NEC.Cost){
+					Owner.stamina-=Cost;
+					UseABdelay = 70;
+					//give raiser to all visible to player corpses
+					ThinkerIterator it = ThinkerIterator.Create("CHmonster");
+					CHmonster this;
+					while(this = CHmonster(it.Next()))
+					{
+						if(this.health>0 || this.CurrentDistance > 512){ continue; }
+						if(!Owner.checkSight(this)){continue;}
+						Owner.Target = this;
+						Owner.A_SpawnProjectile ("RaiserEmmonate", 24, 0, 0, 0, 0, AAPTR_TARGET);
+					}
+
+					Owner.Target = null;
+				} else {
+					Owner.stamina-=Cost;
+					UseABdelay = 70;
+					Pointed.giveInventory("Raiser", 1);
+				}
+				Owner.giveInventory("DominationEffect", 1);
+			}
+
+
+			return true;
+		} else {
+
+			return false;
+		}
+	}
+	override void doEffect(){
+		getinput();
+		if(UseABdelay){
+			UseABdelay--;
+
+		}
+	}
+
+}
+
+
+class RaiserEmmonate : actor
+{
+	default
+	{
+		Radius 6;
+		Height 8;
+		Speed 10;
+		Damage 0;
+		Projectile;
+		+SEEKERMISSILE;
+	}
+
+
+	States
+	{
+		Spawn:
+			TNT1 A 1 A_SpawnItemEx("z_raiserTrial", 0, 0, 0,0, 0, 0, 0,SXF_NOCHECKPOSITION, 64);
+			Loop;
+		Death:
+			TNT1 A 1 {tracer.giveInventory("Raiser", 1);}
+			Stop;
+	}
+
+}
+
+
+class Ability_Necromancy : AdvancedCustomInventory
+{
+	int Cost;
+	override void PostBeginPlay(){
+		super.PostBeginPlay();
+		ActivateText = StringTable.Localize("$USETORAISE");
+		Cost = 130;
+	}
+}
+
+
+class Ability_Regeneration : Undroppable
+{
+	int Cost;
+	int Counter;
+	int C;
+	int PrevHealth;
+
+	override void PostBeginPlay(){
+		super.PostBeginPlay();
+		Cost = 2;
+	}
+
+	override void doEffect(){
+		if(Owner && Owner.health>0 && PrevHealth){
+			if(PrevHealth <= Owner.health){
+				Counter++;
+				if(Owner && Counter>=35*5 && Owner.health<20){
+					if(Counter==35*5){
+						Owner.a_playSound("player/autohill", CHAN_BODY);
+						Owner.giveInventory("SurvivalEffect", 1);
+						a_log(StringTable.Localize("$PLAYERREGEN"));
+					}
+					if(Owner.stamina){
+						if(c==10){
+							Owner.A_SetHealth(Owner.health+1);
+							Owner.stamina-= 2;
+							c=0;
+						}
+
+						c++;
+					}
+				}
+			} else {
+				Counter = 0;
+			}
+		}
+		PrevHealth = Owner.health;
+	}
+}
+class Ability_Repulsion : Undroppable
+{
+	int Cost;
+	bool PlayerJumped;
+	bool PlayerJumpFall;
+	bool DoWave;
+
+	override void PostBeginPlay(){
+		super.PostBeginPlay();
+		Cost = 25;
+	}
+
+	override void doEffect(){
+
+		PlayerInfo player = players[consoleplayer];
+		if (player.cmd.buttons & BT_JUMP){
+			PlayerJumped = true;
+		}
+		if(PlayerJumped && Owner.vel.z<0){PlayerJumpFall=1;}
+		if(PlayerJumpFall && Owner.FloorZ == Owner.pos.z ){
+			PlayerJumpFall = 0;
+			PlayerJumped = 0;
+			DoWave = 0;
+		}
+
+		if(PlayerJumped && Owner.pos.z>Owner.FloorZ && ABS(owner.Vel.z) && (player.cmd.buttons & BT_CROUCH) && !DoWave){
+			if(Owner.stamina < Cost){
+				Owner.a_log(StringTable.Localize("$NOTENOUGHSTAMINA"));
+				Owner.a_PlaySound("player/NoStamina", CHAN_7);
+				return;
+			}
+			Owner.A_Blast(0, 255, 256, 32);
+			Owner.a_playSound("defiler/dieBlow");
+			Owner.a_spawnItemEx("RepulsionBlast");
+			DoWave = 1;
+			Owner.A_ChangeVelocity(0, 0, -16);
+			Owner.stamina-= Cost;
+			Owner.giveInventory("CarnageEffect", 1);
+		}
+	}
+}
+
+class Ability_Shield : AdvancedCustomInventory
+{
+
+	int Cost;
+	override void PostBeginPlay(){
+		super.PostBeginPlay();
+		Cost = 100;
+	}
+	virtual bool Check (actor Pointed){
+		//check for enough stamina and other
+		if(Owner.stamina < Cost){
+			Owner.a_log(StringTable.Localize("$NOTENOUGHSTAMINA"));
+			Owner.a_PlaySound("player/NoStamina", CHAN_7);
+			return false;
+		 }
+		return true;
+	}
+	override void doEffect(){
+
+	}
+
+
+}
+
+Class RepulsionBlast : Actor
+{
+	default
+	{
+		+NOINTERACTION;
+		+NOGRAVITY;
+		+FLATSPRITE;
+		RenderStyle "Translucent";
+	}
+	Override void PostBeginPlay(){
+		Super.PostBeginPlay();
+		vector3 Mypos = pos;
+		Mypos.z = floorZ+8;
+		setOrigin(Mypos, 1);
+	}
+
+	states
+	{
+		Spawn:
+			BLST A 1 {
+				a_setScale(ScaleX+1);
+				a_FadeOut(0.07);
+			}
+			Loop;
+	}
+}
+
+
+class Raiser : Undroppable {
+
+	override void DoEffect(){
+		if(!Owner){ return;}
+		if(Owner.checkInventory("BurnDeathMark", 1) || Owner.checkInventory("FireDeathMark", 1) || Owner.checkInventory("GibDeathMark", 1)  || !Owner.checkInventory("Monster", 1) || Owner.checkInventory("Curse", 1)){
+			Owner.takeInventory("Raiser", 1);
+			return;
+		}
+
+		if(Owner && Owner.health<=0){
+			if(Owner){
+				a_log(String.Format("%s%s", Owner.GetTag(), StringTable.Localize("$RAISED") ) );
+				//Owner.A_RaiseSelf(RF_NOCHECKPOSITION);
+				RaiseActor(Owner, RF_NOCHECKPOSITION);
+				Owner.target=null;
+				Owner.bFRIENDLY = true;
+				actor Marker = Owner.Spawn("AllyMarkerTotal", Owner.pos);
+				Marker.Master = Owner;
+				Owner.A_PlaySound("player/RaiseEnemy");
+				Owner.takeInventory("Raiser", 1);
+			}
+		}
+	}
+}
+
+
+class Ability_SixSence : Undroppable
+{
+	bool active;
+	bool started;
+	int secondCounter;
+
+	int Cost;
+
+	override void PostBeginPlay(){
+		super.PostBeginPlay();
+		Cost = 10;
+	}
+	override void DoEffect(){
+		if(Owner.stamina < Cost && active){
+			Owner.a_log(StringTable.Localize("$NOTENOUGHSTAMINA"));
+			Owner.a_PlaySound("player/NoStamina", CHAN_7);
+			ToggleVision();
+		}
+		if(active){
+			if(secondCounter == 35){
+				Owner.stamina-=Cost;
+				secondCounter = 0;
+			}
+			secondCounter++;
+		}
+	}
+
+	virtual void ToggleVision()
+	{
+		if(started){
+			if(active)
+			{
+				active = 0;
+				players[consoleplayer].mo.takeInventory("SixVision", 1);
+				//
+
+				ThinkerIterator it = ThinkerIterator.Create("VisionMarker");
+				VisionMarker this;
+				while(this = VisionMarker(it.Next()))
+				{
+					this.detach();
+				}
+				players[consoleplayer].mo.A_StopSound(CHAN_7);
+
+			}
+			else
+			{
+				if(Owner.stamina < Cost){
+					Owner.a_log(StringTable.Localize("$NOTENOUGHSTAMINA"));
+					Owner.a_PlaySound("player/NoStamina", CHAN_7);
+					return;
+				}
+
+				active = 1;
+				players[consoleplayer].mo.giveInventory("SixVision", 1);
+
+				ThinkerIterator it = ThinkerIterator.Create("CHmonster");
+				actor this;
+				while(this = actor(it.Next()))
+				{
+					this.a_spawnItemEx("VisionMarker", 0, 0, 0, 0, 0, 0, 0, SXF_SETMASTER);
+				}
+
+				ThinkerIterator it2 = ThinkerIterator.Create("PointUsable");
+				while(this = actor(it2.Next())){
+					if( (this is "stationarLight") ){ continue;}
+					this.a_spawnItemEx("VisionMarker", 0, 0, 0, 0, 0, 0, 0, SXF_SETMASTER);
+				}
+				ThinkerIterator it3 = ThinkerIterator.Create("z_chainSwitchLock");
+				while(this = actor(it3.Next())){
+					this.a_spawnItemEx("VisionMarker", 0, 0, 0, 0, 0, 0, 0, SXF_SETMASTER);
+				}
+				ThinkerIterator it4 = ThinkerIterator.Create("z_QuestItem");
+				while(this = actor(it4.Next())){
+					this.a_spawnItemEx("VisionMarker", 0, 0, 0, 0, 0, 0, 0, SXF_SETMASTER);
+
+				}
+
+				ThinkerIterator it5 = ThinkerIterator.Create("Health");
+				while(this = actor(it5.Next())){
+					this.a_spawnItemEx("VisionMarker", 0, 0, 0, 0, 0, 0, 0, SXF_SETMASTER);
+				}
+
+				ThinkerIterator it6 = ThinkerIterator.Create("Ammo");
+				while(this = actor(it6.Next())){
+					this.a_spawnItemEx("VisionMarker", 0, 0, 0, 0, 0, 0, 0, SXF_SETMASTER);
+				}
+
+				ThinkerIterator it7 = ThinkerIterator.Create("Weapon");
+				while(this = actor(it7.Next())){
+					this.a_spawnItemEx("VisionMarker", 0, 0, 0, 0, 0, 0, 0, SXF_SETMASTER);
+				}
+
+				ThinkerIterator it8 = ThinkerIterator.Create("ItemContainerResp");
+				while(this = actor(it8.Next())){
+					this.a_spawnItemEx("VisionMarker", 0, 0, 0, 0, 0, 0, 0, SXF_SETMASTER);
+				}
+				ThinkerIterator it9 = ThinkerIterator.Create("z_Defiler");
+				while(this = actor(it9.Next())){
+					this.a_spawnItemEx("VisionMarker", 0, 0, 0, 0, 0, 0, 0, SXF_SETMASTER);
+				}
+
+				players[consoleplayer].mo.A_PlaySound("player/senseLoop",  CHAN_7, 1, TRUE);
+			}
+		}
+		started = 1;
+	}
+
+	States
+	{
+		Use:
+			TNT1 A 1 {invoker.ToggleVision();}
+			Loop;
+	}
+}
+
+class VisionMarker : actor
+{
+	//bool DefINVis;
+	Default
+	{
+		RenderStyle "Stencil";
+		StencilColor "Red";
+		//Translation "0:255=#[255,10,10]";
+		height 1;
+		radius 1;
+		+NOINTERACTION;
+		+NOGRAVITY;
+		+BRIGHT;
+		+NOBLOCKMAP;
+		-SOLID;
+		-SHOOTABLE;
+	}
+	Override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+		//if(Master && Master.bINVISIBLE){DefINVis=1;}
+		if(Master){
+			if(Master.bWALLSPRITE){bWALLSPRITE=1;}
+			if(Master.bFLATSPRITE){bFLATSPRITE=1;}
+		}
+	}
+
+	virtual Void Detach(){
+			if(Master){
+				/*if(DefINVis){
+					Master.alpha = 0.1;
+					Master.bINVISIBLE = 1;
+				} else {
+					Master.bINVISIBLE = 0;
+					Master.alpha = Master.default.alpha;
+				}*/
+				Master.alpha = Master.default.alpha;
+			}
+
+			self.destroy();
+	}
+
+	override void Tick(void)
+	{
+		Super.Tick();
+		if(Master && Master.health>0){
+			vector3 selfpos = Master.pos;
+			SetOrigin(selfpos, true);
+			a_setScale(Master.scale.x, Master.scale.y);
+			Sprite = Master.Sprite;
+			Frame = Master.Frame;
+			Angle = Master.Angle;
+			//Master.bINVISIBLE = 1;
+			Master.alpha = 0.01;
+		} else {
+			Detach();
+		}
+	}
+}
+
+class SixVision : Undroppable {}
+
+
+
+
+
+
+
+Class z_Pointer : actor
+{
+	Default
+	{
+		+NOINTERACTION;
+		+CLIENTSIDEONLY;
+	}
+
+	States
+	{
+		Spawn:
+			TNT1 A 0 NODELAY A_jumpif(!CVar.FindCVar("HUD_SHOW_BOUNDINGBOXES").getInt(), 2);
+			PNTR A 2 bright;
+			TNT1 A 1;
+			Stop;
+	}
+}
+
+class Pointable : Undroppable {}
+class PickupAble : Undroppable {}
+
+class Usable : CustomInventory
+{
+	string  HoverText;
+	Default
+	{
+		+INVENTORY.AUTOACTIVATE;
+		+INVENTORY.UNDROPPABLE;
+		Inventory.MaxAmount 1;
+	}
+	Override void PostBeginPlay(){
+		Super.PostBeginPlay();
+		HoverText = StringTable.Localize("$USETOUSE");
+		if(Owner is "PointUsable"){
+			PointUsable ow = PointUsable(Owner);
+			if(ow.HoverText){
+				HoverText = ow.HoverText;
+			}
+		}
+
+	}
+	virtual void SetHoverText(string text){
+		HoverText = text;
+	}
+	States
+	{
+		Spawn:
+			TNT1 A -1;
+			Stop;
+		Use:
+			TNT1 A -1;
+			Stop;
+	}
+}
+class itemInHands : Undroppable {
+
+}
+
+class FallDownSoundController : Undroppable
+{
+	bool PlayerJumped;
+	bool PlayerFolling;
+	float velo;
+	override void DoEffect()
+	{
+
+		if(!Owner){ return;}
+
+		if(owner.Vel.z <=-4){
+			PlayerJumped = true;
+			PlayerFolling = true;
+		}
+		if(owner.Vel.z == 0 && PlayerFolling){
+			PlayerJumped = true;
+		}
+
+		if(owner.Vel.z == 0 && PlayerFolling){
+			PlayerJumped = false;
+			PlayerFolling = false;
+			owner.a_playSound("generic/drop", CHAN_AUTO);
+			Owner.takeInventory(getClassName(), 1);
+		}
+
+		if(Owner && !Owner.checkInventory("itemInHands", 1) &&  velo>16 && velo/(abs(Owner.vel.x+Owner.vel.y)+0.001) >=2){
+			owner.a_playSound("generic/drop", CHAN_AUTO);
+		}
+		if(Owner){
+			velo = abs(Owner.vel.x+Owner.vel.y);
+		}
+	}
+}
+
+
+
+class SubordinatedReady : CustomInventory
+{
+	Default
+	{
+		+INVENTORY.AUTOACTIVATE;
+		+INVENTORY.UNDROPPABLE;
+		Inventory.MaxAmount 1;
+	}
+	States
+	{
+		Spawn:
+			TNT1 A -1;
+			Stop;
+		Use:
+			TNT1 A -1;
+			Stop;
+	}
+}
+
+class QuickKillReady : CustomInventory
+{
+	Default
+	{
+		+INVENTORY.AUTOACTIVATE;
+		+INVENTORY.UNDROPPABLE;
+		Inventory.MaxAmount 1;
+	}
+	States
+	{
+		Spawn:
+			TNT1 A -1;
+			Stop;
+		Use:
+			TNT1 A -1;
+			Stop;
+	}
+}
+class Unhandable : CustomInventory
+{
+	Default
+	{
+		+INVENTORY.AUTOACTIVATE;
+		+INVENTORY.UNDROPPABLE;
+		Inventory.MaxAmount 1;
+	}
+	States
+	{
+		Spawn:
+			TNT1 A -1;
+			Stop;
+		Use:
+			TNT1 A -1;
+			Stop;
+	}
+}
+class RaiseReady : Undroppable {}
+
+class Subordinator : CustomInventory
+{
+	int Time;
+	int Counter;
+	Default
+	{
+		+INVENTORY.AUTOACTIVATE;
+		+INVENTORY.UNDROPPABLE;
+		Inventory.MaxAmount 1;
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		if(!Time){ Time = 35*30; }
+	}
+	Override void Tick(){
+		Super.Tick();
+		if(Owner.health>0){
+			if(!Counter){
+				actor Marker = Owner.Spawn("AllyMarker", Owner.pos);
+				Marker.Master = Owner;
+				//todo spawn friendly marker and effect
+			}
+			if(!Owner.bFRIENDLY){Owner.bFRIENDLY = 1;}
+			Counter++;
+			if(Counter>=Time){
+				if(Owner){
+					Owner.bFRIENDLY = 0;
+					Owner.TakeInventory("Subordinator", 1);
+
+				}
+				////todo  effect
+			}
+		} else {
+			if(Owner){
+				Owner.bFRIENDLY = 0;
+				Owner.TakeInventory("Subordinator", 1);
+			}
+		}
+
+	}
+	States
+	{
+		Spawn:
+			TNT1 A -1;
+			Stop;
+		Use:
+			TNT1 A -1;
+			Stop;
+	}
+}
+
+
+class PlayerBlowLaughController  : Undroppable
+{
+	int Counter;
+	override void DoEffect()
+	{
+		if(Owner && Owner.CountInv("PlayerBlowLaughCounter")>0){
+			Counter++;
+			if(Counter>35){
+
+				Owner.giveInventory("PlayerTalks", 1);
+
+				if(Counter>70){
+					switch(Owner.CountInv("PlayerBlowLaughCounter")){
+						case 1:
+							if(!random(0, 4)){
+								owner.a_playSound("Caleb/Lough1", CHAN_VOICE);
+							}
+							break;
+						case 2:
+							if(!random(0, 1)){
+								owner.a_playSound("Caleb/Lough2", CHAN_VOICE);
+							}
+							break;
+						case 3:
+							owner.a_playSound("Caleb/Lough3", CHAN_VOICE);
+							break;
+						case 4:
+							owner.a_playSound("Caleb/Lough4", CHAN_VOICE);
+							break;
+						case 5:
+							owner.a_playSound("Caleb/Lough5", CHAN_VOICE);
+							break;
+						case 6:
+							owner.a_playSound("Caleb/Lough6", CHAN_VOICE);
+							break;
+						case 7:
+							owner.a_playSound("Caleb/Lough7", CHAN_VOICE);
+
+					}
+					Owner.TakeInventory("PlayerBlowLaughCounter", 7);
+					Counter = 0;
+				}
+			}
+		} else {
+			Counter = 0;
+		}
+	}
+}
+
+class PlayerBlowLaughCounter  : Undroppable
+{
+	default
+	{
+		Inventory.MaxAmount 7;
+	}
+}
+
+class PlayerLaugh  : Undroppable
+{
+	int counter;
+	bool CanTalk;
+
+	override void DoEffect()
+	{
+
+
+		if(!owner.checkInventory("PlayerTalks", 1)){
+			CanTalk = 1;
+			owner.giveInventory("PlayerTalks", 1);
+		}
+		counter++;
+		if(owner.checkInventory("PlayerBlowLaughCounter", 1)){
+			return;
+		}
+
+		if(CanTalk && counter==35+15){//init delay
+			if(random(1, 3) == 3 ){
+				owner.a_playSound("Player/Laugh", CHAN_VOICE);
+			}
+		}
+		if(counter>35*5){
+			owner.takeInventory("PlayerTalks", 1);
+			owner.takeInventory("PlayerLaugh", 1);
+		}
+	}
+
+}
+
+
+
+class playerIdleTalkingController : Undroppable
+{
+	int counter;
+	int counterTalk;
+
+	override void DoEffect()
+	{
+		if(level.mapName == "TITLEMAP" || level.mapName == "INTRO"){ return;}
+		if(!Owner.GetPlayerInput(INPUT_BUTTONS)){
+			if(!owner.checkInventory("PlayerTalks", 1)){
+				counter++;
+				if(counter>35*15){
+					counter = 0;
+					owner.giveInventory("PlayerTalks", 1);
+					counterTalk = 0;
+					owner.a_playSound("Player/IDLE");
+				}
+			} else {
+				//wait if player is talkin now
+				counterTalk++;
+				if(counterTalk>35*5){
+					counterTalk = 0;
+					counter = 0;
+					owner.takeInventory("PlayerTalks", 1);
+				}
+			}
+		} else {
+			counter = 0;
+		}
+	}
+
+}
+
+class PlayerTalks : Undroppable {}
+
+
+
+Class PlayerMarker : actor
+{
+	int counter;
+	Default{
+		+NOGRAVITY;
+		-SOLID;
+		+NEVERTARGET;
+		+DONTTHRUST;
+		+DONTSPLASH;
+	}
+	Override void PostBeginPlay()
+	{
+		counter = 50;
+	}
+	States
+	{
+		Spawn:
+			TNT1 A 20 {
+				if(counter<0){ self.destroy(); }
+				counter--;
+			}
+			LOOP;
+	}
+}
+
+
+
+
+
+
+class playerMarkingController : Undroppable
+{
+//Thows player markers for seek player AI
+	int Counter;
+	override void DoEffect()
+	{
+		if(Counter<20){
+			Counter++;
+		} else {
+			Counter = 0;
+			if(Owner && (abs(Owner.vel.x)+abs(Owner.vel.y))>1){
+				Owner.A_SpawnItemEx("PlayerMarker",0, 0, 0, 0, 0, 0, 0,SXF_NOCHECKPOSITION|SXF_TRANSFERPOINTERS);
+			}
+
+		}
+	}
+
+}
+
+class playerSkyFlareController : Undroppable
+{
+	actor Marker;
+	string LightClass;
+	string MarkerClass;
+
+
+	virtual void init(){}
+
+
+	override void DoEffect()
+	{
+		init();
+
+		actor sun;
+		actor Viewpoint;
+		actor this;
+		float sa, sp, pa, pp;
+
+
+
+
+		ThinkerIterator it = ThinkerIterator.Create(LightClass);
+		while(this = actor(it.Next())){
+			sun = this;
+		}
+		it.reinit();
+		it = ThinkerIterator.Create("SkyViewpoint");
+		while(this = actor(it.Next())){
+			Viewpoint = this;
+			sa = Viewpoint.angle;
+			sp = Viewpoint.pitch;
+			Viewpoint.target = sun;
+			Viewpoint.a_faceTarget(0, 0);
+
+
+			FLineTraceData WallCheckRay;
+			//a_logFloat(Viewpoint.pitch);
+
+			Owner.LineTrace(
+				Viewpoint.angle-sa,
+				8192,
+				Viewpoint.pitch,
+				flags:TRF_THRUACTORS|TRF_THRUBLOCK|TRF_THRUHITSCAN,
+				offsetz: Owner.height-24,
+				data: WallCheckRay
+			);
+
+
+			if (!WallCheckRay.HitType || WallCheckRay.HitType == TRACE_HitCeiling){
+				if(!Marker){
+					Marker = Owner.spawn(MarkerClass, WallCheckRay.HitLocation);
+				}
+			}
+			if(Marker){
+				Marker.setOrigin(WallCheckRay.HitLocation, 1);
+				Viewpoint.angle = sa;
+				Viewpoint.pitch = sp;
+			}
+		}
+
+
+	}
+}
+
+class playerSunFlareController : playerSkyFlareController
+{
+	override void init(){
+		LightClass = "Nature_SUN";
+		MarkerClass = "SunMarker";
+	}
+
+}
+
+
+class playerMoonFlareController : playerSunFlareController
+{
+
+	override void init(){
+		LightClass = "Nature_MOON";
+		MarkerClass = "MoonMarker";
+	}
+
+}
+
+
+
+class SunMarker : actor
+{
+	actor clouds, this;
+	default{
+		radius 0;
+		height 0;
+		+nogravity;
+		+nointeraction;
+		renderstyle "translucent";
+	}
+
+	override void postBeginPlay(){
+		super.postBeginPlay();
+
+
+	}
+
+	void CheckCeilTexture(){
+		ThinkerIterator it = ThinkerIterator.Create("nature_HeavyClouds");
+		while(this = actor(it.Next())){
+			clouds = this;
+		}
+
+		TextureID tx = TexMan.CheckForTexture("F_SKY1",TexMan.Type_Flat);
+		if (tx != ceilingpic || pos.z!=ceilingZ){
+			a_fadeOut(0.1, FTF_CLAMP);
+		} else {
+			a_fadeTo(1-clouds.alpha, 0.1, FTF_CLAMP);
+		}
+
+	}
+
+	states{
+		spawn:
+			TNT1 A 1 NODELAY CheckCeilTexture();
+			loop;
+	}
+
+}
+class MoonMarker : SunMarker {}
+
+
+
+
+///////////
+//Dont show helps pointers
+Class DONT_SHOW : Undroppable {}
+class DONT_SHOW_0 : DONT_SHOW{}
+class DONT_SHOW_1 : DONT_SHOW{}
+class DONT_SHOW_2 : DONT_SHOW{}
+class DONT_SHOW_3 : DONT_SHOW{}
+class DONT_SHOW_4 : DONT_SHOW{}
+class DONT_SHOW_5 : DONT_SHOW{}
+class DONT_SHOW_6 : DONT_SHOW{}
+class DONT_SHOW_7 : DONT_SHOW{}
+class DONT_SHOW_8 : DONT_SHOW{}
+class DONT_SHOW_9 : DONT_SHOW{}
+class DONT_SHOW_10 : DONT_SHOW{}
+class DONT_SHOW_11 : DONT_SHOW{}
+class DONT_SHOW_12 : DONT_SHOW{}
+class DONT_SHOW_13 : DONT_SHOW{}
+class DONT_SHOW_14 : DONT_SHOW{}
+class DONT_SHOW_15 : DONT_SHOW{}
+class DONT_SHOW_16 : DONT_SHOW{}
+class DONT_SHOW_17 : DONT_SHOW{}
+class DONT_SHOW_18 : DONT_SHOW{}
+class DONT_SHOW_19 : DONT_SHOW{}
+
+//tutorial showed items
+class tutorial_0 : Undroppable {}
+class tutorial_1 : Undroppable {}
+class tutorial_2 : Undroppable {}
+class tutorial_3 : Undroppable {}
+class tutorial_4 : Undroppable {}
+class tutorial_5 : Undroppable {}
+class tutorial_6 : Undroppable {}
+class tutorial_7 : Undroppable {}
+class tutorial_8 : Undroppable {}
+class tutorial_9 : Undroppable {}
+class tutorial_10 : Undroppable {}
+class tutorial_11 : Undroppable {}
+class tutorial_12 : Undroppable {}
+class tutorial_13 : Undroppable {}
+class tutorial_14 : Undroppable {}
+class tutorial_15 : Undroppable {}
+class tutorial_16 : Undroppable {}
+class tutorial_17 : Undroppable {}
+class tutorial_18 : Undroppable {}
+class tutorial_19 : Undroppable {}
+class tutorial_20 : Undroppable {}
+class tutorial_21 : Undroppable {}
+class tutorial_22 : Undroppable {}
+class tutorial_23 : Undroppable {}
+class tutorial_24 : Undroppable {}
+class tutorial_25 : Undroppable {}
+class tutorial_26 : Undroppable {}
+class tutorial_27 : Undroppable {}
+class tutorial_28 : Undroppable {}
+class tutorial_29 : Undroppable {}
+class tutorial_30 : Undroppable {}
+class tutorial_31 : Undroppable {}
+class tutorial_32 : Undroppable {}
+class tutorial_33 : Undroppable {}
+class tutorial_34 : Undroppable {}
+class tutorial_35 : Undroppable {}
+class tutorial_36 : Undroppable {}
+class tutorial_37 : Undroppable {}
+class tutorial_38 : Undroppable {}
+class tutorial_39 : Undroppable {}
+class tutorial_40 : Undroppable {}
+class tutorial_41 : Undroppable {}
+class tutorial_42 : Undroppable {}
+class tutorial_43 : Undroppable {}
+class tutorial_44 : Undroppable {}
+class tutorial_45 : Undroppable {}
+class tutorial_46 : Undroppable {}
+class tutorial_47 : Undroppable {}
+class tutorial_48 : Undroppable {}
+class tutorial_49 : Undroppable {}
+class tutorial_50 : Undroppable {}
+class tutorial_51 : Undroppable {}
+class tutorial_52 : Undroppable {}
+class tutorial_53 : Undroppable {}
+class tutorial_54 : Undroppable {}
+class tutorial_55 : Undroppable {}
+class tutorial_56 : Undroppable {}
+class tutorial_57 : Undroppable {}
+class tutorial_58 : Undroppable {}
+class tutorial_59 : Undroppable {}
+class tutorial_60 : Undroppable {}
+class tutorial_61 : Undroppable {}
+class tutorial_62 : Undroppable {}
+class tutorial_63 : Undroppable {}
+class tutorial_64 : Undroppable {}
+class tutorial_65 : Undroppable {}
+class tutorial_66 : Undroppable {}
+class tutorial_67 : Undroppable {}
+class tutorial_68 : Undroppable {}
+class tutorial_69 : Undroppable {}
+class tutorial_70 : Undroppable {}
+class tutorial_71 : Undroppable {}
+class tutorial_72 : Undroppable {}
+class tutorial_73 : Undroppable {}
+class tutorial_74 : Undroppable {}
+class tutorial_75 : Undroppable {}
+class tutorial_76 : Undroppable {}
+class tutorial_77 : Undroppable {}
+class tutorial_78 : Undroppable {}
+class tutorial_79 : Undroppable {}
+class tutorial_80 : Undroppable {}
+class tutorial_81 : Undroppable {}
+class tutorial_82 : Undroppable {}
+class tutorial_83 : Undroppable {}
+class tutorial_84 : Undroppable {}
+class tutorial_85 : Undroppable {}
+class tutorial_86 : Undroppable {}
+class tutorial_87 : Undroppable {}
+class tutorial_88 : Undroppable {}
+class tutorial_89 : Undroppable {}
+class tutorial_90 : Undroppable {}
+class tutorial_91 : Undroppable {}
+class tutorial_92 : Undroppable {}
+class tutorial_93 : Undroppable {}
+class tutorial_94 : Undroppable {}
+class tutorial_95 : Undroppable {}
+class tutorial_96 : Undroppable {}
+class tutorial_97 : Undroppable {}
+class tutorial_98 : Undroppable {}
+class tutorial_99 : Undroppable {}
+
+//info showed items
+class info_marker : Undroppable {
+	override void PostBeginPlay(){
+		super.PostBeginPlay();
+		CALLacs("infoGot", 0, 0, 0, 0);
+		//a_log(StringTable.Localize("$INFO_GOT"));
+	}
+}
+
+class info_0 : info_marker {}
+class info_1 : info_marker {}
+class info_2 : info_marker {}
+class info_3 : info_marker {}
+class info_4 : info_marker {}
+class info_5 : info_marker {}
+class info_6 : info_marker {}
+class info_7 : info_marker {}
+class info_8 : info_marker {}
+class info_9 : info_marker {}
+class info_10 : info_marker {}
+class info_11 : info_marker {}
+class info_12 : info_marker {}
+class info_13 : info_marker {}
+class info_14 : info_marker {}
+class info_15 : info_marker {}
+class info_16 : info_marker {}
+class info_17 : info_marker {}
+class info_18 : info_marker {}
+class info_19 : info_marker {}
+class info_20 : info_marker {}
+class info_21 : info_marker {}
+class info_22 : info_marker {}
+class info_23 : info_marker {}
+class info_24 : info_marker {}
+class info_25 : info_marker {}
+class info_26 : info_marker {}
+class info_27 : info_marker {}
+class info_28 : info_marker {}
+class info_29 : info_marker {}
+class info_30 : info_marker {}
+class info_31 : info_marker {}
+class info_32 : info_marker {}
+class info_33 : info_marker {}
+class info_34 : info_marker {}
+class info_35 : info_marker {}
+class info_36 : info_marker {}
+class info_37 : info_marker {}
+class info_38 : info_marker {}
+class info_39 : info_marker {}
+class info_40 : info_marker {}
+class info_41 : info_marker {}
+class info_42 : info_marker {}
+class info_43 : info_marker {}
+class info_44 : info_marker {}
+class info_45 : info_marker {}
+class info_46 : info_marker {}
+class info_47 : info_marker {}
+class info_48 : info_marker {}
+class info_49 : info_marker {}
+class info_50 : info_marker {}
+class info_51 : info_marker {}
+class info_52 : info_marker {}
+class info_53 : info_marker {}
+class info_54 : info_marker {}
+class info_55 : info_marker {}
+class info_56 : info_marker {}
+class info_57 : info_marker {}
+class info_58 : info_marker {}
+class info_59 : info_marker {}
+class info_60 : info_marker {}
+class info_61 : info_marker {}
+class info_62 : info_marker {}
+class info_63 : info_marker {}
+class info_64 : info_marker {}
+class info_65 : info_marker {}
+class info_66 : info_marker {}
+class info_67 : info_marker {}
+class info_68 : info_marker {}
+class info_69 : info_marker {}
+class info_70 : info_marker {}
+class info_71 : info_marker {}
+class info_72 : info_marker {}
+class info_73 : info_marker {}
+class info_74 : info_marker {}
+class info_75 : info_marker {}
+class info_76 : info_marker {}
+class info_77 : info_marker {}
+class info_78 : info_marker {}
+class info_79 : info_marker {}
+class info_80 : info_marker {}
+class info_81 : info_marker {}
+class info_82 : info_marker {}
+class info_83 : info_marker {}
+class info_84 : info_marker {}
+class info_85 : info_marker {}
+class info_86 : info_marker {}
+class info_87 : info_marker {}
+class info_88 : info_marker {}
+class info_89 : info_marker {}
+class info_90 : info_marker {}
+class info_91 : info_marker {}
+class info_92 : info_marker {}
+class info_93 : info_marker {}
+class info_94 : info_marker {}
+class info_95 : info_marker {}
+class info_96 : info_marker {}
+class info_97 : info_marker {}
+class info_98 : info_marker {}
+class info_99 : info_marker {}
+
+//NOTE markers
+class note_marker : Undroppable {
+	int page;
+	default
+	{
+		+INVENTORY.ALWAYSPICKUP;
+		inventory.pickupmessage "$NOTEPICKUP";
+		Tag "$NOTE";
+		+SHOOTABLE;
+		+INVULNERABLE;
+		+NOBLOOD;
+		+NOBLOODDECALS;
+		-NOGRAVITY;
+		+DONTTHRUST;
+		scale 0.15;
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		giveInventory("Pointable", 1);
+		giveInventory("Unhandable", 1);
+		giveInventory("PickupAble", 1);
+		A_ChangeVelocity(random(1, 4), random(1, 4), random(6, 12));
+
+		Array<string> SplitAR;
+		string ClassName = getClassName();
+		ClassName.Split(SplitAR, "_");
+		page = SplitAR[1].ToInt();
+
+	}
+
+	states
+	{
+		spawn:
+			NOTE A 1;
+			Loop;
+		pickup:
+			TNT1 A 1 {
+				CALLacs("infoGot", 0, 0, 0, 0);
+				CALLacs("SetChapter", 1, 0, 0, 0);
+				CALLacs("SetPage", invoker.page, 0, 0, 0);
+			}
+			stop;
+	}
+}
+class note_0 : note_marker {}
+class note_1 : note_marker {}
+class note_2 : note_marker {}
+class note_3 : note_marker {}
+class note_4 : note_marker {}
+class note_5 : note_marker {}
+class note_6 : note_marker {}
+class note_7 : note_marker {}
+class note_8 : note_marker {}
+class note_9 : note_marker {}
+class note_10 : note_marker {}
+class note_11 : note_marker {}
+class note_12 : note_marker {}
+class note_13 : note_marker {}
+class note_14 : note_marker {}
+class note_15 : note_marker {}
+class note_16 : note_marker {}
+class note_17 : note_marker {}
+class note_18 : note_marker {}
+class note_19 : note_marker {}
+class note_20 : note_marker {}
+class note_21 : note_marker {}
+class note_22 : note_marker {}
+class note_23 : note_marker {}
+class note_24 : note_marker {}
+class note_25 : note_marker {}
+class note_26 : note_marker {}
+class note_27 : note_marker {}
+class note_28 : note_marker {}
+class note_29 : note_marker {}
+class note_30 : note_marker {}
+class note_31 : note_marker {}
+class note_32 : note_marker {}
+class note_33 : note_marker {}
+class note_34 : note_marker {}
+class note_35 : note_marker {}
+class note_36 : note_marker {}
+class note_37 : note_marker {}
+class note_38 : note_marker {}
+class note_39 : note_marker {}
+class note_40 : note_marker {}
+class note_41 : note_marker {}
+class note_42 : note_marker {}
+class note_43 : note_marker {}
+class note_44 : note_marker {}
+class note_45 : note_marker {}
+class note_46 : note_marker {}
+class note_47 : note_marker {}
+class note_48 : note_marker {}
+class note_49 : note_marker {}
+class note_50 : note_marker {}
+class note_51 : note_marker {}
+class note_52 : note_marker {}
+class note_53 : note_marker {}
+class note_54 : note_marker {}
+class note_55 : note_marker {}
+class note_56 : note_marker {}
+class note_57 : note_marker {}
+class note_58 : note_marker {}
+class note_59 : note_marker {}
+class note_60 : note_marker {}
+class note_61 : note_marker {}
+class note_62 : note_marker {}
+class note_63 : note_marker {}
+class note_64 : note_marker {}
+class note_65 : note_marker {}
+class note_66 : note_marker {}
+class note_67 : note_marker {}
+class note_68 : note_marker {}
+class note_69 : note_marker {}
+class note_70 : note_marker {}
+class note_71 : note_marker {}
+class note_72 : note_marker {}
+class note_73 : note_marker {}
+class note_74 : note_marker {}
+class note_75 : note_marker {}
+class note_76 : note_marker {}
+class note_77 : note_marker {}
+class note_78 : note_marker {}
+class note_79 : note_marker {}
+class note_80 : note_marker {}
+class note_81 : note_marker {}
+class note_82 : note_marker {}
+class note_83 : note_marker {}
+class note_84 : note_marker {}
+class note_85 : note_marker {}
+class note_86 : note_marker {}
+class note_87 : note_marker {}
+class note_88 : note_marker {}
+class note_89 : note_marker {}
+class note_90 : note_marker {}
+class note_91 : note_marker {}
+class note_92 : note_marker {}
+class note_93 : note_marker {}
+class note_94 : note_marker {}
+class note_95 : note_marker {}
+class note_96 : note_marker {}
+class note_97 : note_marker {}
+class note_98 : note_marker {}
+class note_99 : note_marker {}
+//////////////////////////////////////////////////////////////////
+class map01done : Undroppable {}
+class map02done : Undroppable {}
+class map03done : Undroppable {}
+class map04done : Undroppable {}
+class map05done : Undroppable {}
+class map06done : Undroppable {}

@@ -1,0 +1,173 @@
+
+Class RatWeapon : CHfakeWeapon
+{
+
+
+	default{
+		Radius 20;
+		Height 16;
+		Scale 0.4;
+		-NOGRAVITY;
+		+Weapon.NoAutoAim;
+		+WEAPON.NOALERT;
+
+		Weapon.AmmoGive 1;
+		Weapon.Ammouse 1;
+		Weapon.AmmoType "RatFakeAmmo";
+
+		Weapon.AmmoGive2 1;
+		Weapon.Ammouse2 1;
+		Weapon.AmmoType2 "RatFakeAmmo";
+		//+WEAPON.AMMO_CHECKBOTH;
+
+
+	}
+
+
+
+	/*override void tick(){
+		super.tick();
+		a_logint(owner.countinv("TNTremoteFakeAmmo"));
+	}*/
+	States
+	{
+		Select:
+			TNT1 A 0 a_jumpIfNoAmmo("SelectNoRat");
+			TNT1 A 0 a_playSound("Ratpain");
+			TNT1 A 0 A_TakeInventory("ThrowPower", 100);
+			WRAT ABCBAD 1 A_Raise;
+			Loop;
+		SelectNoRat:
+			TNT1 A 1 { invoker.SelectPreviousWeapon(); }
+			Loop;
+		Ready:
+			TNT1 A 0 a_jumpIfNoAmmo("ReadyNorat");
+			TNT1 A 0 A_TakeInventory("ThrowPower", 100);
+			WRAT ABCBAD 3 { A_WeaponReady(); }
+			Loop;
+		ReadyNorat:
+			TNT1 A 1 { A_WeaponReady();}
+			Loop;
+		Deselect:
+			TNT1 A 0 A_ThrowGrenadePrecize ("FakeRat");
+			TNT1 A 0 a_jumpIfNoAmmo("DeselectNoRat");
+			TNT1 A 0 A_TakeInventory("ThrowPower", 100);
+			WRAT ABCBAD 1 A_Lower;
+			Loop;
+		DeselectNoRat:
+			TNT1 A 1 { A_Lower(24); }
+			Loop;
+		Fire:
+			TNT1 A 0 a_playSound("Ratpain");
+			WRAT EFG 6;
+			WRAT GFG 6;
+			TNT1 A 0 {
+				A_ThrowGrenadePrecize ("FakeRat", 0.0, 0.0, 0.0, true);
+				a_playSound("ratWeapon/headOff", CHAN_WEAPON);
+				Players[consolePlayer].mo.giveInventory("PlaerBloodSplashMarker", 10);
+				Players[consolePlayer].mo.giveInventory("HeartHealth", 10);
+				A_QuakeEx (0, 0, 6, 15, 0, 32, "none");
+				Players[consolePlayer].mo.roll = 15*random(-1, 1);
+			}
+			WRAT H 6;
+			TNT1 A 10 { invoker.SelectPreviousWeapon(); }
+			Goto Ready;
+		AltFire:
+			WRAT ABC 2;
+			TNT1 A 0 A_Refire();
+			WRAT BAD 1;
+			TNT1 A 0 A_Refire();
+			Goto Throw;
+		AltHold:
+		Hold:
+			WRAT  A 3 {A_WeaponReady(14); A_GiveInventory("ThrowPower", 5);}
+			TNT1  A 0 A_Refire();
+			WRAT  B 3 {A_WeaponReady(14); A_GiveInventory("ThrowPower", 5);}
+			TNT1  A 0 A_Refire();
+			WRAT  C 3 {A_WeaponReady(14); A_GiveInventory("ThrowPower", 5);}
+			TNT1  A 0 A_Refire();
+			WRAT  A 3 {A_WeaponReady(14); A_GiveInventory("ThrowPower", 5);}
+			TNT1  A 0 A_Refire();
+			WRAT  D 3 {A_WeaponReady(14); A_GiveInventory("ThrowPower", 5);}
+			TNT1  A 0 A_Refire();
+			goto Throw;
+		Throw:
+			DYHN J 2;
+			DYHN H 2;
+			DYHN G 2;
+			TNT1 A 0 {
+					float xyVel = 30;
+					float zVel = 0.5;
+					float power = float((CountInv( "ThrowPower" )<=100 ? CountInv( "ThrowPower" ) : 100))/100.0;
+					xyVel = xyVel*power-abs(xyVel*power*sin(invoker.pitch));
+
+					A_ThrowGrenadePrecize ("FakeRat", 8.0, xyVel, zVel, true);
+					A_TakeInventory("ThrowPower", 100);
+				}
+			TNT1 A 0 A_PlayWeaponSound("TNTTOSS");
+
+			DYHN FED 2;
+			TNT1 A 0 { invoker.SelectPreviousWeapon(); }
+			DYHN EEEEE 2 A_Lower(24);
+
+			Goto Ready;
+
+  	}
+}
+
+Class FakeRat : Actor
+{
+
+	default{
+		Decal "BldDec";
+
+		Health 10;
+		Radius 8;
+		Height 10;
+		scale 0.34;
+		reactiontime 35*4;
+		PROJECTILE;
+		+RANDOMIZE;
+		+NOBOUNCESOUND
+		+PUSHABLE;
+		-NOGRAVITY;
+		-NOTELEPORT;
+		+ThruGhost;
+		Gravity 0.56;
+		+ShootAble;
+		damage 5;
+		damageType "FakeRat";
+		Species "PlayerThrough";
+		+ThruSpecies;
+
+		SeeSound "Ratsee";
+		DeathSound "Ratdie";
+		ActiveSound "RatActive";
+
+	}
+
+
+  states
+  {
+
+	Spawn:
+		RATW A 1;
+		goto see;
+	See:
+		RATW ABCD 4 A_LoopActiveSound();
+		Loop;
+	Crash:
+	Death:
+		RATW E 5 A_Scream;
+		RATW F 5;
+		RATW GHI 5;
+		RATW J 15;
+		RATW J -1;
+		stop;
+	XDeath:
+		TNT1 A 0 A_SpawnItemEx("Rat",0,0,0, 0,0,0, 0, SXF_NOCHECKPOSITION);
+		Stop;
+
+  }
+
+}

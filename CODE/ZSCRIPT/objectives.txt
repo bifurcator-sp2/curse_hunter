@@ -1,0 +1,98 @@
+Class z_Objective : SwitchableDecoration
+{
+/*
+args[0] - string id from ENU
+args[1] - visual marker type. 0 - nomarker; 1 - primary objective 2- secondary
+args[2] - deactivate (make objective DONE) radius. 0 - no proximity deactivation;
+args[3] - nex objective id ;
+*/
+	default{
+		+NOINTERACTION;
+		+NOGRAVITY;
+		radius 16;
+		height 8;
+		scale 1.0;
+		//Activation THINGSPEC_Deactivate;
+	}
+
+	states
+	{
+		spawn:
+			TNT1 A -1; Loop;
+
+		Active:
+			"####" "#" 1 {
+				CallACS("objective", args[0], tid, 0, 0);
+				if(args[1]>0){
+					ACS_NamedExecuteAlways("setObjectiveMarker", 0, tid, args[1], args[0]);
+				}
+			 }
+			"####" "#" 1 {
+				if(args[2]>0){
+					if(self.distance3D(players[consoleplayer].mo)<args[2]){
+						Thing_Deactivate(tid);
+					}
+				}
+			}
+			Goto Active+1;
+		Inactive:
+			"####" "#" 1 { CallACS("objectiveComplete", args[0], tid, args[3], 0);  }
+			"####" "#" -1; loop;
+	}
+
+}
+
+
+class z_secondary_objective : z_Objective
+{
+	bool Activated;
+	virtual void checkObjectives(){
+
+			ThinkerIterator it = ThinkerIterator.Create("z_secondary_objective");
+			z_secondary_objective this;
+			CallACS("ClearSecondaryObjectives", 0, 0, 0, 0);
+			while(this = z_secondary_objective(it.Next()))
+			{
+				if(this.Activated){
+					CallACS("SecondaryObjectiveADD", this.args[0], 0, 0, 0);
+				}
+			}
+			CallACS("SecondaryObjectivesPRINT", 0, 0, 0, 0);
+	}
+	states
+	{
+		Active:
+			"####" "#" 1 {
+				CallACS("secondary_objective", args[0], tid, 0, 0);
+				Activated = 1;
+				checkObjectives();
+				if(args[1]>0){
+					//a_logint(tid);
+					ACS_NamedExecuteAlways("setObjectiveMarker", 0, tid, args[1], args[0]);
+				}
+			 }
+			"####" "#" 1 {
+				if(args[2]>0){
+					if(self.distance3D(players[consoleplayer].mo)<args[2]){
+						Thing_Deactivate(tid);
+					}
+				}
+			}
+			Goto Active+1;
+		Inactive:
+			"####" "#" 1 {
+					if(Activated){
+						Activated = 0;
+						checkObjectives(); CallACS("secondary_objectiveComplete", args[0], tid, args[3], 0);
+						//destroy();
+					}
+				}
+			"####" "#" -1; stop;
+	}
+}
+
+
+
+
+
+

@@ -1,0 +1,817 @@
+//WHTX_052
+material texture GZDOOM{
+	specularlevel 3
+	glossiness 30
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/GZDOOM.png"
+}
+
+
+material texture CAVEFLR{
+	//Shader "Shaders/parallax2.fp"
+	//Texture tex_heightmap "materials/heigthmaps/auto/CAVEFLR.png"
+	specularlevel 1
+	glossiness 2
+}
+
+material texture GALKA{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/GALKA.png"
+	specularlevel 1
+	glossiness 5
+}
+
+
+material texture ISCR0{
+	specularlevel 3
+	glossiness 30
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/ISCR0.png"
+}
+material texture BLUD0626{
+	specularlevel 1
+	glossiness 5
+}
+material texture BORD{
+	specularlevel 1
+	glossiness 1
+}
+material texture BLD04281{
+	specularlevel 1
+	glossiness 1
+}
+material texture BLD0428{
+	specularlevel 1
+	glossiness 5
+}
+
+material texture BFMBCOL1{
+	specularlevel 1
+	glossiness 1
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BFMBCOL1.png"
+}
+material texture col2{
+	specularlevel 1
+	glossiness 10
+}
+material texture col1{
+	specularlevel 1
+	glossiness 1
+}
+material texture ROOF{
+	specularlevel 1
+	glossiness 1
+}
+material texture STEPWAY2{
+	specularlevel 3
+	glossiness 20
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/STEPWAY2.png"
+}
+material texture STEPWAY{
+	specularlevel 1
+	glossiness 1
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/STEPWAY.png"
+}
+
+material texture RIVER
+{
+	Shader "shaders/WaterShader.fp"
+	//texture offsetTexture "materials/specular/auto/BLUD0381.png"
+	texture offsetTexture "materials/specular/auto/BLUD0227.png"
+
+	//texture offsetTexture "textures/waterUV.png"
+
+	Speed 0.3
+	specularlevel 10
+	glossiness 70
+}
+material texture BLUD0432
+{
+	specularlevel 1
+	glossiness 5
+}
+material texture BLUD0897
+{
+	specularlevel 1
+	glossiness 1
+}
+material texture BLUD0428
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD0428.png"
+	specularlevel 1
+	glossiness 15
+}
+material texture SHUMER
+{
+	specularlevel 1
+	glossiness 5
+}
+material texture BLD10199
+{
+	//Shader "Shaders/parallax2.fp"
+	//Texture tex_heightmap "materials/heigthmaps/auto/BLD10199.png"
+	specularlevel 1
+	glossiness 1
+}
+
+material texture BLD00199
+{
+	//Shader "Shaders/parallax2.fp"
+	//Texture tex_heightmap "materials/heigthmaps/auto/BLD00199.png"
+	specularlevel 1
+	glossiness 1
+}
+material texture BLUD0199
+{
+	//Shader "Shaders/parallax2.fp"
+	//Texture tex_heightmap "materials/heigthmaps/auto/BLUD0199.png"
+	specularlevel 1
+	glossiness 1
+}
+material texture BLD00228
+{
+	specularlevel 1
+	glossiness 1
+}
+material texture BLUD0228
+{
+	specularlevel 1
+	glossiness 1
+}
+material texture BLD00195
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLD00195.png"
+	specularlevel 1
+	glossiness 20
+}
+material texture BLUD0192
+{
+	specularlevel 1
+	glossiness 20
+}
+material texture BLUD0215
+{
+	specularlevel 4
+	glossiness 20
+}
+material texture ROPE
+{
+	specularlevel 1
+	glossiness 1
+}
+
+material texture BLUD0658
+{
+	specularlevel 1
+	glossiness 10
+}
+material texture BLUD0882
+{
+	specularlevel 1
+	glossiness 1
+}
+
+material texture BLUD0655
+{
+	specularlevel 1
+	glossiness 30
+}
+material texture BLD1092
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLD1092.png"
+	specularlevel 1
+	glossiness 10
+}
+material texture BLUD0092
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLD1092.png"
+	specularlevel 1
+	glossiness 10
+}
+material texture BLUD0207
+{
+	specularlevel 1
+	glossiness 1
+}
+material texture BLUD0220
+{
+	specularlevel 4
+	glossiness 40
+}
+material texture BLUD0854
+{
+	specularlevel 4
+	glossiness 40
+}
+material texture 423_0791
+{
+	specularlevel 1
+	glossiness 8
+}
+material texture 423_079
+{
+	specularlevel 1
+	glossiness 8
+}
+material texture BLUD0423
+{
+specularlevel 1
+glossiness 1
+}
+
+material texture BLUD0079
+{
+	specularlevel 1
+	glossiness 5
+}
+
+material texture WHTX_199
+{
+	specularlevel 1
+	glossiness 3
+}
+
+material texture B0089_1
+{
+specularlevel 1
+glossiness 10
+}
+material texture BGDOR1
+{
+	specularlevel 1
+	glossiness 15
+}
+material texture BLUD0440
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD0440.png"
+	specularlevel 1
+	glossiness 15
+}
+
+material texture BLUD0609
+{
+	specularlevel 1
+	glossiness 10
+}
+material texture BLUD0005
+{
+	specularlevel 1
+	glossiness 10
+}
+material texture CBTM1096
+{
+	specularlevel 1
+	glossiness 3
+}
+material texture CBTM0062
+{
+	specularlevel 1
+	glossiness 3
+}
+material texture BLUD0380
+{
+	specularlevel 1
+	glossiness 3
+}
+material texture BLUD0695
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD0695.png"
+	specularlevel 1
+	glossiness 3
+}
+material texture BLUD0696
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD0696.png"
+	specularlevel 1
+	glossiness 3
+}
+material texture B010113
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/B010113.png"
+	specularlevel 1
+	glossiness 3
+}
+
+material texture BLUD0295
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD0295.png"
+	specularlevel 1
+	glossiness 1
+}
+material texture BLUD0302
+{
+	specularlevel 1
+	glossiness 10
+}
+material texture B0437
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/B0437.png"
+	specularlevel 1
+	glossiness 1
+}
+material texture B0356
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/B0356.png"
+	specularlevel 1
+	glossiness 5
+}
+
+material texture UDYDCLFL
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/UDYDCLFL.png"
+	specularlevel 1
+	glossiness 10
+}
+
+material texture B000161
+{
+	specularlevel 1
+	glossiness 1
+	//Shader "Shaders/parallax2.fp"
+	//Texture tex_heightmap "materials/heigthmaps/auto/B000161.png"
+}
+
+material texture BLUD0663
+{
+	//Shader "Shaders/parallax2.fp"
+	//Texture tex_heightmap "materials/heigthmaps/auto/BLUD0663.png"
+	specularlevel 1
+	glossiness 40
+}
+material texture BLUD0681
+{
+	specularlevel 1
+	glossiness 40
+}
+
+material texture BLUD0572
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD0572.png"
+	specularlevel 2
+	glossiness 30
+}
+material texture BLUD0573
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD0573.png"
+	specularlevel 2
+	glossiness 30
+}
+material texture BLUD0574
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD0574.png"
+	specularlevel 2
+	glossiness 30
+}
+material texture BLUD0575
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD0575.png"
+	specularlevel 2
+	glossiness 30
+}
+material texture BLUD0576
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD0576.png"
+	specularlevel 2
+	glossiness 30
+}
+material texture BLUD0577
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD0577.png"
+	specularlevel 2
+	glossiness 30
+}
+material texture POOL3D
+{
+
+	Shader "shaders/WaterShader.fp"
+	texture offsetTexture "textures/waterUV.png"
+	Speed 1.0
+
+	specularlevel 3
+	glossiness 30
+}
+
+
+material texture BLUD0085
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD0085.png"
+	specularlevel 1
+	glossiness 30
+}
+material texture BLUD0446
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD0446.png"
+	specularlevel 1
+	glossiness 30
+}
+material texture BLUD0084
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD0084.png"
+	specularlevel 1
+	glossiness 30
+}
+material texture BLUD0083
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD0083.png"
+	specularlevel 1
+	glossiness 30
+}
+material texture BLUD0021
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD0021.png"
+	specularlevel 3
+	glossiness 40
+}
+material texture BLUD0165
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD0165.png"
+	specularlevel 2
+	glossiness 20
+}
+
+material texture BLUD0042{
+	specularlevel 2
+	glossiness 40
+}
+material texture BLD227D
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLD227D.png"
+	specularlevel 1
+	glossiness 15
+}
+material texture BLD227C
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLD227C.png"
+	specularlevel 1
+	glossiness 10
+}
+material texture B02027B
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/B02027B.png"
+	specularlevel 1
+	glossiness 10
+}
+material texture BLUD0242
+{
+	specularlevel 1
+	glossiness 10
+}
+material texture BLUD0445
+{
+	specularlevel 1
+	glossiness 10
+}
+
+material texture BLUD0401
+{
+	specularlevel 1
+	glossiness 10
+}
+
+
+material texture BLUD0289
+{
+
+}
+
+
+material texture BLUD0288
+{
+
+}
+
+material texture BLUD0110
+{
+
+}
+material texture BLUD0108 {
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD0108.png"
+	specularlevel 1
+	glossiness 10
+}
+
+material texture B0352 {
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/B0352.png"
+}
+
+material texture B0351
+{
+
+}
+
+material texture B0350
+{
+
+}
+material texture B0138B
+{
+
+}
+
+material texture B00093M {
+	specularlevel 5
+	glossiness 10
+}
+
+material texture B00093 {
+	specularlevel 5
+	glossiness 10
+}
+material texture B0002
+{
+
+}
+material texture B000139
+{
+
+}
+
+material texture B000116 {
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/B000116.png"
+}
+
+material texture B02027 {
+	//Shader "Shaders/parallax2.fp"
+	//Texture tex_heightmap "materials/heigthmaps/auto/B02027.png"
+	specularlevel 1
+	glossiness 25
+}
+
+material texture B1044B {
+	//Shader "Shaders/parallax2.fp"
+	//Texture tex_heightmap "materials/heigthmaps/auto/B1044B.png"
+	specularlevel 2
+	glossiness 25
+}
+material texture B1044 {
+	//Shader "Shaders/parallax2.fp"
+	//Texture tex_heightmap "materials/heigthmaps/auto/B1044.png"
+	specularlevel 2
+	glossiness 25
+}
+
+material texture B00097 {
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/B00097.png"
+	specularlevel 2
+	glossiness 25
+}
+
+
+material texture grbase
+{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/grbase.png"
+}
+material texture BLUD0227
+{
+	specularlevel 1
+	glossiness 10
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD0227.png"
+}
+material texture B0080
+{
+//Shader "Shaders/parallax2.fp"
+//Texture tex_heightmap "materials/heigthmaps/auto/B0080.png"
+specularlevel 1
+glossiness 10
+}
+material texture B0079
+{
+//Shader "Shaders/parallax2.fp"
+//Texture tex_heightmap "materials/heigthmaps/auto/B0079.png"
+specularlevel 1
+glossiness 10
+}
+material texture B0082
+{
+//Shader "Shaders/parallax2.fp"
+//Texture tex_heightmap "materials/heigthmaps/auto/B0082.png"
+specularlevel 1
+glossiness 10
+}
+material texture B0089
+{
+specularlevel 1
+glossiness 10
+}
+material texture B0318
+{
+specularlevel 1
+glossiness 10
+}
+
+material texture BLUD0006
+{
+specularlevel 1
+glossiness 1
+}
+material texture BLUD0430
+{
+specularlevel 1
+glossiness 5
+    Shader "Shaders/parallax2.fp"
+    Texture tex_heightmap "materials/heigthmaps/auto/BLUD0430.png"
+}
+material texture BLUD0095
+{
+specularlevel 1
+glossiness 1
+    Shader "Shaders/parallax2.fp"
+    Texture tex_heightmap "materials/heigthmaps/auto/BLUD0095.png"
+}
+
+material texture BLUD0155
+{
+    Shader "Shaders/parallax2.fp"
+    Texture tex_heightmap "materials/heigthmaps/auto/BLUD0155.png"
+    specularlevel 1
+    glossiness 1
+}
+material texture BLUD0156
+{
+    Shader "Shaders/parallax2.fp"
+    Texture tex_heightmap "materials/heigthmaps/auto/BLUD0156.png"
+    specularlevel 1
+    glossiness 1
+}
+material texture NBR
+{
+    Shader "Shaders/parallax2.fp"
+    Texture tex_heightmap "materials/heigthmaps/auto/NBR.png"
+    specularlevel 1
+    glossiness 5
+}
+
+material texture NBR-
+{
+    normal "materials/normalmaps/auto/NBR.png"
+    specular "materials/specular/auto/NBR.png"
+    specularlevel 1
+    glossiness 5
+}
+material texture BLUD0027
+{
+    //Shader "Shaders/parallax2.fp"
+    //Texture tex_heightmap "materials/heigthmaps/auto/BLUD0027.png"
+    specularlevel 1
+    glossiness 5
+
+}
+
+material texture RUST
+{
+
+}
+material texture BLUD0016
+{
+	specularlevel 1
+	glossiness 1
+}
+material texture BLUD0019
+{
+	specularlevel 1
+	glossiness 5
+}
+material texture BLUD0020
+{
+	specularlevel 1
+	glossiness 5
+}
+
+material texture BLUD0009
+{
+
+	normal "materials/normalmaps/auto/BLUD0009"
+	specular "materials/specular/auto/BLUD0009"
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD0009.png"
+	specularlevel 1
+	glossiness 1
+
+}
+
+material texture BLUD0300{
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD0300.png"
+	specularlevel 1
+	glossiness 10
+}
+material texture BLUD030W{
+	//normal "materials/normalmaps/auto/BLUD030W"
+	//specular "materials/specular/auto/BLUD030W"
+	//ao "materials/ao/auto/BLUD030W"
+
+
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD030W.png"
+	specularlevel 5
+	glossiness 70
+
+}
+
+material texture BLUD030_{
+	specularlevel 1
+	glossiness 1
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD030_.png"
+}
+
+material texture BLUD0855{
+specularlevel 1
+glossiness 15
+	//Shader "Shaders/parallax2.fp"
+	//Texture tex_heightmap "materials/heigthmaps/auto/BLUD0855.png"
+}
+
+
+
+
+material texture BLUD0381{
+	normal "materials/normalmaps/auto/BLUD0381.png"
+	specular "materials/specular/auto/BLUD0381.png"
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/BLUD0381.png"
+	specularlevel 1
+	glossiness 1
+}
+
+
+
+
+material texture SLUDGE_1{
+specularlevel 5
+glossiness 30
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/SLUDGE_1.png"
+}
+material texture SLUDGE_2{
+specularlevel 5
+glossiness 30
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/SLUDGE_2.png"
+}
+material texture SLUDGE_3{
+specularlevel 5
+glossiness 30
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/SLUDGE_3.png"
+}
+material texture SLUDGE_4{
+specularlevel 5
+glossiness 30
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/SLUDGE_4.png"
+}
+material texture SLUDGE_5{
+specularlevel 5
+glossiness 30
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/SLUDGE_5.png"
+}
+material texture SLUDGE_6{
+specularlevel 5
+glossiness 30
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/SLUDGE_6.png"
+}
+material texture SLUDGE_7{
+specularlevel 5
+glossiness 30
+	Shader "Shaders/parallax2.fp"
+	Texture tex_heightmap "materials/heigthmaps/auto/SLUDGE_7.png"
+}

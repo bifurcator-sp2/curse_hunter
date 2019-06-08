@@ -1,0 +1,89 @@
+CLEARLOCKS
+
+Lock 1
+{
+	EyeKey
+	Message "$KEY_EYE_NEED"
+	RemoteMessage "$KEY_EYE_NEED"
+	Mapcolor 255 0 0
+	LockedSound items/needKey
+}
+
+Lock 2
+{
+	DaggerKey
+	Message "$KEY_DAGGER_NEED"
+	RemoteMessage "$KEY_DAGGER_NEED"
+	Mapcolor 0 255 0
+	LockedSound items/needKey
+}
+
+Lock 3
+{
+	MoonKey
+	Message "$KEY_MOON_NEED"
+	RemoteMessage "$KEY_MOON_NEED"
+	Mapcolor 0 0 255
+	LockedSound items/needKey
+}
+
+Lock 4
+{
+	FireKey
+	Message "$KEY_FIRE_NEED"
+	RemoteMessage "$KEY_FIRE_NEED"
+	Mapcolor 255 255 0
+	LockedSound items/needKey
+}
+
+Lock 5
+{
+	SkullKey
+	Message "$KEY_SKULL_NEED"
+	RemoteMessage "$KEY_SKULL_NEED"
+	Mapcolor 255 0 255
+	LockedSound items/needKey
+}
+
+Lock 6
+{
+	SpiderKey
+	Message "$KEY_SPIDER_NEED"
+	RemoteMessage "$KEY_SPIDER_NEED"
+	Mapcolor 0 255 255
+	LockedSound items/needKey
+}
+/*
+Lock 129
+{
+	Any { RedCard RedSkull }
+	Message "That requires a Key."
+	RemoteMessage "That requires a Key."
+	Mapcolor 255 0 0
+}
+
+Lock 130
+{
+	Any { BlueCard Blueskull }
+	Message "That requires a Key."
+	RemoteMessage "That requires a Key."
+	Mapcolor 255 0 0
+}
+
+Lock 131
+{
+	Any { YellowCard YellowSkull }
+	Message "That requires a Key."
+	RemoteMessage "That requires a Key."
+	Mapcolor 255 0 0
+}
+
+Lock 132
+{
+	BlueCard
+	RedSkull
+	Message "That requires a Key."
+	RemoteMessage "That requires a Key."
+	Mapcolor 255 0 0
+}
+*/

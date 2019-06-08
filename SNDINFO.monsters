@@ -1,0 +1,246 @@
+////SHARED
+BTHUD1 	BTHUD1
+BTHUD2 	BTHUD2
+BTHUD3 	BTHUD3
+BTHUD4 	BTHUD4
+BTHUD5 	BTHUD5
+BTHUD6 	BTHUD6
+BTHUD7 	BTHUD7
+
+$random  human/BodyFall { BTHUD1 BTHUD2 BTHUD3 BTHUD4 BTHUD5 BTHUD6 BTHUD7 }
+
+animal/smallBite SMALBITE
+
+monster/resurrect RESURR //doom3 sound
+monster/landing landing
+
+
+
+//Zombie
+ZOMSEE1 ZOMSEE1
+ZOMSEE2 ZOMSEE2
+ZOMSEE3 ZOMSEE3
+$random zombie/sight	 	{ZOMSEE1 ZOMSEE2 ZOMSEE3}
+
+DSZOMACT DSZOMACT
+DSZMACT2 DSZMACT2
+$random zombie/active		{ZOMSEE1 ZOMSEE2 ZOMSEE3}
+
+zombie/pain			ZOMSEE3
+
+ZOMAXE ZOMAXE
+ZOMAXE2 ZOMAXE2
+ZOMAXE3 ZOMAXE3
+$random  zombie/melee	{ZOMAXE ZOMAXE2 ZOMAXE3}
+
+zombie/fake			ZOMFAKE
+
+zombie/fireDeath			ZOMBFDET
+
+ZOMBDTH ZOMBDTH
+ZOMDTH1 ZOMDTH1
+ZOMDTH2 ZOMDTH2
+
+$random zombie/death { ZOMBDTH ZOMDTH1 ZOMDTH2}
+
+
+zombie/groundup		ZOMBFDET
+Zombie/Raise ZOMRUS
+zombie/cickHead DSHEDKCK
+
+//POD
+PODDIE1 PODDIE1
+PODDIE2 PODDIE2
+PODDIE3 PODDIE3
+$random pod/death { PODDIE1 PODDIE2 PODDIE3}
+
+pod/open PODOPEN
+
+ACIDHIT1 ACIDHIT1
+PODEXPL PODEXPL
+$random pod/ballExplode {ACIDHIT1 PODEXPL}
+
+PODSPT1 PODSPT1
+PODSPT2 PODSPT2
+$random pod/attack { PODSPT1 PODSPT2 }
+
+TENSWP TENSWP
+podSeeding/swing TENSWP
+
+TENTDWN TENTDWN
+podSeeding/hide TENTDWN
+
+TENTUP TENTUP
+podSeeding/show TENTUP
+
+TENTEXP TENTEXP
+podSeeding/hit TENTEXP
+
+
+
+//cultists
+DSMSTOM1 DSMSTOM1
+DSMSTOM2 DSMSTOM2
+$Random Cultist/Tommy { DSMSTOM1 DSMSTOM2 }
+
+CShotgun1			CSGUN1
+$rolloff CShotgun1 800 2000
+CShotgun2			CSGUN2
+$rolloff CShotgun2 800 2000
+$random CultistShotgun { CShotgun1 CShotgun2 }
+
+Cultists/Toss	CULTNT
+
+CultistSee1			CULTSEE1
+CultistSee2			CULTSEE2
+CultistSee3			CULTSEE3
+CultistSee4			CULTSEE4
+CultistSee5			CULTSEE5
+CultistAct1			CULTACT
+
+$Random CultistSee { CultistSee1 CultistSee2 CultistSee3 CultistSee4 CultistSee5 }
+$Random CultistAct { CultistSee1 CultistSee2 CultistSee3 CultistSee4 CultistSee5 CultistAct1 }
+
+CultistPain1		CULTPAN1
+CultistPain2		CULTPAN2
+CultistPain3		CULTPAN3
+CultistPain4		CULTPAN4
+CultistPain5		CULTPAN5
+
+$Random CultistPain { CultistPain1 CultistPain2 /*CultistPain3 CultistPain4 CultistPain5 */ }
+
+CultistDie1			CULTDIE1
+CultistDie2			CULTDIE2
+CultistDie3			CULTDIE3
+$Random CultistDie { CultistDie1 CultistDie2 CultistDie3 }
+
+CultistGotYou1		CULTKIL1
+CultistGotYou2		CULTKIL2
+CultistGotYou3		CULTKIL3
+CultistGotYou4		CULTKIL4
+$rolloff CultistGotYou1 384 1024
+$rolloff CultistGotYou2 384 1024
+$rolloff CultistGotYou3 384 1024
+$rolloff CultistGotYou4 384 1024
+
+$Random CultistGotYou { CultistGotYou1 CultistGotYou2 CultistGotYou3 CultistGotYou4 }
+
+$Random CultistBurns {CultistFire1 CultistFire2 CultistFire3}
+CultistFire1	CULTFIR1
+CultistFire2	CULTFIR2
+CultistFire3	CULTFIR3
+
+
+//Spiders
+SpiderSee			SPIDSEE
+SpiderAct			SPIDACT
+SpiderBurn			SPIDBURN
+SpiderPain			SPIDPAIN
+SpiderDie1			SPIDDIE1
+SpiderDie2			SPIDDIE2
+$Random Spiderdie { SpiderDie1 Spiderdie2 }
+
+SPBORN1 SPBORN1
+SPBORN2 SPBORN2
+$Random Spider/Born { SPBORN1 SPBORN1 }
+
+BSPbte1 BSPbte1
+BSPbte2 BSPbte2
+$Random BigSpider/Bite { BSPbte1 BSPbte2 }
+
+BSPdth1 BSPdth1
+BSPdth2 BSPdth2
+$Random BigSpider/Death { BSPdth1 BSPdth2 }
+
+BSPidle1 BSPidle1
+BSPidle2 BSPidle2
+BSPidle3 BSPidle3
+$Random BigSpider/Active { BSPidle1 BSPidle2 BSPidle3 }
+
+BSPjmp1 BSPjmp1
+BSPjmp2 BSPjmp2
+$Random BigSpider/Jump { BSPjmp1 BSPjmp2 }
+
+BSPpn1 BSPpn1
+BSPpn2 BSPpn2
+$Random BigSpider/Pain { BSPpn1 BSPpn2 }
+
+BSPsee1 BSPsee1
+BSPsee2 BSPsee2
+BSPsee3 BSPsee3
+BSPsee4 BSPsee4
+$Random BigSpider/See { BSPsee1 BSPsee2 BSPsee3 BSPsee4 }
+
+BigSpider/Landing SPDLND
+BigSpider/KlimbDown BSPdown
+
+
+
+//bat
+bat/see BATROAM
+bat/pain BATPAIN
+BATDIE1 BATDIE1
+BATDIE2 BATDIE2
+BATDIE3 BATDIE3
+$Random bat/death  { BATDIE1 BATDIE2 BATDIE3 }
+BAT BAT
+BATSPOT BATSPOT
+$Random bat/active	{ BAT BATSPOT }
+
+//Eel
+Eel/Die1	EELDIE1
+Eel/Die2	EELDIE2
+Eel/Die3	EELDIE3
+
+$Random eel/eeldeath { Eel/Die1	Eel/Die2	Eel/Die3 }
+
+Eel/Pain	EELPAIN
+Eel/Roam	EELROAM
+Eel/Spot	EELSPOT
+
+//Gargoyle
+GargoyleSee			GARGSEE
+GargoyleAct			GARGACT
+GargoylePain		GARGPAIN
+GargoyleDie1		GARGDIE1
+GargoyleDie2		GARGDIE2
+GargoyleBurn		GARGDIE3
+GargoyleMelee		GARGMLE
+$Random GargoyleDie { GargoyleDie1 GargoyleDie2 }
+GargoyleWingFlap GarWing
+
+
+
+//Rat
+RatSee1			RATSEE
+RatSee2			RATSEE2
+$random RatSee { RatSee1 RatSee2 }
+$random RatActive { RatSee1 RatSee2 }
+
+RatPain				RATPAIN
+RatDie1				RATDIE1
+RatDie2				RATDIE2
+RatDie3				RATDIE3
+$random RatDie { RatDie1 RatDie2 RatDie3 }
+
+
+//Defiler
+defiler/raize defrize //doom3 sound
+defiler/pain defpan //doom3 sound
+defiler/dieStart defdie1
+defiler/dieBlow defdie2
+
+//Defiler defender
+defender/fire	TORCHON
+defender/fireBlow	TORCHOFF
+defender/raize defnrize
+
+
+//predator
+predator/see PREDSEE
+predator/missleExplode 	PREDEXPL
+predator/fireMissile	PREDFIRE
+$rolloff predator/fireMissile 1024 2500
+predator/spot PREDSPOT
+predator/yell PREDYELL
+$rolloff predator/yell 1024 2500

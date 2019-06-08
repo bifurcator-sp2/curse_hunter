@@ -1,0 +1,84 @@
+class z_Bat_Sleeping : z_Bat
+{
+  States
+  {
+	  Spawn:
+		BATB B 10 A_LookEx(LOF_NOSIGHTCHECK );
+		Loop;
+	}
+}
+class z_Bat : CHmonster
+{
+	default{
+	  Health 5;
+	  Radius 12;
+	  Height 12;
+	  Scale 0.5;
+	  Mass 50;
+	  Speed 9;
+	  Damage 1;
+	  PainChance 256;
+	  MeleeRange 22;
+	  Monster;
+	  +FLOAT;
+	  +NOGRAVITY;
+	  +MISSILEMORE;
+	  +DONTFALL;
+	  +NOICEDEATH;
+	  Species "Bat";
+	  +THRUSPECIES;
+	  SeeSound "bat/see";
+	  AttackSound "animal/smallBite";
+	  PainSound "bat/pain";
+	  DeathSound "bat/death";
+	  ActiveSound "bat/active";
+	  Tag "$BAT";
+	  Obituary "$BAT_OBITUARY";
+	}
+	override void SetNames(){
+		N_NAME = StringTable.Localize("$BAT_NAME");
+		N_DEATHNAME = StringTable.Localize("$BAT_DEATHNAME");
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		SetNames();
+		giveInventory("AvoidFire", 1);
+		GiveInventory("MenhirSkipMark", 1);
+	}
+	virtual void AvoidWater(){
+		if(waterlevel>0){
+			vel.z = 4;
+			a_damageSelf(1);
+		}
+	}
+  States
+  {
+	  SetSprite:
+		BATB A 1;//for DistanceSpawned
+	  Spawn:
+		BATB B 10 a_look;
+		Loop;
+	  See:
+		BATA ABCDE 2 { A_Chase(); AvoidWater(); }
+		Loop;
+	  Melee:
+		BATA A 0 a_jump(72, "Wander");
+		BATA ABCDE 2 A_FaceTarget;
+		BATA ABCDE 2 A_CustomMeleeAttack(1,"","none");
+		BATA ABCDE 2 a_recoil(4);
+		//BATA A 0 a_jump(250, "Wander");
+		Goto Wander;
+	  Wander:
+		BATA ABCDE 2  { AvoidWater(); A_Wander(); }
+		BATA A 0 a_jump(4, "See");
+		Loop;
+	  Pain:
+		BATA A 4 A_Pain;
+		Goto See;
+	  Death:
+		BATC A 4 A_Scream;
+		BATC BCDE 4;
+		Stop;
+  }
+}

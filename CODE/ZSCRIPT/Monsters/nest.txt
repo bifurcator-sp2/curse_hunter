@@ -1,0 +1,256 @@
+Class z_RatNest : SwitchableDecoration
+{
+	string SpawnClass;
+	int ChildNumber;
+	int ChildNum;
+	int ActivationRadius;
+	int MonstersRadius;
+	bool Active;
+	bool ActivePain;
+
+	int ChildSpawnX;
+	int ChildSpawnY;
+	int ChildSpawnZ;
+	bool Spawned;
+
+	default
+	{
+
+		Tag "$RAT_NEST_NAME";
+
+		+SHOOTABLE;
+		+NOGRAVITY;
+		+NOCLIP;
+		+DONTTHRUST;
+		-SOLID;
+		PainChance 200;
+		Health 100;
+	}
+
+	Override void PostBeginPlay(){
+
+		self.giveInventory("Pointable", 1);
+		SpawnClass = "z_Rat";
+		ChildNumber = Args[0]?Args[0]:5;
+		ActivationRadius = Args[1]?Args[1]:256;
+		MonstersRadius = Args[2]?Args[2]:512;
+		Super.PostBeginPlay();
+	}
+
+	virtual void NestAction(){
+		Active = 1;
+		ChildNum = 0;
+		int ChildNumTotal = 0;
+		Spawned = 0;
+		ThinkerIterator ch = ThinkerIterator.Create(SpawnClass);
+		actor Child;
+		while(Child = actor(ch.Next())){
+			if(Child.Master==self && Child.health>0){
+				ChildNum++;
+			}
+			if(Child.Master==self){
+				ChildNumTotal++;
+			}
+		}
+		ThinkerIterator ch2 = ThinkerIterator.Create(SpawnClass);
+		while(Child = actor(ch2.Next())){
+			if(Child.Master==self && Child.health<=0 && ChildNumTotal>ChildNum*2){
+				Child.destroy();
+			}
+		}
+		if(ChildNum<ChildNumber){
+			a_spawnItemEx(SpawnClass, ChildSpawnX, ChildSpawnY, ChildSpawnZ, 0, 0, 0, 0, SXF_SETMASTER );
+			A_AlertMonsters();
+			Spawned = 1;
+		}
+		//Deactivate
+		//ThinkerIterator it = ThinkerIterator.Create("PlayerPawn");
+		//PlayerPawn this;
+		//while(this = PlayerPawn(it.Next())){
+			if(distance3D(players[consoleplayer].mo)>MonstersRadius && !ActivePain){
+				setStateLabel("Inactive");
+			}
+		//}
+	}
+
+
+	override void Tick(){
+		super.tick();
+		if(ChildNum){
+			ThinkerIterator childIterator;
+			childIterator = ThinkerIterator.Create(SpawnClass);
+			actor Child;
+			while(Child = actor(childIterator.Next())){
+				if(Child.Master==self && Child.health>0){
+					if(int(self.distance3D(Child))>MonstersRadius){
+						if(Child.target){
+							Child.a_faceTarget();
+							Child.angle+=180;
+							Child.a_recoil(-16);
+							if(!Active && !Child.target.CheckSight(Child, 0)){
+								Child.destroy();
+
+							} else {
+								Child.target = NULL;
+							}
+
+						} else {
+							Child.a_faceMaster();
+							Child.a_recoil(-16);
+							if(!Active){
+								Child.destroy();
+
+							}
+						}
+					}
+
+				}
+
+			}
+		}
+	}
+
+	States
+	{
+		Spawn:
+			TNT1 A 1;
+		Inactive:
+			"####" "#" 35 {
+				Active = 0;
+				ThinkerIterator it = ThinkerIterator.Create("PlayerPawn");
+				PlayerPawn this;
+				while(this = PlayerPawn(it.Next())){
+					if(distance3D(this)<ActivationRadius){
+						setStateLabel("Active");
+					}
+				}
+			}
+			loop;
+		Active:
+			"####" "#" 15;
+			"####" "#" 0 NestAction();
+			loop;
+		Pain:
+			"####" "#" 35 {ActivePain=1;}
+			Goto Active;
+		Death:
+			TNT1 A 0 GiveInventory("GibDeathMark", 1);
+			TNT1 A 35;
+			Stop;
+
+	}
+}
+
+
+Class z_SpiderNest : z_RatNest
+{
+	int SpawnWebFactor;
+	default
+	{
+		Tag "$RPIDER_NEST_NAME";
+		DamageFactor "Fire", 0.7;
+		DamageFactor "Blast", 2.0;
+		painchance "Fire", 64;
+		BloodType "RedBlood";
+		-NOCLIP;
+		Health 500;
+		radius 32;
+		height 128;
+	}
+	Override void PostBeginPlay(){
+		Super.PostBeginPlay();
+		giveInventory("Material_Blood", 1);
+
+		SpawnClass = "SpiderRed";
+		ChildNumber = Args[0]?Args[0]:10;
+		ActivationRadius = Args[1]?Args[1]:0;
+		MonstersRadius = Args[2]?Args[2]:512;
+	}
+	override void NestAction(){
+		Super.NestAction();
+		if(Spawned && !random(0, 2)){
+			a_playSound("Spider/Born");
+		}
+	}
+
+	States
+	{
+		Spawn:
+			SPDN B 1 nodelay{
+				for(int i = 0; i<random(5, 10); i++){
+					A_SpawnItemEx("WebMaker", 0, 0, 0, frandom(-30.0, 30.0), frandom(-30.0, 30.0), frandom(-10.0, 30.0), 0,SXF_NOCHECKPOSITION);
+				}
+			}
+			Goto Inactive;
+		Active:
+			"####" "#" 0 {
+				ChildSpawnX = random(-48, 48);
+				ChildSpawnY = random(-48, 48);
+				ChildSpawnZ = 0;
+
+			}
+			"####" "#####" 1;
+			"####" "##" 5 {
+				a_setScale(frandom(0.8, 1.0), 1.0);
+			}
+			"####" "#" 0 NestAction();
+			loop;
+		Pain:
+			"####" "#" 35 {ActivePain=1;}
+			Goto Active;
+		Pain.fIRE:
+			"####" "#" 35 {ActivePain=1; giveInventory("Burner", 1);}
+			Goto Active;
+	}
+}
+Class z_SpiderNest2 : z_SpiderNest
+{
+	default
+	{
+		Health 300;
+		radius 18;
+		height 96;
+	}
+	States
+	{
+		Spawn:
+			SPDN A 1 nodelay{
+				for(int i = 0; i<random(5, 10); i++){
+					A_SpawnItemEx("WebMaker", 0, 0, 0, frandom(-30.0, 30.0), frandom(-30.0, 30.0), frandom(-10.0, 30.0), 0,SXF_NOCHECKPOSITION);
+				}
+			}
+			Goto Inactive;
+	}
+}
+
+
+
+
+Class WebMaker : actor
+{
+	int counter;
+	Default
+	{
+		+Missile;
+		speed 32;
+		+THRUACTORS;
+		+clientsideonly;
+		-SOLID;
+		Decal "webbig";
+		+FORCEDECAL;
+		+DONTSPLASH;
+	}
+//
+	States
+	{
+		Spawn:
+			TNT1 A 35;
+			Stop;
+		Death:
+			TNT1 A 1 A_SprayDecal("webbig", 32);
+			Stop;
+
+	}
+
+
+}

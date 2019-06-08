@@ -1,0 +1,289 @@
+class z_TommyGun : CHWeapon {
+	int DrumBullets;
+	default{
+		+ThruGhost;
+		+ThruSpecies;
+		obituary "$TOMMYGUN_OBITUARY";
+		weapon.ammotype1 "bullet";
+		weapon.ammotype2 "bullet";
+		weapon.ammogive 50;
+		weapon.ammouse1 1;
+		weapon.ammouse2 1;
+		inventory.pickupmessage "$TOMMYGUN_PICKED";
+		inventory.pickupsound "PICKWEAP";
+		decal "BulletChip1";
+		Attacksound "";
+		Scale 0.6;
+		Weapon.SelectionOrder 700;
+		weapon.kickback 128;
+		Weapon.BobSpeed 0.8;
+		Weapon.BobStyle "Smooth";
+		Weapon.BobRangeX 0.5;
+		Weapon.BobRangeY 0.5;
+		//Weapon.SisterWeapon DoubleTommyGun;
+		+INVENTORY.IGNORESKILL;
+		-NOGRAVITY;
+		+WEAPON.NOAUTOAIM;
+
+		+SHOOTABLE;
+		+NOBLOOD;
+		+NOBLOODDECALS;
+		+INVULNERABLE;
+
+	}
+	Override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+		DrumBullets = 50;
+		GiveInventory("Pointable", 1);
+	}
+	override void tick(){
+		super.tick();
+		/*if(DrumBullets==0){
+			SetStateLabel("Reload");
+			DrumBullets =50;
+		}*/
+	}
+
+	virtual void FireAnim(){
+		A_WeaponReady(WRF_ALLOWRELOAD);
+		//A_Refire("Fire");
+		//
+		//A_JumpIfNoAmmo("NoAmmo");
+	}
+	states
+	{
+		spawn:
+			TOMP A 4;
+			loop;
+		select:
+			TNT1 A 0 {Invoker.HandlingControl();}
+			TOMG A 1 A_raise;
+			Loop;
+		deselect:
+			TOMG A 1 A_lower;
+			loop;
+		ready:
+			TOMG A 1 {
+					A_WeaponReady(WRF_ALLOWRELOAD|WRF_ALLOWUSER1); GiveInventory("HaveTommy", 1);
+				}
+			loop;
+		Fire:
+			TNT1 A 0 {
+				//A_FireBullets(4,3,-1,random(8,12),"B_BulletPuff",1);
+
+				A_FireProjectile ("PlayerBulletrTracer", frandom(-1, 1), true, 0.0, 0.0, FPF_NOAUTOAIM, frandom(-1, 1));
+
+				A_FireProjectile("TommyGunSmoke", 0, 0, 4, 6, FPF_NOAUTOAIM );
+				invoker.DrumBullets--;
+				A_PlaySound("weapons/chngun", CHAN_WEAPON);
+				A_FireProjectile("TommygunCasing",45+random(-8,8),0,1,8,0);
+				A_PlayWeaponSound("tommyGun/Fire");
+				A_recoil (0.5);
+				A_QuakeEx (1, 1, 16, 15, 0, 0);
+				A_SetPitch(pitch-0.7, 1);
+			}
+			TNT1 A 0 A_jump(128, "Fire2");
+			TOMF ABCD 1 Bright A_FireProjectile("GunFireLight", 0, 0, 4, 6, FPF_NOAUTOAIM );
+			TNT1 A 0 A_jumpif(invoker.DrumBullets<=0, "Reload");
+			TNT1 A 0 { invoker.FireAnim(); }
+			Goto Ready;
+		Fire2:
+			TNT1 A 0 {
+				A_FireProjectile ("PlayerBulletrTracer", frandom(-1, 1), true, 0.0, 0.0, FPF_NOAUTOAIM, frandom(-1, 1));
+				A_FireProjectile("TommyGunSmoke", 0, 0, 4, 6, FPF_NOAUTOAIM );
+				invoker.DrumBullets--;
+				A_FireProjectile("TommygunCasing",45+random(-8,8),0,1,8,0);
+				A_PlayWeaponSound("tommyGun/Fire");
+				A_recoil (0.5);
+				A_QuakeEx (1, 1, 16, 15, 0, 0);
+				A_SetPitch(pitch-0.7, 1);
+			}
+			TNT1 A 0 A_jump(255, 1, 2, 3, 4);
+			TOMF EFGH 1 Bright A_FireProjectile("GunFireLight", 0, 0, 4, 6, FPF_NOAUTOAIM );
+			TNT1 A 0 A_jumpif(invoker.DrumBullets<=0, "Reload");
+			TNT1 A 0 { invoker.FireAnim(); }
+			Goto Ready;
+
+		AltFire:
+			TNT1 A 0 {
+				A_FireProjectile ("PlayerBulletrTracer", 0, true, 0.0, 0.0, FPF_NOAUTOAIM, 0);
+				A_FireProjectile("TommyGunSmoke", 0, 0, 4, 6, FPF_NOAUTOAIM );
+				invoker.DrumBullets--;
+				A_PlaySound("weapons/chngun", CHAN_WEAPON);
+				A_FireProjectile("TommygunCasing",45+random(-8,8),0,1,8,0);
+				A_PlayWeaponSound("tommyGun/Fire");
+				A_recoil (0.5);
+				A_QuakeEx (1, 1, 16, 15, 0, 0);
+				A_SetPitch(pitch-0.7, 1);
+			}
+			TOMF ABCD 1 Bright A_FireProjectile("GunFireLight", 0, 0, 4, 6, FPF_NOAUTOAIM );
+			TNT1 A 0 A_jumpif(invoker.DrumBullets<=0, "Reload");
+			TNT1 A 0 { invoker.FireAnim(); }
+			TNT1 A 0 A_ReFire;
+			Goto Ready;
+		AltHold:
+			TOMG A 1;
+			TOMG A 1 A_ReFire;
+			Goto Ready;
+		Reload:
+			TNT1 A 0 A_PlaySound("tommyGun/drumOut", CHAN_WEAPON);
+			TOMR ABCDE 6;
+			TNT1 A 0 A_PlaySound("tommyGun/drumIn", CHAN_WEAPON);
+			TOMR FGHI 6;
+			TNT1 A 0 { invoker.DrumBullets = 50; A_PlaySound("tommyGun/refire", CHAN_WEAPON);}
+			Goto Ready;
+
+	}
+}
+
+class TommyGunSmoke : Actor
+{
+	int RollSpeed;
+	default
+	{
+		+NOINTERACTION;
+		RENDERSTYLE "translucent";
+		alpha 0.3;
+		Speed 10;
+		scale 0.5;
+		+Rollsprite;
+		+FORCEXYBILLBOARD;
+	}
+	Override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+		if(random(1, 0)){
+			RollSpeed = Random(-6, -2);
+		} else {
+			RollSpeed = Random(2, 6);
+		}
+	}
+	virtual void ParticleLife()
+	{
+		A_SetScale(scale.x+0.01);
+		A_fadeOut(0.03, FTF_REMOVE);
+		A_SetRoll(roll+RollSpeed,SPF_INTERPOLATE);
+
+	}
+	States
+	{
+		Spawn:
+			TNT1 A 5;
+		Smoke:
+			S1MK A 1 ParticleLife();
+			Loop;
+
+	}
+}
+
+class TommygunCasing : DistanceSpawned
+{
+	default
+	{
+	   Height 1;
+	   Radius 3;
+	   Speed 4;
+	   Scale 0.2;
+	   Gravity 0.7;
+	   +DOOMBOUNCE;
+	   maxstepheight 0;
+	   bouncefactor 0.5;
+	   bouncecount 3;
+	   PROJECTILE;
+	   +DONTSPLASH;
+	   +SOLID;
+	   -NOGRAVITY;
+	   +FLOORCLIP;
+	   +WINDTHRUST;
+	   -CANBOUNCEWATER;
+	   +EXPLODEONWATER;
+	   -NOLIFTDROP;
+	   +ClientSideOnly;
+	   +CannotPush;
+	   SeeSound "bullet/casing";
+	   DeathSound "bullet/casing";
+		Damage 0.0;
+   }
+
+	override int getRenderDistance(){
+		return Cvar.GetCVar("z_natue_renderdistance_grass", players[consoleplayer]).GetInt();
+	}
+
+   States
+   {
+	   SetSprite://for DistanceSpawned
+	   Spawn:
+		TNT1 a 3;
+	   Fly:
+		  CASB ABC 1;
+		  Loop;
+	   Death:
+		  CASB A 1 A_Fall;
+		  CASB A 35*10;
+		waitRemove:
+			CASB A 1 a_fadeOut(0.01, FTF_REMOVE);
+			loop;
+   }
+
+}
+class TommygunDrum : DistanceSpawned
+{
+	default
+	{
+	   Height 1;
+	   Radius 3;
+	   Speed 4;
+	   Scale 0.5;
+	   Gravity 0.7;
+	   +DOOMBOUNCE;
+	   maxstepheight 0;
+	   bouncefactor 0.4;
+	   bouncecount 2;
+	   PROJECTILE;
+	   +DONTSPLASH;
+	   +SOLID;
+	   -NOGRAVITY;
+	   +FLOORCLIP;
+	   +WINDTHRUST;
+	   -CANBOUNCEWATER;
+	   +EXPLODEONWATER;
+	   -NOLIFTDROP;
+	   +ClientSideOnly;
+	   +CannotPush;
+		Damage 0.0;
+   }
+
+	override int getRenderDistance(){
+		return Cvar.GetCVar("z_natue_renderdistance_grass", players[consoleplayer]).GetInt();
+	}
+
+   States
+   {
+	   SetSprite://for DistanceSpawned
+	   Spawn:
+		TNT1 a 3;
+	   Fly:
+		  TOMA B 1;
+		  Loop;
+	   Death:
+		  TOMA B 1 A_Fall;
+		  TOMA B 35*10;
+		waitRemove:
+			TOMA B 1 a_fadeOut(0.01, FTF_REMOVE);
+			loop;
+   }
+
+}
+
+
+class HaveTommy : Undroppable {
+
+	Default	{ Inventory.MaxAmount 2; }
+
+	override void DoEffect(){
+		if(Owner.CountInv(self.GetClassName())==1){
+			Owner.a_playSound("player/TommyPickup", CHAN_VOICE);
+		}
+	}
+}

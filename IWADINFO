@@ -1,0 +1,10 @@
+IWad
+{
+Name = "BLOOD: The Curse Hunter"
+AutoName = "ch"
+Game = "Doom"   
+Config = "Doom"
+Mapinfo = "mapinfo/doom2.txt"
+BannerColors = "00 00 00", "FF 00 00"
+
+}

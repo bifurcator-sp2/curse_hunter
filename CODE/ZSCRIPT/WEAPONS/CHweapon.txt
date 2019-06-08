@@ -1,0 +1,90 @@
+Class CHWeapon : Weapon
+{
+	String PreviousWeapon;
+	virtual void HandlingControl(){
+
+		z_PointController Controller = z_PointController(players[consoleplayer].mo.FindInventory("z_PointController"));
+		if(Controller && Controller.HoldedItem){
+			Controller.DOdropItem = 1;
+		}
+	}
+	void SelectPreviousWeapon(){
+		z_PointController Controller = z_PointController(Players[consolePlayer].mo.FindInventory("z_PointController"));
+		if(Controller){
+			if(!Controller.PlayerPreviuosWeapon){
+				Players[consolePlayer].mo.A_SelectWeapon(Controller.PreviousWeapon);
+			} else {
+				Players[consolePlayer].mo.A_SelectWeapon(Controller.PlayerPreviuosWeapon);
+			}
+		}
+	}
+//===========================================================================
+	//
+	// A_ThrowGrenade
+	//
+	// Throws a grenade (like Hexen's fighter flechette)
+	//
+	//===========================================================================
+	action bool, Actor A_ThrowGrenadePrecize(class<Actor> missile, double zheight = 0, double xyvel = 0, double zvel = 0, bool useammo = true)
+	{
+		if (missile == NULL)
+		{
+			return false, null;
+		}
+		if (stateinfo != null && stateinfo.mStateType == STATE_Psprite)
+		{
+			let player = self.player;
+			if (player == null) return false, null;
+			let weapon = player.ReadyWeapon;
+			// Used from a weapon, so use some ammo
+
+			if (weapon == NULL || (useammo && !weapon.DepleteAmmo(weapon.bAltFire)))
+			{
+				return true, null;
+			}
+		}
+
+		let bo = Spawn(missile, pos + (0, 0, (-Floorclip + GetBobOffset() + zheight + 35 + (player? player.crouchoffset : 0.))), ALLOW_REPLACE);
+		if (bo)
+		{
+			bo.PlaySpawnSound(self);
+			if (xyvel != 0)
+				bo.Speed = xyvel;
+			bo.Angle = Angle;// + (random[grenade](-4, 3) * (360./256.));
+
+			let pitch = -self.Pitch;
+			let angle = bo.Angle;
+
+			// There are two vectors we are concerned about here: xy and z. We rotate
+			// them separately according to the shooter's pitch and then sum them to
+			// get the final velocity vector to shoot with.
+
+			double xy_xyscale = bo.Speed * cos(pitch);
+			double xy_velz = bo.Speed * sin(pitch);
+			double xy_velx = xy_xyscale * cos(angle);
+			double xy_vely = xy_xyscale * sin(angle);
+
+			pitch = self.Pitch;
+			double z_xyscale = zvel * sin(pitch);
+			double z_velz = zvel * cos(pitch);
+			double z_velx = z_xyscale * cos(angle);
+			double z_vely = z_xyscale * sin(angle);
+
+			bo.Vel.X = xy_velx + z_velx + Vel.X / 2;
+			bo.Vel.Y = xy_vely + z_vely + Vel.Y / 2;
+			bo.Vel.Z = xy_velz + z_velz;
+
+			bo.target = self;
+			if (!bo.CheckMissileSpawn(radius)) bo = null;
+			return true, bo;
+		}
+		else
+		{
+			return false, null;
+		}
+}
+}
+
+
+
+class CHfakeWeapon : CHWeapon {}

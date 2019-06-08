@@ -1,0 +1,600 @@
+class z_PodSeed : z_Pod
+{
+	float scaleSpeed;
+
+	default{
+	  //Scale 0.01;
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		Growed = 0;
+		scaleSpeed = 0.01;
+		a_setSize(0.0, 0.0);
+		a_setScale(0.01, 0.01);
+		deactivate(null);
+	}
+
+	States
+	{
+		SetSprite:	GPOD A 1;//for DistanceSpawned
+
+		Inactive:
+			GPOD A 10;
+			Loop;
+		Active:
+			GPOD A 1 {
+				if(Scale.x<0.5){
+					a_setScale(Scale.x+scaleSpeed, Scale.y+scaleSpeed);
+				} else {
+					Growed = 1;
+					bDORMANT = false;
+					a_setSize(default.radius, default.height);
+					setStateLabel("Spawn");
+				}
+			}
+			Loop;
+	}
+}
+
+
+class z_Pod : CHmonster
+{
+	//args[0] seedings radius
+
+	int SeeRadius;
+	float PlayerFeelSpeed;
+	float breathSize;
+	int breathCounter;
+	int breathCounter2;
+	bool opened;
+	int FireRate;
+	int SeedingsRadius;
+	int SeedingsNum;
+	int SeedingSpawned;
+	bool Growed;
+	bool shootState;
+
+	default{
+	  Health 200;
+	  Radius 14;
+	  Height 32;
+	  Scale 0.5;
+	  Mass 50;
+	  Speed 0;
+	  deathHeight 22;
+
+	  PainChance 70;
+	  PainChance "fire", 100;
+	  PainChance "PitchFork", 255;
+	  DamageFactor "Blast", 3.0;
+	  DamageFactor "Shell", 2.5;
+	  DamageFactor "Bullet", 0.7;
+
+	  GibHealth -20;
+	  Monster;
+	  +DONTTHRUST;
+	  +NODAMAGETHRUST;
+	  +LOOKALLAROUND;
+	  +FRIENDLY;
+	  BloodType "GreenBlood";
+	  BloodColor "green";
+
+	  Species "POd";
+	  Tag "$POD_NAME";
+	  Obituary "$POD_OBITUARY";
+	}
+
+	override void SetNames(){
+		N_NAME = StringTable.Localize("$POD_NAME");
+		N_DEATHNAME = StringTable.Localize("$POD_DEATHNAME");
+		N_DEATHNAME = StringTable.Localize("$POD_DEATHNAME");
+		N_BURNDEATHNAME = StringTable.Localize("$POD_BURNDEATHNAME");
+		N_GIBDEATHNAME = StringTable.Localize("$POD_GIBDEATHNAME");
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		Growed = 1;
+		ActivationDistance = 512;
+		MyBloodColor = "green";
+		giveInventory("PodArmorController", 1);
+		SetNames();
+		breathSize = 0.03;
+		SeeRadius = 512;
+		PlayerFeelSpeed = 4;
+		putOutFireChance = 20;
+		FireRate = 35;
+		SeedingsRadius = args[0];
+
+		SeedingsNum = (SeedingsRadius*SeedingsRadius)/(64*64);
+		//A_SetTranslation("GreenBlood");
+
+
+		//a_logInt(getActivationDistance());
+	}
+
+	virtual void spawnSeedings(){
+		if(!SeedingSpawned){
+			//a_log("SeedingSpawned");
+			for(int i=0; i<SeedingsNum; i++){
+				a_spawnItemEx("z_PodSeeding", random(-SeedingsRadius, SeedingsRadius), random(-SeedingsRadius, SeedingsRadius), 0, 0, 0, 0, 0, SXF_SETMASTER|SXF_NOCHECKPOSITION);
+				SeedingSpawned++;
+			}
+		}
+	}
+	override void enable(){
+		if(!Activated && !bDORMANT){
+			//a_log("enable");
+			Activated = true;
+			spawnSeedings();
+		}
+
+	}
+	override void disable(){
+		if(Activated && !bDORMANT){
+			//a_log("disable");
+			Activated = false;
+			//A_KillChildren("Remove");
+		}
+	}
+
+	override void tick(){
+		super.tick();
+
+		if(health>0 && !bDORMANT ){
+			//if(scale.x < default.scale.x){ scale.x+=0.1;}
+			if(Growed && !shootState){
+				if(breathCounter2){breathCounter2--;} else {
+					breathCounter+=5;
+					if(breathCounter>359){
+						breathCounter2 = 35*random(1, 5);
+						breathCounter = 0;
+					} else {
+						scale.x = default.scale.x+default.scale.x*(breathSize*sin(breathCounter));
+						scale.y = default.scale.y-default.scale.y*(breathSize*sin(breathCounter));
+					}
+				}
+			}
+			if(CurrentDistance > getActivationDistance()){
+				disable();
+			} else {
+				enable();
+			}
+
+		}
+	}
+
+  States
+  {
+	  SetSprite:
+		TNT1 A 1;//for DistanceSpawned
+	  Spawn:
+		GPOD A 1 {
+			if(CurrentDistance>SeeRadius) {
+				a_lookEx(LOF_NOSOUNDCHECK,  0, SeeRadius, 0, 360);
+			}
+			spawnSeedings();
+		}
+		GPOD A 0 a_jumpif(CurrentDistance && CurrentDistance<radius+players[consolePlayer].mo.radius+8, "See");
+		GPOD A 10 {
+			if(CurrentDistance && CurrentDistance<SeeRadius && abs(players[consolePlayer].mo.vel.x)+abs(players[consolePlayer].mo.vel.y)>PlayerFeelSpeed){
+				setStateLabel("See");
+			} else {
+				setStateLabel("Close");
+			}
+		}
+		Loop;
+	  Inactive:
+		TNT1 A 10;
+		Loop;
+
+	  See:
+		GPOD E 10 {
+			if(CurrentDistance>SeeRadius) {
+				a_chase();
+			} else {
+				if(random(0, 100)<35){
+					target = players[consolePlayer].mo;
+					setStateLabel("Missile");
+				}
+			}
+		}
+		GPOD A 0 a_jumpif(!opened, "Open");
+		GPOD A 0 a_jumpif( (CurrentDistance>SeeRadius && !Target) , "Close");
+		Loop;
+
+		Missile:
+			GPOD A 0 a_jumpif((Target && (Target.bNOGRAVITY ||Target.bFLOAT) ), "Spawn");
+			GPOD A 0 {opened=1;}
+			GPOD EDCBA 4;
+			GPOD A 10;
+			GPOD E 1 {
+				a_setScale(default.scale.x*0.7, scale.y);
+				BallisticForeseengAttack("PodMucusBall", "pod/attack", SeeRadius);
+				a_clearTarget();
+			}
+
+			GPOD BCD 1 a_setScale(scale.x+0.1, scale.y);
+			GPOD E 35;
+			goto see;
+
+	  Open:
+	    GPOD A 0 a_playSound("pod/open");
+		GPOD ABCDE 6;
+		"####" "#" 0 {opened=1;}
+		goto See;
+
+	  Close:
+		"####" "#" 0 a_jumpif(opened==0, "Spawn");
+		GPOD EDCBA 2 {opened=0;}
+		goto Spawn;
+
+	  Pain:
+		GPOD A 0 a_jumpif(opened==0, 2);
+		GPOD EDCBA 2 {opened=0; shootState = 0;}
+		GPOD A 10;
+		Goto See;
+
+      Pain.fire:
+		TNT1 A 0 {A_Pain(); if(LastDamage>5){ self.giveInventory("Burner", 1); } }
+		GPOD A 0 a_jumpif(opened==0, 2);
+		GPOD EDCBA 1 {opened=0; shootState = 0;}
+		GPOD BABABA 3 A_SetScale (default.scale.x*frandom(0.9, 1.1), default.scale.y);
+		GPOD A 1 a_jump(100, "Pain.Fire");
+		Goto See;
+
+	  Death:
+		TNT1 A 0 a_playSound("pod/death");
+		GPOD FGHIJK 8;
+		"####" "#" 0 {
+				giveInventory("ScreenBloodSplashMakerGreen", 1);
+				self.setTag(N_DEATHNAME);
+				actor BC = self.spawn("BodyBlowTargetGreen", self.pos);BC.Master = self;//this is works
+				//spawnLoot();
+			}
+		Goto Corpse;
+
+		XDeath:
+			TNT1 A 0 GiveInventory("GibDeathMark", 1);
+			GPOD L 6 A_XScream;
+			GPOD M 6 { giveInventory("UniDeathGibsGreen", 1); self.setTag(N_GIBDEATHNAME); actor BC = self.spawn("BodyBlowTargetGreen", self.pos);BC.Master = self;}
+			GPOD NOP 6;
+			GPOD QR 6;
+			Goto Corpse;
+
+		Death.Fire:
+			"####" "#" 1 {
+				takeInventory("Burner", 1);
+				giveInventory("GenericFireDeath", 1);
+				a_fall();
+			}
+			TNT1 A 5;
+			Stop;
+		Corpse:
+			"####" "#" 1 {
+				A_setSize(16, 22);
+				bSHOOTABLE = 1;
+				bTHRUACTORS = 1;
+				bGHOST = 1;
+
+			}
+			"####" "#" -1;
+			Stop;
+  }
+}
+
+
+
+class z_PodSeeding : CHmonster
+{
+	int SeeRadius;
+	bool opened;
+	float PlayerFeelSpeed;
+
+	default{
+	  Health 50;
+	  Radius 4;
+	  Height 32;
+	  Scale 0.5;
+	  Mass 50;
+	  Speed 0;
+	  deathHeight 8;
+
+	  MeleeRange 40;
+
+	  PainChance 70;
+	  PainChance "fire", 100;
+	  DamageFactor "Blast", 3.0;
+	  DamageFactor "Poison", 0.0;
+
+	  GibHealth -20;
+	  Monster;
+	  +DONTTHRUST;
+	  +NODAMAGETHRUST;
+	  +LOOKALLAROUND;
+	  +FRIENDLY;
+	  BloodColor "green";
+		BloodType "GreenBlood";
+
+	  ActiveSound "podSeeding/swing";
+	  Species "POd";
+	  Tag "$PODSEEDING_NAME";
+	  Obituary "$PODSEEDING_OBITUARY";
+	}
+
+	override void SetNames(){
+		N_NAME = StringTable.Localize("$PODSEEDING_NAME");
+		N_DEATHNAME = StringTable.Localize("$PODSEEDING_DEATHNAME");
+		N_DEATHNAME = StringTable.Localize("$PODSEEDING_DEATHNAME");
+		N_BURNDEATHNAME = StringTable.Localize("$PODSEEDING_BURNDEATHNAME");
+		N_GIBDEATHNAME = StringTable.Localize("$PODSEEDING_GIBDEATHNAME");
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		GiveInventory("MenhirSkipMark", 1);
+		RenderDistance = 1024;
+		//if(Master){ skip = true;}
+		MyBloodColor = "green";
+		SetNames();
+		SeeRadius = 96;
+		PlayerFeelSpeed = 4;
+		SetZ(floorZ);
+		if(Master && distance3D(Master) > z_Pod(Master).SeedingsRadius){
+
+			destroy();
+		}
+		//a_setScale(0.5*scale.x);
+	}
+
+
+	override void tick(){
+		super.tick();
+		if(health){
+			if(opened){
+				if(height<default.height){ height+=default.height/5;}
+				bINVULNERABLE = 0;
+				A_LoopActiveSound();
+			} else {
+				if(height>0){ height-=default.height/5;}
+				if(Master && Master.health<=0){
+					//bINVULNERABLE = 0;
+					//A_Die("MasterDeath");
+				} else {
+					bINVULNERABLE = 1;
+				}
+				A_StopSound();
+			}
+			if(Master && z_Pod(Master).CurrentDistance > z_Pod(Master).getActivationDistance()){
+				z_Pod(Master).SeedingSpawned = 0;
+				destroy();
+			}
+			if(Master && Master.health<=0){
+				bINVULNERABLE = 0;
+				A_Die("MasterDeath");
+				A_StopSound();
+			}
+		} else {
+			A_StopSound();
+		}
+	}
+
+  States
+  {
+	  SetSprite:
+		GVIN R 1;//for DistanceSpawned
+
+	  Spawn:
+		GVIN R  1 {
+			if(CurrentDistance>SeeRadius) {
+				a_lookEx(LOF_NOSOUNDCHECK,  0, SeeRadius, 0, 360);
+			}
+		}
+		GVIN R  1 a_jump(random(-2, 1), "See");
+		GVIN R  1 a_jumpif(CurrentDistance && CurrentDistance<radius+players[consolePlayer].mo.radius+8, "See");
+		GVIN R  10 {
+			if(CurrentDistance && CurrentDistance<SeeRadius && abs(players[consolePlayer].mo.vel.x)+abs(players[consolePlayer].mo.vel.y)>PlayerFeelSpeed){
+				setStateLabel("See");
+			} else {
+				setStateLabel("Hide");
+			}
+		}
+		Loop;
+
+	  See:
+		TNT1 A 0 {
+			if(CurrentDistance>SeeRadius) {
+				a_chase();
+			} else {
+				if(random(0, 100)<70){
+					target = players[consolePlayer].mo;
+					setStateLabel("Melee");
+				}
+			}
+		}
+		TNT1 A 0 a_jumpif(!opened, "Open");
+		TNT1 A 0 a_jumpif( (CurrentDistance>SeeRadius && !Target) , "Hide");
+		GVIN ABCDEFGHIJKL 3;
+		Loop;
+
+		Melee:
+			TNT1 A 0 a_jumpif(opened==1, 3);
+			TNT1 A 0  a_playSound("podSeeding/show");
+			GVIN QPONM 6;
+			TNT1 A 0 { opened=1; }
+			GVIN ABCDEF 3;
+			GVIN F 0 {
+				bFRIENDLY = 0;
+				A_FaceTarget();
+				A_CustomMeleeAttack(random(3, 6),"podSeeding/hit", "zombie/melee");
+				bFRIENDLY = 1;
+			}
+			GVIN GHIJKL 3;
+			goto see;
+
+	  Open:
+	    GVIN R 0 {opened=1;a_playSound("podSeeding/show");}
+		GVIN QPONM 6;
+		goto See;
+
+	  Hide:
+		"####" "#" 0 a_jumpif(opened==0, "Spawn");
+		"####" "#" 0  {opened=0; self.takeInventory("Burner", 1);}
+		"####" "#" 0 a_playSound("podSeeding/hide");
+		GVIN MNOPQ 2;
+		goto Spawn;
+
+	  Pain:
+		GPOD A 0 a_jumpif(opened==0, 2);
+		GVIN MNOPQ 2 {opened=0;}
+		GVIN Q 20;
+		Goto Open;
+
+      Pain.fire:
+		TNT1 A 0 {A_Pain(); if(LastDamage>5){ self.giveInventory("Burner", 1); } }
+		GVIN OPQPO 3 A_SetScale (default.scale.x*frandom(0.9, 1.1), default.scale.y);
+		GPOD A 1 a_jump(200, "Pain.Fire");
+		GVIN MNOPQ 2;
+		GVIN Q 15 {opened=0;}
+		Goto See;
+
+	  Death:
+		TNT1 A 0 {
+			a_playSound("BLDCVK2");
+			for(int i = 0; i<random(1, 3); i++){
+				A_SpawnItemEx("BloodTrailGreen", random(-16, 16), random(-16, 16), random(0, 16 ), frandom(-3.0, 3.0), frandom(-3.0, 3.0), frandom(4.0, 6.0), 0,SXF_NOCHECKPOSITION);
+			}
+		}
+		GVIN STUV 8;
+		"####" "#" 0 {
+				giveInventory("ScreenBloodSplashMakerGreen", 1);
+				self.setTag(N_DEATHNAME);
+				opened = 0;
+				//spawnLoot();
+			}
+		Stop;
+
+		Death.MasterDeath:
+			TNT1 A 0 {
+				a_playSound("BLDCVK2");
+				self.setTag(N_DEATHNAME);
+				opened = 0;
+				A_SpawnItemEx("BloodTrailGreen", random(-16, 16), random(-16, 16), random(0, 16 ), frandom(-3.0, 3.0), frandom(-3.0, 3.0), frandom(4.0, 6.0), 0,SXF_NOCHECKPOSITION);
+			}
+			GVIN WXYZ 8;
+		"####" "#" 0 {
+
+				self.setTag(N_DEATHNAME);
+				actor BC = self.spawn("BodyBlowTargetGreen", self.pos);BC.Master = self;//this is works
+				//spawnLoot();
+			}
+			Goto Corpse;
+		Death.Fire:
+			"####" "#" 1 {
+				takeInventory("Burner", 1);
+				giveInventory("GenericFireDeath", 1);
+				a_fall();
+				opened = 0;
+			}
+			TNT1 A 5;
+			Stop;
+
+		Corpse:
+			"####" "#" 1 {
+				A_setSize(8, 8);
+				bSHOOTABLE = 1;
+				bTHRUACTORS = 1;
+				bGHOST = 1;
+				opened = 0;
+			}
+			"####" "#" -1;
+			Stop;
+		Death.Remove:
+			"####" "#" 0 a_jumpif(opened==0, 2);
+			GVIN MNOPQ 2;
+			"####" "#" 1;
+			stop;
+  }
+}
+
+
+
+
+
+class PodArmorController : Undroppable
+{
+	z_Pod MyOwner;
+	override void ModifyDamage (int damage, Name damageType, out int newdamage, bool passive)
+	{
+		MyOwner = z_Pod(Owner);
+		if(passive && damage>0){
+			if(MyOwner.opened>0){
+				newdamage =  max(0, ApplyDamageFactors(GetClass(), damageType, damage, damage));
+			} else {
+				newdamage =  max(0, ApplyDamageFactors(GetClass(), damageType, damage, damage*0.2));
+			}
+		}
+		//a_logint(newdamage);
+	}
+
+
+}
+
+
+class PodMucusBall : actor
+{
+	default{
+		Height 8;
+		Radius 8;
+		Damage 3;
+		DamageType "Poison";
+		speed 8;
+		PROJECTILE;
+		-NOGRAVITY;
+		gravity 0.3;
+		RenderStyle "Translucent";
+		Alpha 0.7;
+		Scale 0.25;
+		deathSound "pod/ballExplode";
+	}
+	override void tick(){
+		super.tick();
+		if(waterlevel==3){
+			bFLATSPRITE = 1;
+			setStateLabel("WaterDeath");
+			a_stop();
+		}
+	}
+	states{
+		spawn:
+			MUC0 ABCDEF 3 light("MucoLight") a_spawnItemEx("PodMucusBallSmoke");
+			Loop;
+		Death:
+			MUC0 GHJKL 3 light("MucoLightSpalash") {
+					A_SpawnItemEx("BloodTrailGreen", random(-16, 16), random(-16, 16), random(0, 16 ), frandom(-3.0, 3.0), frandom(-3.0, 3.0), frandom(4.0, 6.0), 0,SXF_NOCHECKPOSITION);
+					giveInventory("ScreenBloodSplashMakerGreen", 1);
+				}
+
+			stop;
+		WaterDeath:
+			MUC0 A 1 { a_fadeOut(0.003); a_setScale(Scale.x+0.01);}
+			Loop;
+	}
+}
+
+class PodMucusBallSmoke : actor
+{
+	default{
+		+NOINTERACTION;
+		+NOGRAVITY;
+		RenderStyle "Translucent";
+		Alpha 0.50;
+		Scale 0.25;
+	}
+	states{
+		spawn:
+			MUC0 JKL 8;
+			Stop;
+	}
+}

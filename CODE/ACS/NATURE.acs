@@ -1,0 +1,552 @@
+#library "NATURE"
+#include "zcommon.acs"
+
+
+
+//hub time settings. Can be ovwerrided by Cvar
+world int 1:WORLD_TIME;//current 24 hour format time in minutes. 15:35 = 15*60+15
+world int 2:WORLD_TIME_DELAY;//time compression in current HUB
+world int 3:WORLD_RAIN;//rain state in current HUB//to start rain - set 'WORLD_RAIN' to 1 or 0 to stop
+world int 4:WORLD_RAIN_COUNTER;
+world int 5:WORLD_RAIN_ALPHA_STATE;//current state of rain 0 - rainAlphaDuration;
+world int 6:WORLD_RAIN_DENSITY;//number of rain drops per tick. if 0 - clouds only
+world int 7:WORLD_RAIN_DURATION;
+world int 8:WORLD_CURRENT_RAIN;
+world int 9:LOCK_WEATHER;//used for forced rain casting by "StartRain" script
+world int 10:LOCK_TIME;
+
+
+
+
+#define WorldTimeRefreshDelay 10 //default time between opdates of time events
+#define WorldTimeDelayDefault 35 //default time compression
+#define GlobalSkyLightTid 7001 //skybox lights
+#define GlobalSkySectorTag 7002 //skybox sector tag
+#define GlobalWorldLightTid 7003 //world lights
+#define GlobalWorldSectorTag 7004 //world outdoor sector tag
+#define GlobalSkyboxCloudGenTID 7005
+//#define GlobalRainSoundTID 7006
+#define GlobalSunTID 7007
+#define GlobalMoonTID 7008
+#define RainSoundTid 7009
+#define ZombieFromGraveTID 7010
+#define rainLightsDecreaseFactor 70 //percentage how mutch lights decrease when it`s raining
+#define rainFadeDarkinFactor 70 //factor of skybox and world fade color darkens when it is rain. 100-black, 0-fullbright
+#define rainSectorLumIncreaseFactor 30 //percentage how mutch word sectors increase they`r light when it`s raining
+#define rainSectorFogIncreaseFactor 40 //percentage how mutch world  fog increase dencity  when it`s raining
+#define rainRadius  768//radius around player to spawn raindrops
+#define rainSpawnHeight  256//how mutch higher of player raindrops spawns
+#define rainDesaturationLimit  50//how mutch all can desaturates if it is rain
+#define rainLightningSpawnRadius  128//how far around clouds center lightnings can spawn
+
+
+
+
+//how quickly rain ambience come in and out
+int rainAlphaDuration = 35*10;
+bool RainAmbientStarted = false;
+bool WorldThunder = 1;
+
+int currentSkyLight[3] = { 128, 128, 128 };
+int currentWorldLight[3] = { 128, 128, 128 };
+int currentSkySector[5] = { 128, 128, 128, 32, 120 };// [red_of_fog, green_of_fog, blue_of_fog, FogDensity, SectorLight]
+int currentWorldSector[5] = { 128, 128, 128, 32, 120 };// [red_of_fog, green_of_fog, blue_of_fog, FogDensity, SectorLight]
+
+
+//rain duration in seconds
+script "StartRain" (int duration, int Dencity){
+	LOCK_WEATHER = 1;
+	WORLD_RAIN = 1;
+	WORLD_RAIN_DENSITY = Dencity;
+	WORLD_RAIN_DURATION = duration;
+	WORLD_RAIN_COUNTER++;
+	if(WORLD_RAIN_COUNTER>=WORLD_RAIN_DURATION){
+		WORLD_RAIN = 0;
+		WORLD_RAIN_COUNTER = 0;
+		LOCK_WEATHER = 0;
+		terminate;
+	}
+	delay(35);
+	restart;
+}
+script "StopRain" (void){
+	ACS_NamedTerminate("StartRain", 0);
+	WORLD_RAIN = 0;
+	WORLD_RAIN_COUNTER = 0;
+	LOCK_WEATHER = 0;
+}
+
+function void set_time(int miutesOfDay){
+	//set global light and fade to current miutesOfDay offset and apply rain filter
+	set_time_vars(miutesOfDay);
+	int RainDensity = (WORLD_RAIN_ALPHA_STATE*10000/rainAlphaDuration)/100;
+
+	SetActorProperty (GlobalSkyboxCloudGenTID, APROP_Alpha, FixedDiv(RainDensity, 100));
+	SetActorProperty (GlobalSunTID, APROP_Alpha, 1.0-FixedDiv(RainDensity, 100));
+	SetActorProperty (GlobalMoonTID, APROP_Alpha, 1.0-FixedDiv(RainDensity, 100));
+	//PrintBold(i:RainDensity);
+	//set skybox lights color
+	Thing_SetSpecial (GlobalSkyLightTid, 0, RainFilter(0, 0, RainDensity), RainFilter(0, 1, RainDensity), RainFilter(0, 2, RainDensity));
+	//set world outdoor lights color
+	Thing_SetSpecial (GlobalWorldLightTid, 0, RainFilter(1, 0, RainDensity), RainFilter(1, 1, RainDensity), RainFilter(1, 2, RainDensity));
+	//set skybox fade color
+	Sector_SetFade (GlobalSkySectorTag, RainFilter(2, 0, RainDensity), RainFilter(2, 1, RainDensity), RainFilter(2, 2, RainDensity));
+
+	//set world fade color
+	Sector_SetFade (GlobalWorldSectorTag, RainFilter(3, 0, RainDensity), RainFilter(3, 1, RainDensity), RainFilter(3, 2, RainDensity));
+		//set sky Fog Density
+	SetFogDensity(GlobalSkySectorTag, RainFilter(2, 3, RainDensity));
+		//set world Fog Density
+	SetFogDensity(GlobalWorldSectorTag, RainFilter(3, 3, RainDensity));
+		//set sky sector light
+	//Light_ChangeToValue(GlobalSkySectorTag, RainFilter(2, 4, RainDensity));
+	//set world sector light
+	Light_ChangeToValue(GlobalWorldSectorTag, RainFilter(3, 4, RainDensity));
+
+}
+
+script "ManageTime" enter {
+	if(CheckInventory("TotalTimeFreezer") || LOCK_TIME){
+		delay(1);
+		restart;
+	}
+
+	WORLD_TIME_DELAY=GetCVar("WORLD_TIME_DELAY");
+	if(WORLD_TIME_DELAY==0){ WORLD_TIME_DELAY=WorldTimeDelayDefault; SetCVar("WORLD_TIME_DELAY", WorldTimeDelayDefault); }
+
+	if(!GetCVar ("WORLD_TIME")){
+		if(GetCVar("WORLD_TIME_STOP")!=true){
+			WORLD_TIME++;
+			if(WORLD_TIME>=24*60){
+				WORLD_TIME=0;
+			}
+		}
+	} else {
+		WORLD_TIME=GetCVar("WORLD_TIME");
+		SetCVar("WORLD_TIME", 0);
+	}
+
+	delay(WORLD_TIME_DELAY);
+	restart;
+}
+
+script "Time" enter {
+	set_time(WORLD_TIME);
+	delay(WorldTimeRefreshDelay);
+	restart;
+}
+
+
+
+
+script "GetRain" (void){
+	SetResultValue(WORLD_RAIN);
+}
+script "GetTime" (void){
+	SetResultValue(WORLD_TIME);
+}
+script "GetTimeDelay" (void){
+	SetResultValue(WORLD_TIME_DELAY);
+}
+script "GetrainLightningSpawnRadius" (void){
+	SetResultValue(rainLightningSpawnRadius);
+}
+script "GetRainDencity" (void){
+	SetResultValue(WORLD_CURRENT_RAIN);
+}
+script "GetRainRadius" (void){
+	SetResultValue(rainRadius);
+}
+script "GetRainSpawnHeight" (void){
+	SetResultValue(rainSpawnHeight);
+}
+script "GetRainSoundTid" (void){
+	SetResultValue(RainSoundTid);
+}
+
+
+script "CloudControl" enter
+{
+	if(CheckInventory("TotalTimeFreezer")){
+		delay(1);
+		restart;
+	}
+	if(WORLD_RAIN){
+		if(WORLD_RAIN_ALPHA_STATE<rainAlphaDuration){
+			WORLD_RAIN_ALPHA_STATE++;
+		} else {
+			//full clouds
+			WORLD_CURRENT_RAIN = WORLD_RAIN_DENSITY;
+			if(WorldThunder && random(1, 2048)<WORLD_RAIN_DENSITY){
+				Thing_Activate(GlobalSkyboxCloudGenTID);
+				ACS_NamedExecuteAlways("RainLightning", 0);
+				AmbientSound("Thunder", 127);
+			}
+		}
+	} else {
+		WORLD_CURRENT_RAIN = 0;
+		if(WORLD_RAIN_ALPHA_STATE>0){
+			WORLD_RAIN_ALPHA_STATE--;
+		}
+	}
+	delay(1);
+	restart;
+}
+
+script "RainLightning" (void){
+	//int SectorLights = currentWorldSector[4];
+	int LT = random(3, 10);
+	for(int i = 0; i<=LT; i++){
+		Light_ChangeToValue(GlobalWorldSectorTag, 192);
+		delay(random(1, 5));
+	}
+}
+
+
+
+
+script "RainStartCron" enter
+{
+	if(!CheckInventory("TotalTimeFreezer")){
+		if(!LOCK_WEATHER){ WORLD_RAIN = 1; }
+	}
+	delay(random(35*60, 35*60*3));
+	restart;
+}
+script "RainStopCron" enter
+{
+	if(!CheckInventory("TotalTimeFreezer")){
+		if(!LOCK_WEATHER){WORLD_RAIN = 0;}
+	}
+	if(WORLD_TIME<22*60 && WORLD_TIME>6*60){
+		delay(random(35*60, 35*60*10));
+	} else {
+		delay(random(35*30, 35*60*3));
+	}
+	restart;
+}
+
+script "RainFluctuation" enter
+{
+	if(CheckInventory("TotalTimeFreezer")){
+		delay(1);
+		restart;
+	}
+	if(!LOCK_WEATHER){
+		if(WORLD_CURRENT_RAIN<16){
+			WORLD_RAIN_DENSITY = WORLD_CURRENT_RAIN + random(-3, 3);
+		} else {
+			WORLD_RAIN_DENSITY = WORLD_CURRENT_RAIN + random(-5, 3);
+		}
+
+		if(WORLD_RAIN_DENSITY<0){
+			WORLD_RAIN_DENSITY = 0;
+		}
+		if(WORLD_RAIN_DENSITY>128){
+			WORLD_RAIN_DENSITY = 128;
+		}
+	}
+	//PrintBold(i:WORLD_CURRENT_RAIN);
+	delay(random(35, 35*5));
+	restart;
+}
+
+
+
+function void set_time_vars(int miutesOfDay){
+	currentSkyLight[0] = GetLightChannelOffset (0, miutesOfDay, 0);
+	currentSkyLight[1] = GetLightChannelOffset (1, miutesOfDay, 0);
+	currentSkyLight[2] = GetLightChannelOffset (2, miutesOfDay, 0);
+
+	currentWorldLight[0] = GetLightChannelOffset (0, miutesOfDay, 1);
+	currentWorldLight[1] = GetLightChannelOffset (1, miutesOfDay, 1);
+	currentWorldLight[2] = GetLightChannelOffset (2, miutesOfDay, 1);
+
+	currentSkySector[0] = GetLightChannelOffset (0, miutesOfDay, 2);
+	currentSkySector[1] = GetLightChannelOffset (1, miutesOfDay, 2);
+	currentSkySector[2] = GetLightChannelOffset (2, miutesOfDay, 2);
+	currentSkySector[3] = GetLightChannelOffset (3, miutesOfDay, 2);
+	currentSkySector[4] = GetLightChannelOffset (4, miutesOfDay, 2);
+
+	currentWorldSector[0] = GetLightChannelOffset (0, miutesOfDay, 3);
+	currentWorldSector[1] = GetLightChannelOffset (1, miutesOfDay, 3);
+	currentWorldSector[2] = GetLightChannelOffset (2, miutesOfDay, 3);
+	currentWorldSector[3] = GetLightChannelOffset (3, miutesOfDay, 3);
+	currentWorldSector[4] = GetLightChannelOffset (4, miutesOfDay, 3);
+}
+
+
+
+//modify result value of arrayId[offset] in rain state context
+//what rain filter do:
+//desaturates sky and world global lights and fog color
+//decrease luminance of sky and world global lights
+//increase world sector light
+//increase world and sky fog density
+function int RainFilter(int arrayId, int offset, int density){
+
+	int val;
+	int current;
+	switch (arrayId) {
+		case 0:
+			//set skybox lights color
+			val = desaturate(currentSkyLight[0], currentSkyLight[1], currentSkyLight[2], density, offset);
+			//val = val - (val/100*rainLightsDecreaseFactor/100*density);
+			//PrintBold(d:val);
+			break;
+		case 1:
+			//set world outdoor lights color
+			val = desaturate(currentWorldLight[0], currentWorldLight[1], currentWorldLight[2], density, offset);
+			//val = val - FixedMul(val, FixedDiv(density, 100)  ) ;
+			val = val - FixedMul( FixedMul( val, FixedDiv(density, 100)  ), FixedDiv(rainLightsDecreaseFactor, 100)) ;
+			//PrintBold(f:FixedDiv(density, 100));
+			break;
+		case 2:
+			if(offset<3){
+				//set skybox fade color
+				val = desaturate(currentSkySector[0], currentSkySector[1], currentSkySector[2], density, offset);
+				val = val - FixedMul(val, FixedMul(FixedDiv(rainFadeDarkinFactor*1.0, 100.0),FixedDiv(density*1.0, 100.0)));
+
+			}
+			if(offset==3){
+				//sky fog density
+				//val = currentSkySector[3]+ (currentSkySector[3]/100*rainSectorFogIncreaseFactor);
+				val = currentSkySector[3]+((FixedMul(500.0, FixedMul(density*1.0, 0.01)))>>16);
+				//PrintBold(d:val);
+			}
+			if(offset==4){
+				//there is no reson to increase light of skybox sectors if it is rain
+			}
+			break;
+		case 3:
+			if(offset<3){
+				//set world fade color
+				val = desaturate(currentWorldSector[0], currentWorldSector[1], currentWorldSector[2], density, offset);
+				val = val - FixedMul(val, FixedMul(FixedDiv(rainFadeDarkinFactor*1.0, 100.0),FixedDiv(density*1.0, 100.0)));
+				//val = val - (val/100*rainLightsDecreaseFactor);
+				//val = val - (val/100*(rainLightsDecreaseFactor/100*density));
+			}
+			if(offset==3){
+				//world outdoor fog density
+				//val = currentWorldSector[3]+ (currentWorldSector[3]/100*rainSectorFogIncreaseFactor);
+				val = currentWorldSector[3]+((FixedMul(rainSectorFogIncreaseFactor*1.0, FixedMul(density*1.0, 0.01)))>>16);
+				//PrintBold(f:currentWorldSector[3]);
+			}
+			if(offset==4){
+				//set world sector light
+				val = currentWorldSector[4];//+ (currentWorldSector[4]/100*rainSectorLumIncreaseFactor);
+			}
+			break;
+		default:
+			val = 128;
+	}
+	return val;
+}
+
+//returns desaturated by percentage value of channel of specified color
+function int desaturate(int r, int g, int b, int percentage, int channelId){
+	int gray = (r+g+b)/3;//idealised luminance of grayscaled channel
+	int Calculated;
+	int current;
+	int Delta;
+	if(percentage>rainDesaturationLimit){percentage=rainDesaturationLimit;}
+	if(percentage==100){ return gray; }
+	switch (channelId) {
+			case 0:
+				current = r;
+				break;
+			case 1:
+				current = g;
+				break;
+			case 2:
+				current = b;
+				break;
+			default:
+				current = 128;
+
+	}
+
+	if(gray > current){
+		Delta = gray - current;
+		Calculated = current+((10000*Delta/100*percentage))/10000;
+	} else {
+		Delta = current - gray;
+		Calculated = current-((10000*Delta/100*percentage))/10000;
+	}
+	return Calculated;
+}
+
+
+
+
+
+
+
+
+//{ r[0-255], g[0-255], b[0-255] }
+int GlobalSKyLight[24][3] = {
+			{ 50, 100, 130 },
+			{ 30, 60, 75 },
+			{ 20, 40, 50 },
+			{ 20, 40, 50 },
+			{ 20, 40, 50 },
+			{ 30, 60, 75 },
+			{ 50, 100, 130 },
+			{ 170, 130, 80 },
+			{ 130, 170, 200 },//08.00
+			{ 130, 170, 200 },
+			{ 130, 170, 200 },
+			{ 130, 170, 200 },
+			{ 150, 190, 210 },//12.00
+			{ 190, 210, 225 },
+			{ 150, 190, 210 },
+			{ 130, 170, 200 },
+			{ 130, 170, 200 },
+			{ 172, 126, 69 },//17.00
+			{ 163, 71, 20 },
+			{ 104, 48, 37 },
+			{ 50, 100, 130 },
+			{ 50, 100, 130 },
+			{ 50, 100, 130 },
+			{ 50, 100, 130 },
+                    };
+
+//{ r[0-255], g[0-255], b[0-255] }
+int GlobalWorldLight[24][3] = {
+			{ 50, 100, 130 },
+			{ 50, 100, 130 },
+			{ 50, 100, 130 },
+			{ 50, 100, 130 },
+			{ 50, 100, 130 },
+			{ 50, 100, 130 },
+			{ 50, 100, 130 },
+			{ 170, 130, 80 },
+			{ 230, 220, 190 },//08.00
+			{ 230, 220, 190 },
+			{ 230, 220, 190 },
+			{ 230, 220, 190 },
+			{ 230, 220, 190 },//12.00
+			{ 230, 220, 190 },
+			{ 230, 220, 190 },
+			{ 230, 220, 190 },
+			{ 230, 220, 190 },
+			{ 172, 126, 69 },//17.00
+			{ 163, 71, 20 },
+			{ 104, 48, 37 },
+			{ 50, 100, 130 },
+			{ 50, 100, 130 },
+			{ 50, 100, 130 },
+			{ 50, 100, 130 },
+                    };
+
+//{ r[0-255], g[0-255], b[0-255], fogDensity[0-510], sectorLight[0-255] }
+int GlobalSkyFade[24][5] = {
+			{ 19, 32, 48, 200, 96 },
+			{ 31, 35, 33, 200, 96 },
+			{ 24, 41, 62, 200, 50 },
+			{ 28, 47, 72, 200, 50 },
+			{ 39, 57, 84, 200, 50 },
+			{ 84, 78, 60, 200, 96 },
+			{ 122, 112, 69, 200, 120 },
+			{ 126, 154, 166, 200, 120 },
+			{ 134, 177, 210, 200, 120 },//08.00
+			{ 144, 189, 222, 200, 120 },
+			{ 155, 200, 227, 200, 120 },
+			{ 163, 207, 229, 200, 120 },
+			{ 163, 207, 229, 200, 120 },//12.00
+			{ 155, 202, 229, 200, 120 },
+			{ 144, 193, 226, 200, 120 },
+			{ 134, 182, 218, 200, 120 },
+			{ 130, 171, 202, 200, 120 },
+			{ 172, 126, 69, 200, 120 },//17.00
+			{ 163, 71, 20, 200, 120 },
+			{ 104, 48, 37, 200, 120 },
+			{ 48, 61, 84, 200, 96 },
+			{ 33, 53, 77, 200, 96 },
+			{ 27, 44, 65, 200, 96 },
+			{ 24, 39, 58, 200, 96 },
+                    };
+
+//{ r[0-255], g[0-255], b[0-255], fogDensity[0-510], sectorLight[0-255]  }
+int GlobalWorldFade[24][5] = {
+			{ 19, 32, 48, 16, 96 },
+			{ 31, 35, 33, 16, 96 },
+			{ 24, 41, 62, 16, 96 },
+			{ 28, 47, 72, 16, 96 },
+			{ 39, 57, 84, 16, 96 },
+			{ 84, 78, 60, 16, 96 },
+			{ 122, 112, 69, 16, 120 },
+			{ 126, 154, 166, 16, 120 },
+			{ 134, 177, 210, 16, 120 },//08.00
+			{ 144, 189, 222, 16, 130 },
+			{ 155, 200, 227, 16, 140 },
+			{ 163, 207, 229, 16, 160 },
+			{ 163, 207, 229, 16, 160 },//12.00
+			{ 155, 202, 229, 16, 160 },
+			{ 144, 193, 226, 16, 140 },
+			{ 134, 182, 218, 16, 130 },
+			{ 130, 171, 202, 16, 120 },
+			{ 172, 126, 69, 16, 120 },//17.00
+			{ 163, 71, 20, 16, 120 },
+			{ 104, 48, 37, 16, 120 },
+			{ 48, 61, 84, 16, 96 },
+			{ 33, 53, 77, 16, 96 },
+			{ 27, 44, 65, 16, 96 },
+			{ 24, 39, 58, 16, 96 },
+                    };
+
+
+//return int color of specified channel at miutesOfDay offset
+function int GetLightChannelOffset (int channel, int miutesOfDay, int ArrayId){
+
+	int hour = miutesOfDay/60;
+	int minutes = miutesOfDay-60*hour;
+	int nextHour = hour+1;
+	if(nextHour>23){nextHour = 0;}
+	int previousHourChannelColor;
+	int nextHourChannelColor;
+
+	switch (ArrayId) {
+			case 0:
+				previousHourChannelColor = GlobalSKyLight[hour][channel];
+				nextHourChannelColor = GlobalSKyLight[nextHour][channel];
+				break;
+			case 1:
+				previousHourChannelColor = GlobalWorldLight[hour][channel];
+				nextHourChannelColor = GlobalWorldLight[nextHour][channel];
+				break;
+			case 2:
+				previousHourChannelColor = GlobalSkyFade[hour][channel];
+				nextHourChannelColor = GlobalSkyFade[nextHour][channel];
+				break;
+			case 3:
+				previousHourChannelColor = GlobalWorldFade[hour][channel];
+				nextHourChannelColor = GlobalWorldFade[nextHour][channel];
+				break;
+			default:
+				previousHourChannelColor = 128;
+				nextHourChannelColor = 128;
+
+	}
+
+
+	//PrintBold(i:hour,  s:" ", i:minutes);
+
+	if(minutes==0){ return previousHourChannelColor;}
+
+	//if(nextHourChannelColor == previousHourChannelColor){return previousHourChannelColor;}
+
+	int CurrentColor;
+	int Delta;
+
+	if(nextHourChannelColor > previousHourChannelColor){
+		Delta = nextHourChannelColor - previousHourChannelColor;
+		CurrentColor = previousHourChannelColor+((1000*Delta/60*minutes)/1000);
+	} else {
+		Delta =  previousHourChannelColor - nextHourChannelColor;
+		CurrentColor = previousHourChannelColor-((1000*Delta/60*minutes)/1000);
+	}
+	return CurrentColor;
+}
+
+

@@ -1,0 +1,134 @@
+class z_eel : CHmonster
+{
+	int cntr;
+	Default
+	{
+		Health 150;
+		PainChance 128;
+		Speed 4;
+		Radius 16;
+		Height 16;
+		DeathHeight 16;
+		Mass 200;
+		scale 0.5;
+		floatspeed 4;
+		Monster;
+		-NoTeleport;
+		+FLOORCLIP;
+		+FLOAT;
+		+NOGRAVITY;
+		+ROLLSPRITE;
+		MeleeRange 32;
+		SeeSound "Eel/Spot";
+		DeathSound "eel/eeldeath";
+		ActiveSound "Eel/Roam";
+		PainSound "Eel/Pain";
+		Obituary "$EEL_OBITUARY";
+		tag "$EEL_NAME";
+	}
+	override void SetNames(){
+		N_NAME = StringTable.Localize("$EEL_NAME");
+		N_DEATHNAME = StringTable.Localize("$EEL_DEATHNAME");
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		SetNames();
+	}
+	override void Tick(){
+		super.tick();
+
+		cntr++;
+		if(cntr==10){
+			if(waterlevel<3){
+				bNOGRAVITY = 0;
+				Speed = 2;
+				if(health>0){ThrustThingZ(0,-2,0,0);}
+			} else {
+
+				bNOGRAVITY = 1;
+				Speed = 4;
+				floatspeed = 4;
+				if(health<=0){ThrustThingZ(0,1,0,0);}
+			}
+			if(waterlevel<1){
+				A_DamageSelf(5);
+			}
+			cntr = 0;
+		}
+
+	}
+
+
+	States
+	{
+	SetSprite:
+		BNEL A 1;//for DistanceSpawned
+	Spawn:
+		BNEL AB 10 {
+			if( (waterlevel==3 && players[consoleplayer].mo.waterlevel>1) || (waterlevel<2 && players[consoleplayer].mo.waterlevel<2) ){
+				A_Look();
+
+			} else {
+				A_LookEx(LOF_NOSOUNDCHECK, 0, 64);
+			}
+		}
+		Loop;
+	See:
+		//TNT1 A 0 A_ChangeFlag("NOGRAVITY",1);
+		BNEL AABBCCDD 2 Fast A_Chase();
+		Loop;
+	Pain:
+		BNEL B 2 Fast;
+		BNEL C 2 Fast A_Pain;
+		Goto See;
+	Melee:
+		BNEL B 8 Fast a_faceTarget;
+		BNEL C 8 Fast A_CustomMeleeAttack(random(2,16), "gore/hit", "", "Normal", 1);
+		Goto See;
+	Death:
+		BNEL I 0 {
+			if(waterlevel>2){
+				bNOGRAVITY = 1;
+				ThrustThingZ(0, 1,0,0);
+			} else {
+				bNOGRAVITY = 0;
+			}
+
+			setTag(N_DEATHNAME);
+		}
+		BNEL I 0 a_jump(127, "Death2");
+		BNEL I 8;
+		BNEL J 8 A_Scream;
+		BNEL K 8;
+		BNEL K 4;
+		BNEL J 1 {
+				if(waterlevel==3){
+					if(roll<180){
+						roll+=5;
+					}
+				}
+			}
+		BNEL K 0 a_jumpif(roll>=180, 2);
+		BNEL K 0 a_jumpif(waterlevel<2, 1);
+		Goto Death+6;
+		BNEL L 4;
+		Goto Corpse;
+	Death2:
+		BNEL M 8;
+		BNEL N 8 A_Scream;
+		BNEL O 8;
+		BNEL P 8;
+		BNEL Q 8;
+		Goto Corpse;
+	Corpse:
+		"####" "#" 1 {
+			ThrustThingZ(0, 1,0,0);
+			bSHOOTABLE = 1;
+			bSOLID = 1;
+		}
+		"####" "#" -1;
+		Stop;
+
+	}
+}

@@ -1,0 +1,971 @@
+class stationarLight : PointUsable
+{
+
+	int lightOffset;
+	TorchLightStat Light;
+	LightFlareStat1 Flare;
+	bool DrawFlare;
+	int LightFallOff;
+
+	default
+	{
+		+NOBLOOD;
+		+SHOOTABLE;
+		+SOLID;
+		+DONTTHRUST;
+		+FORCEYBILLBOARD;
+		+ALLOWPAIN;
+		+INVULNERABLE;
+	}
+
+
+	override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+		lightOffset = 32;
+	}
+
+
+	override void Doit(actor Caller){
+		//switch burner / light
+		if(active){ setStateLabel("InActive"); } else { setStateLabel("Active");}
+	}
+	virtual Void on(){
+
+		if(!Light){
+			Light = TorchLightStat(spawn("TorchLightStat"));
+			Light.Master = self;
+			Light.offsetZ = lightOffset;
+			if(LightFallOff){
+				Light.fallOff = LightFallOff;
+			}
+
+		}
+		if(!Flare && DrawFlare){
+
+			Flare = LightFlareStat1(spawn("LightFlareStat1"));
+			Flare.Master = self;
+			vector3 myPos = self.pos;
+			mypos.z = mypos.z + lightOffset;
+			Flare.SetOrigin(myPos, 1);
+		}
+		active = 1;
+		a_playSound("fx/lampON");
+	}
+	virtual Void off(){
+		if(Light){Light.destroy();}
+		if(Flare){Flare.destroy();}
+		self.takeInventory("Burner", 1);
+		active = 0;
+		a_playSound("fx/lampOFF");
+	}
+	States
+	{
+		spawn:
+			TNT1 A 1;
+			goto Active;
+		Active:
+			"####" "#" -1 on();
+			Stop;
+		Inactive:
+			"####" "#" -1 off();
+			Stop;
+	}
+}
+
+class MovableLight : stationarLight
+{
+	default
+	{
+		-SOLID;
+	}
+	override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+		self.takeInventory("Unhandable", 1);
+		self.takeInventory("Usable", 1);
+	}
+	override Void on(){
+		if(!Light){
+			Light = TorchLightStat(spawn("TorchLightMovable"));
+			Light.Master = self;
+			Light.offsetZ = lightOffset;
+			if(args[0]){LightFallOff=args[0];}
+			if(LightFallOff){
+				Light.fallOff = LightFallOff;
+			}
+
+
+		}
+		if(!Flare && DrawFlare){
+			LightFlareMovable1 Flare = LightFlareMovable1(spawn("LightFlareMovable1"));
+			Flare.Master = self;
+			vector3 myPos = self.pos;
+			mypos.z = mypos.z + lightOffset;
+			Flare.offsetZ = lightOffset;
+			Flare.SetOrigin(myPos, 1);
+		}
+		active = 1;
+
+	}
+
+
+}
+
+
+Class z_smallCandleHolder : MovableLight
+{
+	default
+	{
+		scale 0.9;
+		radius 10;
+		height 40;
+		tag "$SMALLCANDLEHOLDER";
+	}
+	override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+		lightOffset = 40;
+		DrawFlare = 0;
+
+	}
+	States
+	{
+		spawn:
+			CAND A 1 BRIGHT NODELAY on();
+			GOTO Halt;
+		Halt:
+			CAND ABCD 4 BRIGHT {
+				if(CurrentDistance<ActivationDistance){
+					A_Explode(1, 11, XF_NOSPLASH, false, 0, 0, 0, "", "Fire");
+				}
+			}
+			LOOP;
+	}
+}
+Class z_bigCandleHolder : MovableLight
+{
+	default
+	{
+		scale 0.6;
+		radius 10;
+		height 48;
+		tag "$BIGCANDLEHOLDER";
+	}
+	override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+		lightOffset = 48;
+		DrawFlare = 0;
+	}
+	States
+	{
+		spawn:
+			CBRA A 1 BRIGHT NODELAY on();
+			GOTO Halt;
+		Halt:
+			CBRA ABCD 4 BRIGHT
+				{
+					if(CurrentDistance<ActivationDistance){
+						A_Explode(1, 11, XF_NOSPLASH, false, 0, 0, 0, "", "Fire");
+					}
+				}
+			LOOP;
+	}
+}
+Class z_skullCandleHolder : MovableLight
+{
+	default
+	{
+		scale 0.25;
+		radius 6;
+		height 12;
+		tag "$SKULLCANDLEHOLDER";
+	}
+	override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+		lightOffset = 15;
+		DrawFlare = 0;
+		LightFallOff = 64;
+	}
+	States
+	{
+		spawn:
+			SKLC A 1 BRIGHT NODELAY on();
+			GOTO Halt;
+		Halt:
+			SKLC ABC 4 BRIGHT {
+					if(CurrentDistance<ActivationDistance){
+						A_Explode(1, 11, XF_NOSPLASH, false, 0, 0, 0, "", "Fire");
+					}
+				}
+			LOOP;
+	}
+}
+
+Class z_SmallTorch : MovableLight
+{
+	int fx_fireplace_offset;
+	int HelpID;
+	default
+	{
+		scale 0.6;
+		radius 4;
+		height 22;
+		+NOGRAVITY;
+		//+DONTOVERLAP;
+		-PUSHABLE;
+		+Solid;
+		+ALLOWBOUNCEONACTORS;
+		+DONTTHRUST;
+		+BOUNCEAUTOOFF;
+		+DROPOFF;
+		+GHOST;
+		+THRUSPECIES;
+		+THRUACTORS;
+		painchance "Fire", 255;
+		tag "$SMALLTORCH";
+	}
+	override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+		lightOffset = 30;
+		DrawFlare = 0;
+		LightFallOff = 48;
+		fx_fireplace_offset = 16;
+		HelpID = 1;
+	}
+
+	override Void on(){
+		if(!checkInventory("Burner", 1)){
+			self.giveInventory("Burner", 1);
+			Burner Fire = Burner(self.findInventory("Burner"));
+			Fire.fx_fireplace_offset = fx_fireplace_offset;
+			Fire.fx_fireplace_scale = 0.15;
+			Fire.forceIntensity = 64;
+			if(args[0]){ Fire.forceIntensity = args[0];	}
+			args[1] = 0;
+		}
+		active = 1;
+	}
+
+	void TorchLife(){
+		if(CurrentDistance<ActivationDistance){
+			if(checkInventory("itemInHands", 1)){
+				bDONTOVERLAP = 0;
+				bALLOWBOUNCEONACTORS = 0;
+				bTHRUACTORS = 1;
+				bSolid = 0;
+				//a_log("s");
+			} else {
+				bDONTOVERLAP = 1;
+				bTHRUACTORS = 0;
+				bALLOWBOUNCEONACTORS = 1;
+				bSolid = default.bSolid;
+			}
+			A_Explode(1, 11, XF_NOSPLASH, false, 0, 0, 0, "", "Fire");
+			if(HelpID && waterlevel > 1){
+				CALLacs("Tutorial", HelpID, 0, 0, 0);
+				HelpID = 0;
+			}
+		}
+	}
+
+	States
+	{
+		spawn:
+			SMBT A 0 NODELAY a_jumpif(args[1], "inactive");
+			SMBT A 1 BRIGHT on();
+			goto Halt;
+		Halt:
+			SMBT A 1 BRIGHT TorchLife();
+			LOOP;
+		Pain.Fire:
+			SMBT A 1 on();
+
+		Goto Spawn;
+	}
+}
+Class z_BigTorch : z_SmallTorch
+{
+	default
+	{
+		tag "$BIGTORCH";
+	}
+	override void PostBeginPlay(){super.PostBeginPlay();fx_fireplace_offset = 15;}
+	States
+	{
+		spawn:
+			SMBT B 0 NODELAY a_jumpif(args[1], "inactive");
+			SMBT B 1 BRIGHT on();
+			goto Halt;
+		Halt:
+			SMBT B 1 BRIGHT TorchLife();
+			LOOP;
+		Pain.Fire:
+			SMBT B 1 on();
+
+		Goto Spawn;
+	}
+}
+
+
+Class z_IndoorCeilingLamp : stationarLight
+{
+
+	default
+	{
+		scale 0.8;
+		radius 24;
+		height 16;
+		tag "$INDOORCEILINGLAMP";
+	}
+	override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+		lightOffset = 16;
+		DrawFlare = 0;
+	}
+	States
+	{
+		spawn:
+			TLMP A 1 a_jumpif(args[1], "inactive");
+			goto Active;
+		Active:
+			TLMP A -1 on();
+			Goto Fire;
+		Fire:
+			TLMP ABCD 3;
+			Loop;
+		Inactive:
+			TLMP A -1 off();
+			STOP;
+	}
+
+}
+
+Class z_OutdoorFloorLamp : stationarLight
+{
+
+	default
+	{
+		scale 0.8;
+		radius 4;
+		height 64;
+		tag "$FLOORTALLLAMP";
+	}
+	override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+		lightOffset = 51;
+		DrawFlare = 1;
+
+	}
+	States
+	{
+		spawn:
+			TLP1 A 1;
+			goto Active;
+		Active:
+			TLP1 A -1 on();
+			Stop;
+		Inactive:
+			TLP1 B -1 off();
+			STOP;
+	}
+
+}
+Class z_OutdoorFloorLamp_off : z_OutdoorFloorLamp
+{
+
+	States
+	{
+		spawn:
+			TLP1 A 1;
+			goto InActive;
+	}
+
+}
+
+class z_DeathAwaiting : stationarLight
+{
+	default
+	{
+		scale 1.0;
+		radius 17;
+		height 77;
+		tag "$DEATHAWAITS";
+	}
+	override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+		lightOffset = 24;
+		DrawFlare = 0;
+		LightFallOff = 64;
+	}
+	States
+	{
+		spawn:
+			COL6 A 1;
+			goto Active;
+		Active:
+			COL6 A -1 on();
+			STOP;
+		Inactive:
+			COL6 B -1 off();
+			STOP;
+	}
+
+}
+
+
+class z_floorBigTorch  : stationarLight
+{
+
+	default
+	{
+		scale 0.7;
+		radius 10;
+		height 54;
+		+NOGRAVITY;
+		tag "$BIGFLOORTORCH";
+		painchance "Fire", 255;
+	}
+	override Void on(){
+
+			if(!checkInventory("Burner", 1)){
+				self.giveInventory("Burner", 1);
+				Burner Fire = Burner(self.findInventory("Burner"));
+				Fire.fx_fireplace_offset = 42;
+				Fire.fx_fireplace_scale = 0.2;
+				Fire.forceIntensity = 128;
+			}
+			if(!Flare){
+				Flare = LightFlareStat1(spawn("LightFlareStat1"));
+				Flare.Master = self;
+				vector3 myPos = self.pos;
+				mypos.z = mypos.z + 50;
+				Flare.SetOrigin(myPos, 1);
+			}
+			active = 1;
+
+	}
+	override Void off(){
+		if(checkInventory("Burner", 1)){takeInventory("Burner", 1);a_playSound("fx/fireOFF", CHAN_AUTO);}
+		if(Flare){Flare.destroy();}
+		active = 0;
+	}
+
+
+	States
+	{
+		spawn:
+			TRED A 1 nodelay a_jumpif(args[1], "inactive");
+			goto Active;
+		Active:
+			TRED A -1 on();
+			STOP;
+		Inactive:
+			TRED A -1 off();
+			STOP;
+		Pain.Fire:
+			"####" "#" 1;
+		Goto Active;
+	}
+
+}
+class z_floorBigScullTorch  : z_floorBigTorch
+{
+
+	default
+	{
+		tag "$BIGFLOORSCULLTORCH";
+	}
+
+	States
+	{
+		spawn:
+			TRED B 1 nodelay a_jumpif(args[1], "inactive");
+			goto Active;
+		Active:
+			TRED B -1 on();
+			STOP;
+		Inactive:
+			TRED B -1 off();
+			STOP;
+		Pain.Fire:
+			TRED B 1;
+		Goto Active;
+	}
+}
+
+class z_CeilOilLamp : stationarLight
+{
+	default
+	{
+		scale 0.5;
+		radius 15;
+		height 60;
+		+NOGRAVITY;
+		tag "$CEILINGOILLAMP";
+		painchance "Fire", 255;
+	}
+
+
+	override Void on(){
+
+			if(!checkInventory("Burner", 1)){
+				self.giveInventory("Burner", 1);
+				Burner Fire = Burner(self.findInventory("Burner"));
+				Fire.fx_fireplace_offset = 10;
+				Fire.fx_fireplace_scale = 0.15;
+				Fire.forceIntensity = 128;
+			}
+			if(!Flare){
+				Flare = LightFlareStat1(spawn("LightFlareStat1"));
+				Flare.Master = self;
+				vector3 myPos = self.pos;
+				mypos.z = mypos.z + 14;
+				Flare.SetOrigin(myPos, 1);
+			}
+			active = 1;
+
+	}
+	override Void off(){
+		if(checkInventory("Burner", 1)){takeInventory("Burner", 1);a_playSound("fx/fireOFF", CHAN_AUTO);}
+		if(Flare){Flare.destroy();}
+
+		active = 0;
+	}
+
+
+	States
+	{
+		spawn:
+			TGRN C 1 nodelay a_jumpif(args[1], "inactive");
+			goto Active;
+		Active:
+			TGRN C -1 on();
+			STOP;
+		Inactive:
+			TGRN C -1 off();
+			STOP;
+		Pain.Fire:
+			"####" "#" 1;
+		Goto Active;
+	}
+
+}
+
+
+class distanceControlledDynamicLight : PointLightFlickerAttenuated
+{
+	int ActivationDistance;
+	int CurrentDistance;
+	virtual int getCurrentDistance(){
+		return CurrentDistance;
+	}
+	virtual void setCurrentDistance(int dist){
+		CurrentDistance = dist;
+	}
+	virtual int getActivationDistance(){
+		PlayerInfo players = players[consoleplayer];
+		return Cvar.GetCVar("z_natue_activation_radius", players).GetInt()?Cvar.GetCVar("z_natue_activation_radius", players).GetInt():1024;
+	}
+	Override void PostBeginPlay(){
+		Super.PostBeginPlay();
+		ActivationDistance = getActivationDistance();
+	}
+}
+class TorchLightStat : distanceControlledDynamicLight
+{
+	vector3 myPos;
+	vector3 PrevMasterPos;
+	double offsetZ;
+	int baseIntensity;
+	int fallOff;
+	bool Activated;
+
+
+
+	override void PostBeginPlay()
+	{
+		if(Master is "PointUsable"){
+			PointUsable MST = PointUsable(Master);
+			PrevMasterPos = MST.previousPOS;
+		}
+
+		baseIntensity = 192;
+		super.PostBeginPlay();
+		if(fallOff){baseIntensity = fallOff; }
+		args[LIGHT_RED] = 200;
+		args[LIGHT_GREEN] = 130;
+		args[LIGHT_BLUE] = 65;
+		args[LIGHT_INTENSITY] = baseIntensity;
+		args[LIGHT_SECONDARY_INTENSITY] = baseIntensity+(baseIntensity*0.2);
+		angle = 64;
+
+		myPos = Master.Pos;
+		myPos.z = Master.Pos.z+offsetZ;
+		setOrigin(myPos, 1);
+
+		Activated = true;
+
+
+
+
+	}
+	virtual void SetFallOff(int falloff){
+		baseIntensity =  falloff;
+	}
+
+	virtual void enable(){ Activated = true; }
+	virtual void disable(){ Activated = false; }
+
+	/*override void Tick()
+	{
+		Super.Tick();
+		if(Activated){
+			if(CurrentDistance<ActivationDistance){
+				args[LIGHT_INTENSITY] = random(baseIntensity-6, baseIntensity+6);
+			}
+		}
+	}*/
+
+
+}
+class TorchLightMovable : TorchLightStat
+{
+	override void Tick()
+	{
+		Super.Tick();
+		if(Master){
+			if(PrevMasterPos.x!=Master.Pos.x || PrevMasterPos.y!=Master.Pos.y || PrevMasterPos.z!=Master.Pos.z){
+				//a_log("move");
+				myPos = Master.Pos;
+				myPos.z = Master.Pos.z+offsetZ;
+				setOrigin(myPos, 1);
+			}
+		} else { self.destroy();}
+	}
+}
+
+
+
+class LightFlareStat1 : actor
+{
+	float defAlpha;
+	bool Activated;
+	int ActivationDistance;
+	bool visible;
+	default
+	{
+		+Nointeraction;
+		+FORCEXYBILLBOARD;
+		RenderStyle "Add";
+		Scale 0.5;
+		Alpha 0.0;
+	}
+	override void PostBeginPlay()
+		{
+			defAlpha = 0.7;
+			Activated = true;
+			super.PostBeginPlay();
+			ActivationDistance = getActivationDistance();
+		}
+	override void Tick()	{
+		Super.Tick();
+		if(distance3D(players[consoleplayer].mo) < getActivationDistance()){
+			visible = checkSight(players[consoleplayer].mo);
+			if(!visible){alpha=0.0;} else {alpha=defAlpha;}
+		} else {
+			//visible = 0;
+			A_fadeout(0.01, FTF_CLAMP);
+		}
+	}
+
+	virtual int getActivationDistance(){
+		PlayerInfo players = players[consoleplayer];
+		return Cvar.GetCVar("z_natue_activation_radius", players).GetInt()?Cvar.GetCVar("z_natue_activation_radius", players).GetInt():1024;
+	}
+
+
+	states
+	{
+		Spawn:
+			TNT1 A 1;
+
+		Show:
+			"####" "#" 1 A_fadeTo(defAlpha, 0.01, FTF_CLAMP);
+			//TNT1 A 0 a_jumpif(!Activated, "Hide");
+			Loop;
+		Hide:
+			"####" "#" 1 A_fadeout(0.01, FTF_CLAMP);
+			//TNT1 A 0 a_jumpif(Activated, "Show");
+			Loop;
+
+	}
+
+
+}
+class LightFlareMovable1 : LightFlareStat1
+{
+	int offsetZ;
+	override void Tick()
+	{
+		Super.Tick();
+		if(Master){
+			if(Activated){
+
+				vector3 myPos = Master.Pos;
+				myPos.z = Master.Pos.z+offsetZ;
+				setOrigin(myPos, 1);
+			}
+		} else { self.destroy();}
+	}
+}
+
+Class z_randomLightMoss : DecorController
+{
+
+	default
+	{
+		+NOBLOOD;
+		+SHOOTABLE;
+		+DROPOFF;
+		+GHOST;
+		-NOLIFTDROP;
+
+		//+SOLID;
+		alpha 0.0;
+		+FORCEYBILLBOARD;
+		radius  16;
+		tag "$STONE";
+	}
+	override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+		self.giveInventory("Unhandable", 1);
+		self.takeInventory("Usable", 1);
+		A_SetScale(0.3);
+		Args[0] =  Args[0]? Args[0]:128;
+		radius = Args[0];
+		density = Args[1]?Args[1]:32;
+		double SQ = (3.14*radius*radius)/(256*256)*density;
+		iterationNumber = (SQ<=1)?1:SQ;
+		thinner = (SQ<=1)?(1/SQ):0;
+
+		DistCvar = "z_natue_renderdistance_grass";
+		SpawnClass = "z_randomMossChild";
+	}
+
+
+	override int getRenderDistance(){
+		return Cvar.GetCVar("z_natue_renderdistance_big_decor", players[consoleplayer]).GetInt();
+	}
+
+	States
+	{
+		SetSprite:
+			TNT1 A 0 Nodelay { SetZ(floorZ);}
+			TNT1 A 0 A_Jump (256, 1, 2, 3, 4, 5);
+			LMOS A 0 A_jump(256, "Draw");
+			LMOS B 0 A_jump(256, "Draw");
+			LMOS C 0 A_jump(256, "Draw");
+			LMOS D 0 A_jump(256, "Draw");
+			LMOS E 0 A_jump(256, "Draw");
+
+		Spawn:
+			TNT1 A 35;
+			 Loop;
+		Draw:
+			"####" "#" 5 light("GreenMossLight") {
+				Enable();
+				a_fadeIn(0.1, FTF_CLAMP);
+				A_SpawnItemEx("z_randomLightMoss_particle", fRandom(-128, 128), fRandom(-128, 128), fRandom(-32, 0), 0, 0, 0, 0, SXF_NOCHECKPOSITION, 200, 0);
+			}
+			loop;
+
+	}
+
+}
+
+Class z_randomLightMossCeiling :  z_randomLightMoss
+{
+	default
+	{
+		+ROLLSPRITE;
+		+NOGRAVITY;
+		+SPAWNCEILING;
+		HEIGHT 1;
+	}
+	override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+		roll = 180;
+		vel.z = 8000;
+
+	}
+
+	States
+	{
+		Draw:
+			"####" "#" 5 light("GreenMossLightCeiling") {
+				Enable();
+				a_fadeIn(0.1, FTF_CLAMP);
+				A_SpawnItemEx("z_randomLightMoss_particle", fRandom(-128, 128), fRandom(-128, 128), fRandom(0, 24), 0, 0, 0, 0, SXF_NOCHECKPOSITION, 200, 0);
+			}
+			loop;
+	}
+}
+
+
+Class z_randomMossChild : DistanceSpawned
+{
+
+	default
+	{
+		+NOBLOOD;
+		+SHOOTABLE;
+		+DROPOFF;
+		+GHOST;
+		-NOLIFTDROP;
+
+		//+SOLID;
+		alpha 0.0;
+		+FORCEYBILLBOARD;
+		radius  16;
+		tag "$STONE";
+	}
+	override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+		SetZ(floorZ);
+		self.giveInventory("Unhandable", 1);
+		self.takeInventory("Usable", 1);
+		A_SetScale(frandom(0.25, 0.5));
+
+		float Sscale = Scale.x;
+
+		int MaxDist = Master.Args[0];
+		float ScaleFactor = 1.0;
+		float Dist = Distance3D(Master);
+		if(Dist>MaxDist){ destroy(); }//it means extreme height offset
+		ScaleFactor = 1-Dist/MaxDist;
+		if(ScaleFactor<0.2){ destroy();}
+		A_SetScale(Scale.x*ScaleFactor);
+
+
+	}
+
+
+	override int getRenderDistance(){
+		return Cvar.GetCVar("z_natue_renderdistance_grass", players[consoleplayer]).GetInt();
+	}
+
+	States
+	{
+		SetSprite:
+			TNT1 A 0;
+			TNT1 A 0 A_Jump (256, 1, 2);
+			LMOS F 0 A_jump(256, "Draw");
+			LMOS G 0 A_jump(256, "Draw");
+		Spawn:
+			TNT1 A 1;
+			 Loop;
+		Draw:
+			"####" "#" 1 a_fadeIn(0.1, FTF_CLAMP);
+			loop;
+
+	}
+
+}
+Class z_randomLightMoss_particle  : DistanceActivated
+{
+	float ScaleMultiplerMin;
+	float ScaleMultiplerMax;
+	float FadeoutSpeed;
+	float MaxAlpha;
+	float CalcAlpha;
+	bool startFade;
+	float RollSpeed;
+	Default
+	{
+		Scale 1.0;
+		+ROLLSPRITE;
+		+NoInteraction;
+		+Rollsprite;
+		+FORCEXYBILLBOARD;
+		-SOLID;
+		Renderstyle "Add";
+		alpha 0.0;
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+
+		/*BlockThingsIterator it = BlockThingsIterator.Create(self, 32);
+		while (it.Next()){
+			if (!(it.thing is "z_randomLightMoss_particle")) { continue; }
+			if(distance3d(it.thing)<16){destroy();}
+		}*/
+
+		MaxAlpha = 0.6;
+		ScaleMultiplerMax = 4.5;
+		ScaleMultiplerMin = 2.0;
+		FadeoutSpeed = 0.01;
+		CalcAlpha = alpha;
+		A_SetScale(Frandom(scale.X*ScaleMultiplerMin, scale.X*ScaleMultiplerMax));
+		startFade = false;
+
+		RollSpeed = random(-1, 1);
+
+	}
+
+
+
+	virtual void ParticleLife()
+	{
+		playerPawn Player = Players[consoleplayer].mo;
+		//
+		CalcAlpha = Alpha;
+		if(startFade){
+			CalcAlpha -= FadeoutSpeed;
+
+		} else {
+			CalcAlpha += FadeoutSpeed;
+		}
+
+		if(CalcAlpha>=MaxAlpha && !startFade){
+			startFade = true;
+		}
+
+		CalcAlpha = CalcAlpha>=0?CalcAlpha:0;
+		if(CalcAlpha<=0){destroy();}
+
+		CalcAlpha = CalcAlpha>MaxAlpha?MaxAlpha:CalcAlpha;
+
+		float FadeStartDist = 128.0;
+		float FadeStoptDist = 0.0;
+		float DistFadeFactor = 1.0;
+		if(CurrentDistance<=FadeStoptDist){
+			DistFadeFactor = 0.0;
+		} else if(CurrentDistance>FadeStartDist){
+		} else {
+			DistFadeFactor = (CurrentDistance-FadeStoptDist)/(FadeStartDist-FadeStoptDist);
+
+		}
+		alpha = CalcAlpha*DistFadeFactor;
+		roll+=RollSpeed;
+
+	}
+
+	States
+	{
+		SetSprite://for DistanceSpawned
+		Spawn:
+			DUST A 1 ParticleLife();
+			Loop;
+	 }
+}

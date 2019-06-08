@@ -1,0 +1,1135 @@
+#library "LIB"
+#include "zcommon.acs"
+////////////////////////////////////////////////////////////////////////
+//Objective and hudmassages system LIB----------------------------------
+#DEFINE HUD_DISCLAIMER 776
+#DEFINE HUD_OBJ 776
+#DEFINE HUD_OBJSTRING 777
+#DEFINE HUD_OBJLINE 778
+#DEFINE HUD_SOBJLINE 779
+#DEFINE HUD_SPLASHPRESS_AND_NOT 796
+#DEFINE HUD_SPLASHTEXTPIC 797
+#DEFINE HUD_SPLASHTITLE 798
+#DEFINE HUD_SPLASHTEXT 799
+#DEFINE HUD_SPLASHPRESS 800
+#DEFINE HUD_BCG 801
+#DEFINE HUD_SCREENDRIPS 840
+#DEFINE HUD_SPLASHPIC 850
+
+#DEFINE HUD_INFO_TITLE 851
+#DEFINE HUD_INFO_CHAPTER1 852
+#DEFINE HUD_INFO_CHAPTER2 853
+#DEFINE HUD_INFO_CHAPTER3 854
+#DEFINE HUD_INFO_CHAPTER4 855
+#DEFINE HUD_INFO_RIGHT_TEXT 856
+#DEFINE HUD_INFO_BOTTOM_TEXT 857
+#DEFINE HUD_INFO 858
+#DEFINE HUD_INFO_MARKER 859
+
+#DEFINE HUD_THROWPOWER 860
+
+#DEFINE HUD_INFO_IMAGE 861
+#DEFINE HUD_INFO_MESSAGE 870
+#DEFINE HUD_DISCLAIMER1 871
+#DEFINE HUD_DISCLAIMER2 872
+#DEFINE HUD_DISCLAIMER3 873
+#DEFINE HUD_SUPRESFIREMES 874
+
+
+script "disclaimer" enter {
+	while(true){
+		delay(35*20);
+		if(GetCVar("DISCLAIMER")){
+			//SetFont("SMALLFONT");
+			//HudMessage(l:"DISCLAIMER"; HUDMSG_FADEOUT|HUDMSG_LAYER_UNDERHUD, HUD_DISCLAIMER, CR_WHITE, 0.5, 0.1, 3.0, 10.0);
+				SetHudSize(640, 480, 0);
+				SetFont("SMALLFONT");
+				HudMessage(l:"DISCLAIMER2"; HUDMSG_FADEINOUT, HUD_DISCLAIMER1, CR_WHITE, 320.0, 50.0, 10.0, 3.0, 3.0);
+				delay(35*2);
+				HudMessage(l:"DISCLAIMER3"; HUDMSG_FADEINOUT, HUD_DISCLAIMER2, CR_WHITE, 320.0, 60.0, 10.0, 3.0, 3.0);
+				SetHudSize(800, 600, 0);
+				SetFont("BIGFONT");
+				HudMessage(l:"DISCLAIMER4"; HUDMSG_FADEINOUT, HUD_DISCLAIMER3, CR_WHITE, 400.0, 100.0, 10.0, 3.0, 3.0);
+
+		}
+		delay(35*60*5);
+	}
+}
+
+
+script "SupressFireMes" (void) {
+	SetActivator(0, AAPTR_PLAYER1);
+	SetHudSize(640, 480, 0);
+	SetFont("BIGFONT");
+	HudMessage(l:"USETOFIREOFF"; HUDMSG_FADEINOUT, HUD_SUPRESFIREMES, CR_WHITE, 320.0, 300.0, 0.1, 0.3, 0.1);
+}
+
+
+
+int ActiveObjectiveTID;
+bool ObjectiveOnscreen;
+bool SecondaryOnscreen;
+
+script "objective" (int objID, int thisObjectiveTID){
+	while(ObjectiveOnscreen){ delay(35);}
+	ObjectiveOnscreen = 1;
+	SetActivator(0, AAPTR_PLAYER1);
+
+	PlaySound(0, "objective/on", CHAN_ITEM, 1.0);
+	if(ActiveObjectiveTID>0){ Thing_Remove(ActiveObjectiveTID); }
+	ActiveObjectiveTID = thisObjectiveTID;
+	str ObjectiveString = strparam(l:strparam(s:"OBJ", i:objID));
+	str OBJ = strparam(l:"OBJ");
+	SetFont("SMALLFONT");
+	HudMessage(s:OBJ; HUDMSG_FADEOUT|HUDMSG_LAYER_UNDERHUD, HUD_OBJ, CR_WHITE, 0.5, 0.27, 3.0, 1.0);
+	SetFont("BIGFONT");
+	SetHudWrapWidth(500);
+	HudMessage(s:ObjectiveString; HUDMSG_FADEOUT|HUDMSG_LAYER_UNDERHUD, HUD_OBJSTRING, CR_WHITE, 0.5, 0.3, 5.0, 2.0);
+	HudMessage(s:""; HUDMSG_PLAIN, HUD_OBJLINE, CR_WHITE, 1.0, 0.1, 0);
+	delay(35*5);
+	ObjectiveOnscreen = 0;
+	setFont("SMALLFONT");
+	HudMessage(s:strparam(s:"-> ", s:ObjectiveString); HUDMSG_PLAIN|HUDMSG_LAYER_UNDERHUD, HUD_OBJLINE, CR_WHITE, 0.97, 0.03, 0);
+
+}
+
+
+script "secondary_objective" (int objID, int thisObjectiveTID){
+	while(ObjectiveOnscreen){ delay(35);}
+	ObjectiveOnscreen = 1;
+	SecondaryOnscreen = 1;
+	SetActivator(0, AAPTR_PLAYER1);
+	PlaySound(0, "SecondaryObjective/on", CHAN_ITEM, 1.0);
+
+	str ObjectiveString = strparam(l:strparam(s:"SOBJ", i:objID));
+	str OBJ = strparam(l:"SOBJ");
+	SetFont("SMALLFONT");
+	HudMessage(s:OBJ; HUDMSG_FADEOUT|HUDMSG_LAYER_UNDERHUD, HUD_OBJ, CR_GRAY, 0.5, 0.27, 3.0, 1.0);
+	SetFont("BIGFONT");
+	SetHudWrapWidth(500);
+	HudMessage(s:ObjectiveString; HUDMSG_FADEOUT|HUDMSG_LAYER_UNDERHUD, HUD_OBJSTRING, CR_GRAY, 0.5, 0.3, 5.0, 2.0);
+	delay(35*5);
+	ObjectiveOnscreen = 0;
+	SecondaryOnscreen = 0;
+}
+
+
+
+script "objectiveComplete"(int objID, int thisObjectiveTID, int nextObjectiveTID){
+	bool notCleanObjective;
+	Thing_Remove(thisObjectiveTID);
+	while(ObjectiveOnscreen){ notCleanObjective = 1; delay(35);}
+
+	ObjectiveOnscreen = 1;
+	SetActivator(0, AAPTR_PLAYER1);
+	ActiveObjectiveTID = 0;
+	str ObjectiveString = strparam(l:strparam(s:"OBJ", i:objID));
+	str OBJ = strparam(l:"OBJ_COMPLETE");
+	SetFont("BIGFONT");
+	PlaySound(0, "objective/off", CHAN_ITEM, 1.0);
+	HudMessage(s:OBJ; HUDMSG_FADEOUT|HUDMSG_LAYER_UNDERHUD, HUD_OBJ, CR_WHITE, 0.5, 0.27, 3.0, 1.0);
+	SetFont("SMALLFONT");
+	SetHudWrapWidth(500);
+	HudMessage(s:ObjectiveString; HUDMSG_FADEOUT|HUDMSG_LAYER_UNDERHUD, HUD_OBJSTRING, CR_WHITE, 0.5, 0.3, 3.0, 2.0);
+	if(!notCleanObjective || SecondaryOnscreen){
+		HudMessage(s:""; HUDMSG_PLAIN, HUD_OBJLINE, CR_WHITE, 1.0, 0.1, 0);
+	}
+	delay(35*3);
+	ObjectiveOnscreen = 0;
+	if(!notCleanObjective || SecondaryOnscreen || ActiveObjectiveTID == 0){
+		HudMessage(s:""; HUDMSG_PLAIN, HUD_OBJLINE, CR_WHITE, 1.0, 0.1, 0);
+	}
+	if(nextObjectiveTID){
+		delay(35);
+		Thing_Activate(nextObjectiveTID);
+	}
+}
+
+script "secondary_objectiveComplete"(int objID, int thisObjectiveTID, int nextObjectiveTID){
+	Thing_Remove(thisObjectiveTID);
+	while(ObjectiveOnscreen){ delay(35);}
+
+	ObjectiveOnscreen = 1;
+	SetActivator(0, AAPTR_PLAYER1);
+	PlaySound(0, "SecondaryObjective/off", CHAN_ITEM, 1.0);
+	str ObjectiveString = strparam(l:strparam(s:"SOBJ", i:objID));
+	str OBJ = strparam(l:"SOBJ_COMPLETE");
+	SetFont("BIGFONT");
+	HudMessage(s:OBJ; HUDMSG_FADEOUT|HUDMSG_LAYER_UNDERHUD, HUD_OBJ, CR_GRAY, 0.5, 0.27, 3.0, 1.0);
+	SetFont("SMALLFONT");
+	SetHudWrapWidth(500);
+	HudMessage(s:ObjectiveString; HUDMSG_FADEOUT|HUDMSG_LAYER_UNDERHUD, HUD_OBJSTRING, CR_GRAY, 0.5, 0.32, 3.0, 2.0);
+	delay(35*3);
+	ObjectiveOnscreen = 0;
+	if(nextObjectiveTID){
+		delay(35);
+		Thing_Activate(nextObjectiveTID);
+	}
+}
+
+str SecondaryObjectives;
+script "ClearSecondaryObjectives" (void){
+	SetActivator(0, AAPTR_PLAYER1);
+	HudMessage(s:""; HUDMSG_PLAIN, HUD_SOBJLINE, CR_WHITE, 1.0, 0.1, 0);
+	SecondaryObjectives = "";
+}
+script "SecondaryObjectiveADD" (int objID){
+	SecondaryObjectives = strparam(s:SecondaryObjectives, s:"\n-", s:strparam(l:strparam(s:"SOBJ", i:objID)));
+}
+script "SecondaryObjectivesPRINT" (void){
+	SetActivator(0, AAPTR_PLAYER1);
+	SetFont("SMALLFONT");
+	HudMessage(s:SecondaryObjectives; HUDMSG_PLAIN|HUDMSG_LAYER_UNDERHUD, HUD_SOBJLINE, CR_DARKGRAY, 0.97, 0.04, 0);
+	//log(s:SecondaryObjectives);
+}
+
+
+script "setObjectiveMarker" (int tid, int markerType, int objID){
+	SetActivator(0, AAPTR_PLAYER1);
+	int dist, angle, vang, pitch, x, y, z;
+
+	if(CheckSight(0, tid, CSF_NOBLOCKALL)){
+
+		int holdTime = FixedDiv(1.0, 35.0);
+		int hudX = HUD_SPLASHPRESS;
+		int hudY = 600;
+		int xOffset = 0;
+		int yOffset = 0;
+		int range = 2048;
+
+		SetHudSize(hudX, hudY, 1);
+		x = GetActorX(tid) - GetActorX(0);
+		y = GetActorY(tid) - GetActorY(0);
+		Z = GetActorZ(tid) - GetActorZ(0);
+
+		vang = VectorAngle(x,y);
+		angle = (vang - GetActorAngle(0) + 1.0) % 1.0;
+
+		if(((vang+0.125)%0.5) > 0.25) dist = FixedDiv(y, sin(vang));
+		else dist = FixedDiv(x, cos(vang));
+
+		if ((angle < 0.23 || angle > 0.85) && (dist >> 16) < range  && (dist >> 16)>64)
+		{
+
+			if (GetActorPitch(0) >= -0.5 && GetActorPitch(0) <= 0.5)
+			{
+
+				pitch = VectorAngle(dist, GetActorZ(tid) - (GetActorZ(0) + GetActorViewHeight(0)));
+				pitch += FixedMul(GetActorPitch(0), 1.2) % 1.0;
+
+				if ((hudX/2) * sin(angle) != 0 && cos(angle) != 0 && (hudX/2) * sin(pitch) != 0 && cos(pitch) != 0)
+				{
+
+					x = hudX/2 - ((hudX/2) * sin(angle) / cos(angle));
+					y = hudY/2 - ((HUDX/2) * sin(pitch) / cos(pitch));
+
+					x+=xOffset;
+					y+=yOffset;
+					str text = "A";
+					str ObjectiveString;
+					//log(i:markerType);
+					SetHudWrapWidth(130);
+					if(markerType==1){
+						//primary objective
+						SetFont("OBJTA0");
+						ObjectiveString = strparam(l:strparam(s:"OBJ", i:objID));
+						HudMessage(s:text; HUDMSG_PLAIN|HUDMSG_LAYER_UNDERHUD, -tid-100, CR_WHITE, (x << 16), (y << 16), holdTime);
+						SetFont("SMALLFONT");
+						HudMessage(s:ObjectiveString; HUDMSG_PLAIN|HUDMSG_LAYER_UNDERHUD, -tid, CR_WHITE, (x << 16), ((y-32) << 16), holdTime);
+					}
+					if(markerType==2){
+						//secondary objective
+						//
+						SetFont("OBJTB0");
+						ObjectiveString = strparam(l:strparam(s:"SOBJ", i:objID));
+						//log(s:ObjectiveString);
+						HudMessage(s:text; HUDMSG_PLAIN|HUDMSG_LAYER_UNDERHUD, -tid-100, CR_GRAY, (x << 16), (y << 16), holdTime);
+						SetFont("SMALLFONT");
+						HudMessage(s:ObjectiveString; HUDMSG_PLAIN|HUDMSG_LAYER_UNDERHUD, -tid, CR_GRAY, (x << 16), ((y-20) << 16), holdTime);
+					}
+				}
+
+			}
+
+		}  else {
+			HudMessage(s:""; HUDMSG_PLAIN, -tid-100, CR_WHITE, 0, 0, 0.1);
+			HudMessage(s:""; HUDMSG_PLAIN, -tid, CR_WHITE, 0, 0, 0.1);
+		}
+	} else {
+		HudMessage(s:""; HUDMSG_PLAIN, -tid-100, CR_WHITE, 0, 0, 0.1);
+		HudMessage(s:""; HUDMSG_PLAIN, -tid, CR_WHITE, 0, 0, 0.1);
+	}
+	if(ThingCountName ("Objective", tid) || ThingCountName ("secondary_objective", tid)){
+		delay(1);
+		restart;
+	}
+}
+
+
+
+
+
+
+function void ScreenBlood (int frame){
+	SetHudSize(0, 0, 0);
+	SetFont(strparam(s:"BDRIP_", i:frame));
+	HudMessage(	s:"A";	HUDMSG_PLAIN, HUD_SCREENDRIPS, CR_DARKRED, 0.0, 0.0, 0.3);
+	HudMessage(	s:"A";	HUDMSG_PLAIN, HUD_SCREENDRIPS+1, CR_DARKRED, 1.0, 0.0, 0.3);
+}
+
+script "splashScreen" (void){
+	SetActivator(0, AAPTR_PLAYER1);
+	if(!GetCVar("HUD_DISPLAY_SPLASHSCREEN")){ terminate;}
+
+	while(ObjectiveOnscreen){ delay(35);}
+
+	TakeInventory("DrawHUD",1);
+	SetPlayerProperty(0, 1, PROP_TOTALLYFROZEN);
+	GiveInventory("TotalTimeFreezerNosound",1);
+
+
+	SetHudSize(1920, 1080, 0);
+	int r1 = random(1, 4);
+	SetFont(strparam(s:"spscr0", i:r1));
+	HudMessage(	s:"A";	HUDMSG_PLAIN, HUD_SPLASHPIC, CR_DARKRED, 960.0, 540.0, 0);
+	SetHudSize(800, 600, 0);
+
+	SetHudSize(0, 0, 0);
+	SetFont("SMALLFONT");
+	str USEtoContinue = strparam(l:"SPLASHSCREEN_TO_CONTINUE");
+	HudMessage(s:USEtoContinue; HUDMSG_PLAIN, HUD_SPLASHPRESS, CR_DARKRED, 0.5, 0.8, 0);
+
+	int c = 0;
+	while( strparam(l:strparam(s:"SPLASHSCREEN_", i:c)) != strparam(s:"SPLASHSCREEN_", i:c)){
+		c++;
+	}
+
+	int r = random(0, c-1);
+	str SplashText = strparam(l:strparam(s:"SPLASHSCREEN_", i:r));
+	str SplashTitle = strparam(l:strparam(s:"SPLASHSCREEN_TITLE_", i:r));
+
+	SetHudSize(640, 480, 0);
+	SetHudWrapWidth(300);
+
+	if(SplashTitle!=strparam(s:"SPLASHSCREEN_TITLE_", i:r)){
+		SetFont("BIGFONT");
+		HudMessage(s:SplashTitle; HUDMSG_PLAIN,HUD_SPLASHTITLE, CR_WHITE, 450.0, 200.0, 0);
+	}
+	SetFont("SMALLFONT");
+	SetHudSize(400, 300, 0);
+	SetHudWrapWidth(200);
+	HudMessage(s:SplashText; HUDMSG_PLAIN, HUD_SPLASHTEXT, CR_WHITE, 290.0, 150.0, 0);
+
+
+	int b=1;
+	int bc = 0;
+	SetHudWrapWidth(0);
+	while(!(GetPlayerInput(0, INPUT_BUTTONS) & BT_USE)){
+		ObjectiveOnscreen = 1;
+		b++; if(b>8){b=1;}
+		if(bc++ == 5){
+			bc=0;
+			//ScreenBlood(b);
+		}
+		delay(1);
+	}
+	SetPlayerProperty(0, 0, PROP_TOTALLYFROZEN);
+	HudMessage(	s:"";	HUDMSG_PLAIN, HUD_SPLASHPIC, CR_DARKRED, 400.0, 300.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN, HUD_SPLASHPRESS, CR_DARKRED, 400.0, 300.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN, HUD_SPLASHTEXT, CR_DARKRED, 400.0, 300.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN, HUD_SPLASHTITLE, CR_DARKRED, 400.0, 300.0, 0);
+
+	TakeInventory("TotalTimeFreezerNosound",1);
+	GiveInventory("DrawHUD",1);
+	SetHudWrapWidth(0);
+	ObjectiveOnscreen = 0;
+}
+
+
+script "infoGot" (void){
+	SetActivator(0, AAPTR_PLAYER1);
+
+	while(ObjectiveOnscreen || GetActorProperty(0, APROP_Waterlevel)>1){ delay(35);}
+
+	SetHudSize(640, 480, 0);
+	HudMessage(s:StrParam(l: "INFO_GOT"); HUDMSG_PLAIN, HUD_SPLASHTEXT, CR_WHITE, 320.0, 290.0, 3.0);
+	PlaySound(0, "player/GotInfo", CHAN_UI, 1.0);
+}
+
+
+script "Tutorial" (int TutID){
+	SetActivator(0, AAPTR_PLAYER1);
+	if(!GetCVar("HUD_DISPLAY_TUTORIAL")){ terminate;}
+	if(CheckInventory("NoTutorial")){ terminate;}
+	if(CheckInventory(strparam(s:"DONT_SHOW_", i:TutID))){ terminate;}
+	//if(CheckInventory("TotalTimeFreezer")){ terminate;}
+	//if(CheckInventory("TotalTimeFreezerNosound")){ terminate;}
+
+	while(
+		ObjectiveOnscreen ||
+		GetActorProperty(0, APROP_Waterlevel)>1 ||
+		CheckInventory("TotalTimeFreezer") ||
+		CheckInventory("TotalTimeFreezerNosound")
+		){ delay(35);}
+
+	SetPlayerProperty(0, 1, PROP_TOTALLYFROZEN);
+	GiveInventory("TotalTimeFreezer",1);
+
+	SetHudSize(640, 480, 0);
+	SetFont("TUTOR");
+	HudMessage(	s:"A";	HUDMSG_PLAIN, HUD_SPLASHPIC, CR_DARKRED, 320.0, 240.0, 0);
+	SetFont("BIGFONT");
+	str SplashTitle = strparam(l:"TUTORIAL");
+	HudMessage(s:SplashTitle; HUDMSG_PLAIN, HUD_SPLASHTITLE, CR_WHITE, 320.0, 210.0, 0);
+
+	SetHudSize(640, 480, 0);
+	SetFont("SMALLFONT");
+	str USEtoContinue = strparam(l:"TUTORIAL_TO_CONTINUE");
+	SetHudWrapWidth(150);
+	HudMessage(s:USEtoContinue; HUDMSG_PLAIN, HUD_SPLASHPRESS, CR_WHITE, 200.0, 390.0, 0);
+
+	USEtoContinue = strparam(l:"TUTORIAL_TO_CONTINUE_AND_NOT_AGAIN");
+	HudMessage(s:USEtoContinue; HUDMSG_PLAIN, HUD_SPLASHPRESS_AND_NOT, CR_WHITE, 440.0, 390.0, 0);
+
+	SetHudSize(0, 0, 0);
+
+	str SplashText;
+	str Tutimage = strparam(l:strparam(s:"TUTORIAL", i:TutID, s:"image"));
+	if(Tutimage == strparam(s:"TUTORIAL", i:TutID, s:"image")){
+		//no image in tutorial
+		SetHudSize(640, 480, 0);
+		SetFont("SMALLFONT");
+		SplashText = strparam(l:strparam(s:"TUTORIAL", i:TutID));
+		SetHudWrapWidth(300);
+		HudMessage(s:SplashText; HUDMSG_PLAIN, HUD_SPLASHTEXT, CR_WHITE, 320.0, 290.0, 0);
+		SetHudWrapWidth(0);
+	} else {
+		//imag in tutorial (placed in TEXTURES folder)
+		SetHudSize(640, 480, 0);
+		SetFont("SMALLFONT");
+		SplashText = strparam(l:strparam(s:"TUTORIAL", i:TutID));
+		SetHudWrapWidth(210);
+		HudMessage(s:SplashText; HUDMSG_PLAIN, HUD_SPLASHTEXT, CR_WHITE, 390.0, 290.0, 0);
+		SetHudWrapWidth(0);
+		SetFont(Tutimage);
+		SetHudSize(320, 240, 0);
+		HudMessage(s:"A"; HUDMSG_PLAIN, HUD_SPLASHTEXTPIC, CR_WHITE, 105.0, 140.0, 0);
+		SetHudSize(0, 0, 0);
+	}
+
+	GiveInventory(strparam(s:"tutorial_", i:TutID), 1);
+	ACS_NamedExecute("SetChapter", 0, 3);
+	ACS_NamedExecute("SetPage", 0, TutID);
+
+	while(GetPlayerInput(0, INPUT_BUTTONS) != BT_USE && GetPlayerInput(0, INPUT_BUTTONS) != BT_JUMP ){
+		ObjectiveOnscreen = 1;
+		delay(1);
+	}
+	if(GetPlayerInput(0, INPUT_BUTTONS) == BT_JUMP){
+		GiveInventory(strparam(s:"DONT_SHOW_", i:TutID), 1);
+	}
+	HudMessage(	s:"";	HUDMSG_PLAIN, HUD_SPLASHPIC, CR_DARKRED, 0.0, 0.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN, HUD_SPLASHTITLE, CR_DARKRED, 0.0, 0.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN, HUD_SPLASHTEXT, CR_DARKRED, 0.0, 0.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN, HUD_SPLASHTEXTPIC, CR_DARKRED, 0.0, 0.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN, HUD_SPLASHPRESS, CR_DARKRED, 0.0, 0.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN, HUD_SPLASHPRESS_AND_NOT, CR_DARKRED, 0.0, 0.0, 0);
+	delay(15);
+
+
+	SetPlayerProperty(0, 0, PROP_TOTALLYFROZEN);
+	TakeInventory("TotalTimeFreezer",1);
+	SetHudWrapWidth(0);
+	ObjectiveOnscreen = 0;
+}
+
+
+script "TntThowPowerIndication"(void){
+	//HUD_THROWPOWER
+}
+
+bool InfoScreenON;
+int CurrentChapter;
+int CurrentPage;
+int InfoInputDelayCounter;
+
+script "InfoScreen" (void){
+
+	SetActivator(0, AAPTR_PLAYER1);
+	if(InfoScreenON){ACS_NamedExecute("HideInfoScreen", 0);}
+	if(CheckInventory("TotalTimeFreezer")){ terminate;}
+	if(CheckInventory("TotalTimeFreezerNosound")){ terminate;}
+
+	InfoScreenON = 1;
+	FadeTo (0, 0, 0, 1.0, 0.5);
+	TakeInventory("DrawHUD",1);
+	SetPlayerProperty(0, 1, PROP_TOTALLYFROZEN);
+	GiveInventory("TotalTimeFreezer",1);
+	SetHudSize(1920, 1200, 0);
+	SetFont("infobcg");
+	HudMessage(	s:"A";	HUDMSG_PLAIN|HUDMSG_LAYER_UNDERHUD, HUD_SPLASHPIC, CR_DARKRED, 960.0, 600.0, 0);
+
+	str Title = strparam(l:"INFO_SCREEN_TITLE");
+	SetHudSize(400, 300, 0);
+	SetFont("BIGFONT");
+
+	HudMessage(s:Title; HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD, HUD_INFO, CR_WHITE, 70.0, 50.0, 0);
+	SetHudSize(640, 480, 0);
+
+	int offset = 45.0;
+	HudMessage(s:strparam(l:"INFO_SCREEN_TITLE1"); HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD, HUD_INFO_CHAPTER1, CR_WHITE, 100.0, 185.0, 0);
+	HudMessage(s:strparam(l:"INFO_SCREEN_TITLE2"); HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD, HUD_INFO_CHAPTER2, CR_WHITE, 100.0, 185.0+offset, 0);
+	HudMessage(s:strparam(l:"INFO_SCREEN_TITLE3"); HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD, HUD_INFO_CHAPTER3, CR_WHITE, 100.0, 185.0+offset*2, 0);
+	HudMessage(s:strparam(l:"INFO_SCREEN_TITLE4"); HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD, HUD_INFO_CHAPTER4, CR_WHITE, 100.0, 185.0+offset*3, 0);
+
+
+	SetHudSize(1920, 1200, 0);
+	SetFont("infomrc");
+	HudMessage(	s:"A";	HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD, HUD_INFO_MARKER, CR_DARKRED, 80.0+offset*CurrentChapter, 470.0, 0);
+
+
+
+	showScreen(CurrentChapter, CurrentPage, 1);
+
+	int Bigoffset = 112.0;
+	while(
+	!GetPlayerInput(0, INPUT_BUTTONS)
+	||
+	(GetPlayerInput(0, INPUT_BUTTONS)&BT_FORWARD)
+	||
+	(GetPlayerInput(0, INPUT_BUTTONS)&BT_BACK)
+	||
+	(GetPlayerInput(0, INPUT_BUTTONS)&BT_MOVELEFT)
+	||
+	(GetPlayerInput(0, INPUT_BUTTONS)&BT_MOVERIGHT)
+	){
+		if(!CheckInventory("TotalTimeFreezer")){ terminate;}
+
+		if(GetPlayerInput(0, INPUT_BUTTONS)&BT_FORWARD){
+			if(!InfoInputDelayCounter){
+				InfoInputDelayCounter = 5;
+				showScreen(GetPrevChapter(), 0, 0);
+			}
+		}
+		if(GetPlayerInput(0, INPUT_BUTTONS)&BT_BACK){
+			if(!InfoInputDelayCounter){
+				showScreen(GetNextChapter(), 0, 1);
+				InfoInputDelayCounter = 5;
+			}
+		}
+		if(GetPlayerInput(0, INPUT_BUTTONS)&BT_MOVELEFT){
+			if(!InfoInputDelayCounter){
+				InfoInputDelayCounter = 5;
+				showScreen(CurrentChapter, GetPrevPage(), 0);
+			}
+		}
+		if(GetPlayerInput(0, INPUT_BUTTONS)&BT_MOVERIGHT){
+			if(!InfoInputDelayCounter){
+				InfoInputDelayCounter = 5;
+				showScreen(CurrentChapter, GetNextPage(), 1);
+			}
+		}
+
+		InfoInputDelayCounter--;
+		if(InfoInputDelayCounter<0){InfoInputDelayCounter=0;}
+		SetHudSize(1920, 1200, 0);
+		SetFont("infomrc");
+		HudMessage(	s:"A";	HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD, HUD_INFO_MARKER, CR_DARKRED, 80.0, 470.0+Bigoffset*CurrentChapter, 0);
+
+		delay(3);
+	}
+
+	ACS_NamedExecute("HideInfoScreen", 0);
+}
+
+function void showScreen(int chapter, int page, bool SeachTo){
+	//if chapter page not found
+	//SeachTo = 0 search backward
+	//SeachTo = 1 search forward
+	SetActivator(0, AAPTR_PLAYER1);
+	bool Tfound;
+	int i;
+
+	PlaySound (0, "Pitch/Wood", CHAN_UI, 1.0, false, ATTN_NORM);
+
+	switch (chapter) {
+		case 0:
+			ShowMainScreen("info_", "INFO_TITLE_", "INFO_", page, SeachTo);
+			break;
+		case 1:
+			ShowMainScreen("note_", "", "NOTE_", page, SeachTo);
+			break;
+		case 2:
+
+			if(page<0){ page = 99;}
+			str TitleTemplate = "SPLASHSCREEN_TITLE_";
+			str TextTemplate = "SPLASHSCREEN_";
+			str Title = strparam(l:StrParam(s: TitleTemplate, i:page));
+			str Text = strparam(l:StrParam(s: TextTemplate, i:page));
+
+			if(!isTextSet(TextTemplate, page)){
+				//page not found
+				if(SeachTo){
+					//search forward to next normal text
+					for(i=page; i<100; i++){
+						if(isTextSet(TextTemplate, i)){
+							Tfound = 1;
+							showScreen(chapter, i, SeachTo);
+							return;
+						}
+					}
+					if(!Tfound && !isTextSet(TextTemplate, 0)){
+						//try to dispaly first text
+						for(i=0; i<100; i++){
+							if(isTextSet(TextTemplate, i)){
+								showScreen(chapter, i, 1);
+								return;
+							}
+						}
+					} else {
+						showScreen(chapter, 0, 1);
+						return;
+					}
+				} else {
+					//search backward to previous normal text
+					for(i=page; i>0; i--){
+						if(isTextSet(TextTemplate, i)){
+							Tfound = 1;
+							showScreen(chapter, i, 0);
+							return;
+						}
+					}
+					if(!Tfound ){
+						//try to dispaly first text from back
+						for(i=99; i>0; i--){
+							if(isTextSet(TextTemplate, i)){
+								showScreen(chapter, i, 0);
+								return;
+							}
+						}
+					}
+				}
+				ShowDefaultText();
+			} else {
+				//text found
+				CurrentPage = page;
+
+				SetHudSize(640, 480, 0);
+				SetHudWrapWidth(300);
+				SetFont("bigfont");
+				HudMessage(	s:Title;	HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD, HUD_SPLASHTITLE, CR_DARKRED, 420.0, 230.0, 0);
+				SetFont("smallfont");
+
+				SetHudSize(400, 300, 0);
+				SetHudWrapWidth(200);
+
+				HudMessage(	s:Text;	HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD|HUDMSG_COLORSTRING, HUD_SPLASHTEXT, "DarkBlack", 260.0, 170.0, 0);
+				HudMessage(	s:"";	HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD, HUD_INFO_IMAGE, CR_BLACK, 390.0, 170.0, 0);
+
+				SetHudSize(1024, 768, 0);
+				SetFont("textbcg1");
+				HudMessage(	s:"A";	HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD, HUD_BCG, CR_BLACK, 650.0, 400.0, 0);
+
+				SetHudWrapWidth(0);
+			}
+			break;
+		case 3:
+			ShowMainScreen("tutorial_", "", "TUTORIAL", page, SeachTo);
+			break;
+
+		default:
+			ShowDefaultText();
+
+	}
+
+}
+
+function void ShowMainScreen(str MarkerTemplate, str TitleTextTemplate, str TextTemplate, int id, bool SeachTo){
+	int PageLimit = 99;
+	int i;
+	SetActivator(0, AAPTR_PLAYER1);
+	//log(s:StrParam(s:MarkerTemplate, i:id));
+	//log(s:StrParam(l:StrParam(s:TextTemplate, i:id)));
+
+		HudMessage(	s:"";	HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD, HUD_SPLASHTITLE, CR_DARKRED, 390.0, 170.0, 0);
+		HudMessage(	s:"";	HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD, HUD_SPLASHTEXT, CR_DARKRED, 390.0, 170.0, 0);
+		HudMessage(	s:"";	HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD, HUD_INFO_IMAGE, CR_DARKRED, 390.0, 170.0, 0);
+		HudMessage(	s:"";	HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD, HUD_BCG, CR_DARKRED, 390.0, 170.0, 0);
+
+
+	if(CheckInventory(StrParam(s:MarkerTemplate, i:id))){
+
+
+		str Title = StrParam(l:StrParam(s:TitleTextTemplate, i:id));
+		str Text = StrParam(l:StrParam(s:TextTemplate, i:id));
+		str Image = StrParam(l:StrParam(s:TextTemplate, i:id, s:"image"));
+
+
+
+		SetHudSize(640, 480, 0);
+		int Voffset = -30.0;
+		int offset = 0;
+
+		if(Image != StrParam(s:TextTemplate, i:id, s:"image")){
+			offset = 70.0;
+			SetFont(Image);
+			HudMessage(	s:"A";	HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD, HUD_INFO_IMAGE, CR_DARKRED, 250.0, 280.0+Voffset, 0);
+		}
+		SetHudWrapWidth(250);
+		if(isTextSet(TitleTextTemplate, id)){
+			SetFont("bigfont");
+			HudMessage(	s:Title;	HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD, HUD_SPLASHTITLE, CR_DARKRED, 385.0+offset, 150.0+Voffset, 0);
+		}
+		if(isTextSet(TextTemplate, id)){
+
+			if(CurrentChapter==1){
+				SetFont("HNDFN");
+				HudMessage(	s:Text;	HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD|HUDMSG_COLORSTRING, HUD_SPLASHTEXT, "DarkBlack", 390.0+offset, 280.0+Voffset, 0);
+			} else {
+				SetHudSize(400, 300, 0);
+				SetHudWrapWidth(180);
+				SetFont("SMALLFONT");
+				HudMessage(	s:Text;	HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD|HUDMSG_COLORSTRING, HUD_SPLASHTEXT, "DarkBlack", 230.0+offset, 190.0+Voffset, 0);
+			}
+		}
+
+		SetHudSize(850, 630, 0);
+		SetFont("textbcg1");
+		HudMessage(	s:"A";	HUDMSG_PLAIN|HUDMSG_LAYER_UNDERHUD, HUD_BCG, CR_BLACK, 530.0, 320.0, 0);
+
+		SetHudWrapWidth(0);
+		return;
+	} else {
+		int Page;
+		if(SeachTo){
+			Page = GetNextPage();
+			if(Page>PageLimit){ CurrentPage = 0; Page = 0; }
+
+			for(i=Page; i<PageLimit; i++){
+				if(CheckInventory(StrParam(s:MarkerTemplate, i:i))){
+					CurrentPage = i;
+					ShowMainScreen(MarkerTemplate, TitleTextTemplate, TextTemplate, i, SeachTo);
+					return;
+				}
+			}
+			for(i=0; i<PageLimit; i++){
+				if(CheckInventory(StrParam(s:MarkerTemplate, i:i))){
+					CurrentPage = i;
+					ShowMainScreen(MarkerTemplate, TitleTextTemplate, TextTemplate, i, SeachTo);
+					return;
+				}
+			}
+
+			ShowDefaultText();
+			return;
+
+		} else {
+			Page = GetPrevPage();
+			if(Page<0){ CurrentPage = PageLimit; Page = PageLimit; }
+
+			for(i=Page; i>=0; i--){
+				if(CheckInventory(StrParam(s:MarkerTemplate, i:i))){
+					CurrentPage = i;
+					ShowMainScreen(MarkerTemplate, TitleTextTemplate, TextTemplate, i, SeachTo);
+					return;
+				}
+			}
+			for(i=PageLimit; i>=0; i--){
+				if(CheckInventory(StrParam(s:MarkerTemplate, i:i))){
+					CurrentPage = i;
+					ShowMainScreen(MarkerTemplate, TitleTextTemplate, TextTemplate, i, SeachTo);
+					return;
+				}
+			}
+
+			ShowDefaultText();
+			return;
+
+		}
+	}
+	ShowDefaultText();
+}
+
+
+function void ShowDefaultText(void){
+
+	HudMessage(	s:"";	HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD, HUD_SPLASHTITLE, CR_DARKRED, 390.0, 170.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD, HUD_SPLASHTEXT, CR_DARKRED, 390.0, 170.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD, HUD_INFO_IMAGE, CR_DARKRED, 390.0, 170.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD, HUD_BCG, CR_DARKRED, 390.0, 170.0, 0);
+
+
+	SetHudSize(640, 480, 0);
+	SetHudWrapWidth(400);
+	SetFont("bigfont");
+	HudMessage(	s:strparam(l:"INFO_SCREEN_NODATA");	HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD, HUD_SPLASHTITLE, CR_DARKRED, 390.0, 200.0, 0);
+}
+
+function bool isTextSet(str Template, int id){
+	if(strparam(l:StrParam(s: Template, i:id)) != StrParam(s: Template, i:id)){
+		return true;
+	}
+	return false;
+}
+
+
+script "SetChapter" (int Chapter){CurrentChapter=Chapter;}
+script "SetPage" (int Page){CurrentPage=Page;}
+
+function int GetNextPage(void){
+	CurrentPage++;
+	return CurrentPage;
+}
+function int GetPrevPage(void){
+	CurrentPage--;
+	return CurrentPage;
+}
+function int GetNextChapter(void){
+	CurrentChapter++;
+	if(CurrentChapter>3){CurrentChapter=0;}
+	return CurrentChapter;
+}
+
+function int GetPrevChapter(void){
+	CurrentChapter--;
+	if(CurrentChapter<0){CurrentChapter=3;}
+	return CurrentChapter;
+}
+
+script "HideInfoScreen" (void){
+	InfoScreenON = 0;
+	FadeTo (0, 0, 0, 0.0, 0.5);
+	SetPlayerProperty(0, 0, PROP_TOTALLYFROZEN);
+	HudMessage(	s:"";	HUDMSG_PLAIN, HUD_SPLASHPIC, CR_DARKRED, 400.0, 300.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN, HUD_SPLASHPRESS, CR_DARKRED, 400.0, 300.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN, HUD_SPLASHTEXT, CR_DARKRED, 400.0, 300.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN, HUD_SPLASHTITLE, CR_DARKRED, 400.0, 300.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN, HUD_INFO, CR_DARKRED, 400.0, 300.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN, HUD_INFO_CHAPTER1, CR_DARKRED, 400.0, 300.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN, HUD_INFO_CHAPTER2, CR_DARKRED, 400.0, 300.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN, HUD_INFO_CHAPTER3, CR_DARKRED, 400.0, 300.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN, HUD_INFO_CHAPTER4, CR_DARKRED, 400.0, 300.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN, HUD_INFO_RIGHT_TEXT, CR_DARKRED, 400.0, 300.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN, HUD_INFO_BOTTOM_TEXT, CR_DARKRED, 400.0, 300.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN, HUD_INFO_MARKER, CR_DARKRED, 400.0, 300.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN, HUD_INFO_IMAGE, CR_DARKRED, 400.0, 300.0, 0);
+	HudMessage(	s:"";	HUDMSG_PLAIN|HUDMSG_LAYER_OVERHUD, HUD_BCG, CR_DARKRED, 390.0, 170.0, 0);
+
+
+	TakeInventory("TotalTimeFreezer",1);
+	GiveInventory("DrawHUD",1);
+	SetHudWrapWidth(0);
+
+	ACS_NamedTerminate("HideInfoScreen", 0);
+}
+
+
+script "MES" (int mesId) {
+	str String = strparam(l:strparam(s:"MES", i:mesId));
+	SetFont("SMALLFONT");
+	HudMessage(s:String; HUDMSG_FADEOUT|HUDMSG_LAYER_UNDERHUD, HUD_INFO_MESSAGE, CR_WHITE, 0.5, 0.27, 7.0, 1.0);
+}
+
+
+
+//END OF Objective and hudmassages system LIB----------------------------------
+////////////////////////////////////////////////////////////////////////
+
+
+
+//MUSIC LIB
+////////////////////////////////////////////////////////////////////////
+bool LockChangeMusic;
+int MusVolume = 1.0;
+str MusicTrack = "SURFACE";
+int MusicTrackID = 7;
+str FightTrack = "stndrt";
+str DayMusic = "SURFACE";
+int DayMusicID = 7;
+
+script "ChangeMusic"(int Track, int NighTimeOverride) {
+	while (LockChangeMusic){ delay(1);}
+	LockChangeMusic = 1;
+	/*
+	GARDEN
+	MARKET
+	SNOW
+	SURFACE
+	SWAMP
+	TOWN
+	changes to NIGHT from 20.00 to 07.00
+	*/
+	int McangeSpeed = 0.02;
+
+	str mTrack[11];
+	mTrack[0] = "BOSS";
+	mTrack[1] = "CATACOMB";
+	mTrack[2] = "GARDEN";
+	mTrack[3] = "MANOR";
+	mTrack[4] = "MARKET";
+	mTrack[5] = "NIGHT";
+	mTrack[6] = "SNOW";
+	mTrack[7] = "SURFACE";
+	mTrack[8] = "SWAMP";
+	mTrack[9] = "TITLE";
+	mTrack[10] = "TOWN";
+/*
+	str mFight[4];
+	mFight[0] = "stndrt";
+	mFight[1] = "cabal";
+	mFight[2] = "flight";
+	mFight[3] = "townf";
+*/
+
+
+	if(MusicTrack!=mTrack[Track]){
+		MusicTrack = mTrack[Track];
+		MusicTrackID = Track;
+		while (MusVolume > 0){ MusVolume-=McangeSpeed; SetMusicVolume(MusVolume); delay(1);}
+		SetMusicVolume(0.0);
+		SetMusic (MusicTrack, 0);
+		while (MusVolume < 1.0){ MusVolume+=McangeSpeed; SetMusicVolume(MusVolume); delay(1);}
+	} else {
+		while (MusVolume < 1.0){ MusVolume+=McangeSpeed; SetMusicVolume(MusVolume); delay(1);}
+		SetMusicVolume(1.0);
+	}
+
+	LockChangeMusic = 0;
+}
+
+/*
+script "NightMusicMonitoring" ENTER
+{
+
+	if(IsNightTime()){
+		ACS_NamedExecuteAlways("ChangeMusic", 0, MusicTrackID);
+	}
+
+	delay(35); restart;
+}
+
+function bool IsNightTime (void){
+	if( ( WORLD_TIME<=7*60 || WORLD_TIME>=20*60) && MusicTrack!="NIGHT"){
+		return true;
+	}
+	return false;
+}
+function bool IsMusicForNightTime (void){
+	if(
+			MusicTrack=="GARDEN"
+			|| MusicTrack=="MARKET"
+			|| MusicTrack=="SNOW"
+			|| MusicTrack=="SURFACE"
+			|| MusicTrack=="SWAMP"
+			|| MusicTrack=="TOWN"
+	){
+			return true;
+	}
+
+	return false;
+}
+*/
+//END OF MUSIC LIB
+////////////////////////////////////////////////////////////////////////
+
+
+
+/*script "FloorANDCeilingFluctuateHeights" (int tag, int speed, int amount) {
+	int cz =  GetSectorCeilingZ (tag, 0, 0);
+	int Fz =  GetSectorFloorZ (tag, 0, 0);
+	int angle = 0;
+	int iteration = 0;
+	int NCz;
+	int NFz;
+	while(true){
+		angle = iteration*speed;
+		NCz = Cz + amount*sin(angle);
+		NFz = Fz + amount*sin(angle);
+		log(f:sin(angle));
+
+		Floor_MoveToValue (tag, 1024, NFz, 0);
+		Ceiling_MoveToValue (tag, 1024, NCz, 0);
+		iteration++;
+		if(iteration>359){ iteration=0; }
+		delay(1);
+	}
+}*/
+
+
+script "itemBlockLine" (void) {
+	//if(CheckActorClass(0, "z_QuestItem")){
+		SetActorState(0, "CantCross");
+	//}
+}
+script "FloorFallDown" (int tag, int speed,int height){
+	Radius_Quake (4, 35, 0, 64, tag);
+	delay(35);
+	if(speed){
+		FloorAndCeiling_LowerByValue(tag, speed, height);
+	}
+	SetLineSpecial (tag, 0, 0, 0, 0, 0, 0);
+	Thing_Activate(tag);//sound and debris
+}
+
+script "RotateDoorLeft" (int pilyID, int speed, int angle) {
+
+    if ( speed==0 ){ speed=16; }
+	PolyWait (pilyID);
+    Polyobj_RotateLeft(pilyID, speed, angle);
+    SoundSequenceOnPolyobj (pilyID, "PlyDoorRotateNormalOpen");
+    delay(35*3);
+    Polyobj_RotateRight(pilyID, speed, angle);
+    SoundSequenceOnPolyobj (pilyID, "PlyDoorRotateNormalClose");
+	PolyWait (pilyID);
+}
+
+script "RotateDoorRight" (int pilyID, int speed, int angle) {
+    if ( speed==0 ){ speed=16; }
+	PolyWait (pilyID);
+    Polyobj_RotateRight(pilyID, speed, angle);
+    SoundSequenceOnPolyobj (pilyID, "PlyDoorRotateNormalOpen");
+    delay(35*3);
+    Polyobj_RotateLeft(pilyID, speed, angle);
+    SoundSequenceOnPolyobj (pilyID, "PlyDoorRotateNormalClose");
+	PolyWait (pilyID);
+}
+script "ItIsStuck" (void){
+	PlaySound(0, "player/ItStuck", CHAN_BODY, 1.0, false, ATTN_NORM);
+}
+
+
+script "ScanPlayerKey"(int KeyId, int tidToDeActivate, int tidToActivate, int ScriptToRun){
+	SetActivator(0, AAPTR_PLAYER1);
+	str key = "null";
+
+	switch(KeyId){
+		case 1:
+			key = "EyeKey"; break;
+		case 2:
+			key = "DaggerKey"; break;
+		case 3:
+			key = "MoonKey"; break;
+		case 4:
+			key = "FireKey"; break;
+		case 5:
+			key = "SkullKey"; break;
+		case 6:
+			key = "SpiderKey"; break;
+	}
+
+	if(!CheckInventory(key)){
+		delay(15);
+		restart;
+	}
+	if(tidToDeActivate) { Thing_Deactivate(tidToDeActivate);}
+	delay(35*3);
+	if(tidToActivate){ Thing_Activate(tidToActivate);}
+	if(ScriptToRun){ ACS_ExecuteAlways(ScriptToRun, 0);}
+
+}
+script "ScanSpiderKey"(int tidToDeActivate, int tidToActivate, int ScriptToRun){
+	SetActivator(0, AAPTR_PLAYER1);
+	str key = "SpiderKey";
+
+	if(!CheckInventory(key)){
+		delay(15);
+		restart;
+	}
+	if(tidToDeActivate) { Thing_Deactivate(tidToDeActivate);}
+	delay(35*3);
+	if(tidToActivate){ Thing_Activate(tidToActivate);}
+	if(ScriptToRun){ ACS_ExecuteAlways(ScriptToRun, 0);}
+
+}
+script "ScanFireKey"(int tidToDeActivate, int tidToActivate, int ScriptToRun){
+	SetActivator(0, AAPTR_PLAYER1);
+	str key = "FireKey";
+
+	if(!CheckInventory(key)){
+		delay(15);
+		restart;
+	}
+	if(tidToDeActivate) { Thing_Deactivate(tidToDeActivate);}
+	delay(35*3);
+	if(tidToActivate){ Thing_Activate(tidToActivate);}
+	if(ScriptToRun){ ACS_ExecuteAlways(ScriptToRun, 0);}
+
+}
+script "ScanSkullKey"(int tidToDeActivate, int tidToActivate, int ScriptToRun){
+	SetActivator(0, AAPTR_PLAYER1);
+	str key = "SkullKey";
+
+	if(!CheckInventory(key)){
+		delay(15);
+		restart;
+	}
+	if(tidToDeActivate) { Thing_Deactivate(tidToDeActivate);}
+	delay(35*3);
+	if(tidToActivate){ Thing_Activate(tidToActivate);}
+	if(ScriptToRun){ ACS_ExecuteAlways(ScriptToRun, 0);}
+
+}
+script "ScanPlayerWeapon"(int WId, int tidToDeActivate, int tidToActivate){
+	SetActivator(0, AAPTR_PLAYER1);
+	str wp = "null";
+
+	switch(WId){
+		case 1:
+			wp = "Sawedoff"; break;
+
+
+	}
+
+	if(!CheckInventory(wp)){
+		delay(15);
+		restart;
+	}
+	if(tidToDeActivate) { Thing_Deactivate(tidToDeActivate);}
+	delay(35*3);
+	if(tidToActivate){ Thing_Activate(tidToActivate);}
+
+}
+script "ScanCurse"(int tidToDeActivate, int tidToActivate, int ScriptToRun){
+	SetActivator(0, AAPTR_PLAYER1);
+	if(!CheckInventory("Curse")){
+		delay(15);
+		restart;
+	}
+	if(tidToDeActivate) { Thing_Deactivate(tidToDeActivate);}
+	delay(35*3);
+	if(tidToActivate){ Thing_Activate(tidToActivate);}
+	if(ScriptToRun){ ACS_ExecuteAlways(ScriptToRun, 0);}
+}
+script "ScanCarnage"(int tidToDeActivate, int tidToActivate, int ScriptToRun){
+	SetActivator(0, AAPTR_PLAYER1);
+	if(!CheckInventory("AM_Carnage")){
+		delay(15);
+		restart;
+	}
+	if(tidToDeActivate) { Thing_Deactivate(tidToDeActivate);}
+	delay(35*3);
+	if(tidToActivate){ Thing_Activate(tidToActivate);}
+	if(ScriptToRun){ ACS_ExecuteAlways(ScriptToRun, 0);}
+}
+
+
+
+
+script "FloorRemove" (int tag, int speed,int height){
+	Radius_Quake (4, 35, 0, 64, tag);
+	delay(35);
+	//FloorAndCeiling_LowerByValue(tag, speed, height);
+	SetLineSpecial (tag, 0, 0, 0, 0, 0, 0);
+	Thing_Activate(tag);//sound and debris
+}
+
+
+
+script "BrakeGlassWall" (int id){
+	Line_SetBlocking (id, 0, BLOCKF_EVERYTHING|BLOCKF_HITSCAN);
+	SetLineTexture(id, SIDE_FRONT, TEXTURE_MIDDLE, "-");
+	SetLineTexture(id, SIDE_BACK, TEXTURE_MIDDLE, "-");
+	Thing_Activate(id);
+}
+
+

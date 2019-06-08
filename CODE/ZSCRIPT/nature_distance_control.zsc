@@ -1,0 +1,523 @@
+/*
+class DistanceControl : StaticEventHandler
+{
+	DistanceController VGC;
+	override void PlayerEntered(PlayerEvent e)
+	{
+		PlayerInfo player = players[e.PlayerNumber];
+		VGC = DistanceController(player.mo.Spawn("DistanceController",player.mo.pos));
+
+	}
+
+	override void WorldTick(){
+		PlayerInfo player = players[consoleplayer];
+		VGC.SetOrigin(player.mo.pos, true);
+		//if (players[consoleplayer].camera == players[consoleplayer].mo && !(ownerRef.player.cheats & CF_CHASECAM))
+	}
+}
+*/
+
+class DistanceControllEvent : EventHandler
+{
+	override void PlayerEntered(PlayerEvent e)
+	{
+		Super.PlayerEntered(e);
+		PlayerInfo player = players[e.PlayerNumber];
+
+		//if any DistanceActivated actor was placed manually in editor - they got Skip = true and not obey render distance
+		ThinkerIterator it = ThinkerIterator.Create("DistanceActivated");
+		DistanceActivated this;
+		while(this = DistanceActivated(it.Next()))
+		{
+			this.skip = true;
+			//this.a_log(this.getClassName());
+			if(this.tid){ continue;} //this actor was spawned by acs and have not to be distance controlled
+		}
+
+
+
+		player.mo.giveInventory("DistanceControllerItem", 1);
+	}
+}
+
+Class DistanceControllerItem : CustomInventory
+{
+	DistanceController DC;
+	Default
+	{
+		Inventory.MaxAmount 1;
+		+INVENTORY.UNDROPPABLE
+		+INVENTORY.UNTOSSABLE
+		+INVENTORY.AUTOACTIVATE
+	}
+
+	override void DoEffect(){
+		if(!DC){
+			DC = DistanceController(Spawn("DistanceController",owner.pos));
+			DC.Master = owner;
+		}
+	}
+
+	states
+	{
+		Spawn:
+			TNT1 A 1;
+			stop;
+		Use:
+			TNT1 A 1;
+			Loop;
+	}
+}
+
+class z_ch_MovingCamera : MovingCamera
+{
+	actor previousMaster;
+	override void Activate (Actor activator){
+		super.Activate(activator);
+		ThinkerIterator iter = ThinkerIterator.Create("DistanceController");
+		Actor FLR;
+		while(FLR = actor(iter.Next())){
+			previousMaster = FLR.Master;
+			FLR.Master = self;
+			FLR.setOrigin(pos, 1);
+			Cvar.GetCVar("z_natue_vegetation_redraw", players[consolePlayer]).SetInt(1);
+		}
+	}
+	override void DeActivate (Actor activator){
+		super.DeActivate(activator);
+
+		ThinkerIterator iter = ThinkerIterator.Create("DistanceController");
+		Actor FLR;
+		while(FLR = actor(iter.Next())){
+			if(previousMaster){
+				FLR.Master = previousMaster;
+			} else {
+				PlayerInfo player = players[consolePlayer];
+				FLR.Master = player.mo;
+			}
+			Cvar.GetCVar("z_natue_vegetation_redraw", players[consolePlayer]).SetInt(1);
+		}
+	}
+}
+
+class DistanceController :actor
+{
+	int Grass_DENSITY;
+	int draw_plants;
+	int GrassRadius_VIS;
+	int TreeRadius_VIS;
+	int BushRadius_VIS;
+	int RainCount;
+	float RainSoundVolume;
+	int TreeRadius_CACHE;
+	int Tree_DENSITY;
+	int GrassRadius_CACHE;
+	int c;//total distance controlled count of sprites
+	int Tree_DENSITY_divisor;
+	int DistanceActivationRadius;
+	int VD;
+	float coef;
+	bool DrawGrass;
+	bool DrawBushes;
+
+
+	Override void PostBeginPlay()
+	{
+
+		Super.PostBeginPlay();
+		PlayerInfo players = players[consoleplayer];
+
+
+		coef = Cvar.GetCVar("z_natue_renderDistCoeff", players).GetFloat();
+		BushRadius_VIS = Cvar.GetCVar("z_natue_renderdistance_bush", players).GetInt()*coef;
+		TreeRadius_VIS = Cvar.GetCVar("z_natue_renderdistance_tree", players).GetInt()*coef;
+		GrassRadius_VIS = Cvar.GetCVar("z_natue_renderdistance_grass", players).GetInt()*coef;
+		VD = Cvar.GetCVar("z_natue_vegetation_density", players).GetInt();
+
+		GrassRadius_CACHE = GrassRadius_VIS+Cvar.GetCVar("z_natue_renderdistance_ring", players).GetInt();
+		TreeRadius_CACHE = TreeRadius_VIS+Cvar.GetCVar("z_natue_renderdistance_ring", players).GetInt();
+		Grass_DENSITY = Cvar.GetCVar("z_natue_grass_density", players).GetInt();//num off grass on 512*512
+		Tree_DENSITY = Cvar.GetCVar("z_natue_tree_density", players).GetInt();
+
+		//Tree_DENSITY_divisor = 7;
+
+		DrawGrass = Cvar.GetCVar("z_natue_draw_grass", players).GetInt();
+		DrawBushes = Cvar.GetCVar("z_natue_draw_bushes", players).GetInt();
+		draw_plants = Cvar.GetCVar("z_natue_draw_plants", players).GetInt();
+		if(draw_plants){
+			GrowPlants(1);
+		}
+		if(Cvar.GetCVar("z_natue_vegetation_redraw", players).GetInt()==1){
+			Cvar.GetCVar("z_natue_vegetation_redraw", players).SetInt(0);
+		}
+		//a_log("PostBeginPlay");
+	}
+
+	virtual void DistanceControl()
+	{
+		if(!Master){self.destroy();}
+//////////////////////////////////////////////////////////
+		if(
+			BushRadius_VIS != int(Cvar.GetCVar("z_natue_renderdistance_bush", players[consoleplayer]).GetInt()*coef)
+			||
+			GrassRadius_VIS != int(Cvar.GetCVar("z_natue_renderdistance_grass", players[consoleplayer]).GetInt()*coef)
+			||
+			TreeRadius_VIS != int(Cvar.GetCVar("z_natue_renderdistance_tree", players[consoleplayer]).GetInt()*coef)
+			||
+			VD != Cvar.GetCVar("z_natue_vegetation_density", players[consoleplayer]).GetInt()
+			||
+			DrawGrass != Cvar.GetCVar("z_natue_draw_grass", players[consoleplayer]).GetInt()
+			||
+			DrawBushes != Cvar.GetCVar("z_natue_draw_bushes", players[consoleplayer]).GetInt()
+			||
+			Grass_DENSITY != Cvar.GetCVar("z_natue_grass_density", players[consoleplayer]).GetInt()
+			||
+			Tree_DENSITY != Cvar.GetCVar("z_natue_tree_density", players[consoleplayer]).GetInt()
+			||
+			coef != Cvar.GetCVar("z_natue_renderDistCoeff", players[consoleplayer]).GetFloat()
+			||
+			draw_plants != Cvar.GetCVar("z_natue_draw_plants", players[consoleplayer]).GetInt()
+			||
+			Cvar.GetCVar("z_natue_vegetation_redraw", players[consoleplayer]).GetInt()==1
+
+		){
+			//settings was changed - redraw all
+			//a_log("New distance controll settings applyed");
+			Cvar.GetCVar("z_natue_vegetation_redraw", players[consoleplayer]).SetInt(0);
+
+			ThinkerIterator it = ThinkerIterator.Create("DistanceActivated");
+			DistanceActivated this;
+			while(this = DistanceActivated(it.Next()))
+			{
+				if(this is "DistanceSpawned"){
+					if(this.Skip){ continue;}//this is manually placed actor - do not distance controll
+					if(this.tid){ continue;} //this actor was spawned by acs and have not to be distance controlled
+					this.Destroy();
+				}
+			}
+
+			PostBeginPlay();
+		}
+/////////////////////////////////////////////////////////////
+
+
+		self.SetOrigin(Master.pos, true);
+			//rain spawner is inventory item of DistanceController
+			if(CallACS("GetRain",0,0,0) && !CheckInventory("z_nature_rain_spawner", 1)){
+					self.giveInventory("z_nature_rain_spawner", 1);
+			} else{
+				if (!CallACS("GetRain",0,0,0)) {
+					self.takeInventory("z_nature_rain_spawner", 1);
+				}
+			}
+
+
+
+		double angle;
+		double radius;
+		vector3 Gpos;
+		int old_c = c;
+		c = 0;
+
+
+
+		ThinkerIterator iter1 = ThinkerIterator.Create("LightFlareStat1");
+		LightFlareStat1 FLR;
+		while(FLR = LightFlareStat1(iter1.Next())){
+			int Dist = self.Distance3D(FLR);
+			if(Dist >=FLR.getActivationDistance() ){
+				FLR.SetStateLabel("Hide"); FLR.Activated = false;
+			} else {
+				FLR.SetStateLabel("Show"); FLR.Activated = true;
+			}
+		}
+
+
+
+		ThinkerIterator iter = ThinkerIterator.Create("FirePlaceLight");
+		FirePlaceLight FPL;
+		while(FPL = FirePlaceLight(iter.Next())){
+			int Dist = self.Distance3D(FPL);
+			if(Dist >=FPL.getActivationDistance() ){
+				FPL.Active = false;
+			} else {
+				FPL.Active = true;
+			}
+		}
+
+
+		ThinkerIterator us = ThinkerIterator.Create("TorchLightStat");
+		TorchLightStat lt;
+		while(lt = TorchLightStat(us.Next())){
+			int Dist = self.Distance3D(lt);
+			if(Dist >=lt.getActivationDistance() ){
+				lt.disable();
+
+			} else {
+				lt.enable();
+			}
+		}
+
+
+		ThinkerIterator it = ThinkerIterator.Create("DistanceActivated");
+		DistanceActivated this;
+
+		while(this = DistanceActivated(it.Next()))
+		{
+			c++;
+			int Dist = this.Distance3D(Master);
+
+			this.setCurrentDistance(Dist);
+
+			if(this is "DistanceSpawned"){
+
+				if(this.Skip ){ continue;}//this is manually placed actor - do not distance controll
+				if(this.tid){ continue;} //this actor was spawned by acs and have not to be distance controlled
+
+				if(Dist >=this.getRenderDistance()*coef)
+				{
+					//a_logint(this.getRenderDistance()*coef);
+					//if(this is "z_randomStone"){ a_log("stone");}
+					this.Destroy();
+					continue;
+				}
+			}
+			if(Dist >=this.getActivationDistance() ){
+				this.disable();
+				//if(this is "z_Pod"){ a_log("z_Pod");}
+
+			} else {
+				this.enable();
+			}
+		}
+
+		////
+
+
+			ThinkerIterator PU = ThinkerIterator.Create("PointUsable");
+			PointUsable puse;
+			while(puse = PointUsable(PU.Next()))
+			{
+				int Dist = puse.Distance3D(self);
+				puse.setCurrentDistance(Dist);
+				/*if(Dist >=this.getActivationDistance() ){
+					this.disable();
+
+				} else {
+					this.enable();
+				}*/
+			}
+	}
+
+
+
+	private int GetRadiusterations(int density, int radius){
+			double S = 3.14*radius*radius;
+			return S/(512*512)*density;//density;
+	}
+
+	virtual void GrowPlants(int mode = 0)
+	{
+		double angle;
+		double radius;
+		double radiusTree;
+		vector3 Gpos;
+		double grassnum;
+		double treenum;
+
+		z_nature_bush Bush, testBush;
+		z_nature_grass Grass, testGrass;
+		z_nature_tree Tree, testTree;
+
+		int n=0;
+
+
+		if(!mode){
+			grassnum = GetRadiusterations(Grass_DENSITY, GrassRadius_CACHE) - GetRadiusterations(Grass_DENSITY, GrassRadius_VIS);
+			//a_logfloat(GetRadiusterations(Grass_DENSITY, GrassRadius_VIS));
+			treenum = GetRadiusterations(Tree_DENSITY, TreeRadius_CACHE) - GetRadiusterations(Tree_DENSITY, TreeRadius_VIS);
+		} else {
+			//double RingS = 3.14*(GrassRadius_CACHE*GrassRadius_CACHE-GrassRadius_VIS*GrassRadius_VIS);
+			//double dens = Grass_DENSITY/RingS;
+			//grassnum = dens*3.14*GrassRadius_VIS*GrassRadius_VIS;
+			//a_logint(GetRadiusterations(Grass_DENSITY, GrassRadius_VIS));
+			grassnum = GetRadiusterations(Grass_DENSITY, GrassRadius_VIS);
+			//a_logFloat(grassnum);
+
+			/*double TreeRingS = 3.14*(TreeRadius_CACHE*TreeRadius_CACHE-TreeRadius_VIS*TreeRadius_VIS);
+			double TreeDens = Tree_DENSITY/TreeRingS;
+			treenum = TreeDens*3.14*TreeRadius_VIS*TreeRadius_VIS;*/
+			treenum = GetRadiusterations(Tree_DENSITY, TreeRadius_VIS);
+		}
+
+		for(int i = 0; i<treenum; i++){
+			if(n>VD+c){return;} n++;
+			angle = random(0, 359);
+			if(!mode){
+				radiusTree = random(TreeRadius_VIS, TreeRadius_CACHE);
+			} else {
+				radiusTree = random(0.0, TreeRadius_VIS);
+			}
+				//Gpos.x = self.pos.x+cos(angle)*radiusTree;
+				//Gpos.y = self.pos.y+sin(angle)*radiusTree;
+				//Gpos.Z = self.pos.z;
+				//Spawn("z_nature_tree",Gpos);
+				//Spawn("z_nature_tree_spawner",Gpos);
+				a_spawnItemEX("z_nature_tree_spawner", cos(angle)*radiusTree, sin(angle)*radiusTree, self.pos.z);
+
+		}
+
+
+		if(DrawGrass){
+		//a_logInt(GrassRadius_VIS*coef);
+			for(int i = 0; i<grassnum; i++){
+				if(n>VD+c){return;} n++;
+				angle = random(0, 359);
+				if(!mode){
+					radius = random(GrassRadius_VIS+1, GrassRadius_CACHE);
+				} else {
+					radius = random(0.0, GrassRadius_VIS);
+				}
+				//Gpos.x = self.pos.x+cos(angle)*radius;
+				//Gpos.y = self.pos.y+sin(angle)*radius;
+				//Gpos.Z = self.pos.z;
+				//Spawn("z_nature_grass",Gpos);
+				a_spawnItemEX("z_nature_grass", cos(angle)*radius, sin(angle)*radius, self.pos.z);
+			}
+		}
+
+		int DistFogRadius;
+		int WORLD_TIME = CallACS("GetTime",0,0,0);
+		if(WORLD_TIME>(06*60) && WORLD_TIME<(19*60)){return;}
+
+
+		for(int i = 0; i<10; i++){
+			if(n>VD+c){return;}
+			n++;
+			angle = random(0, 359);
+			if(!mode){
+				DistFogRadius = random(TreeRadius_VIS+1024, TreeRadius_CACHE+1024);
+			} else {
+				DistFogRadius = random(1536, TreeRadius_CACHE+1024);
+				//radius = random(0.0, random(TreeRadius_VIS*1.2*0.6, TreeRadius_CACHE));
+			}
+
+			//Gpos.x = self.pos.x+cos(angle)*DistFogRadius;
+			//Gpos.y = self.pos.y+sin(angle)*DistFogRadius;
+			//Gpos.Z = self.pos.z;
+			//Spawn("Z_nature_distant_haze_particle",Gpos);
+			a_spawnItemEX("Z_nature_distant_haze_particle", cos(angle)*DistFogRadius, sin(angle)*DistFogRadius, self.pos.z);
+		}
+
+
+
+
+	}
+
+	States
+	{
+
+		Spawn:
+			TNT1 A 0;
+			Goto Doit;
+		Doit:
+			TNT1 A 1 { if(draw_plants){ GrowPlants();} }
+			TNT1 A 1 DistanceControl();
+			TNT1 A 4;
+			Loop;
+	}
+
+}
+
+Class Eidos : DistanceActivated {
+	//string className;
+	//int ActivationDistance;
+	//int RenderDistance;
+	//int SpawnDistance;
+	//int CurrentDistance;
+	//bool Activated;
+	//bool Render;
+	//Alpha
+	//scaleX
+	//scaleY
+	//Master
+	//Owner
+	//Args
+	//Tid
+	//special
+
+	default{
+		+NOINTERACTION;
+		+NOGRAVITY;
+	}
+}
+
+Class DistanceSpawned : DistanceActivated {
+
+}
+Class DistanceActivated : Actor {
+
+	int ActivationDistance;
+	int RenderDistance;
+	int SpawnDistance;
+	int CurrentDistance;
+	int ticksFromStart;
+	bool Activated;
+	bool Render;
+	bool Skip;
+	string className;//for eidos
+
+	virtual void enable(){ Activated = true; }
+	virtual void disable(){ Activated = false; }
+	virtual int getRenderDistance(){ return 1024;}
+	virtual int getSpawnDistance(){ return 1024+128;}
+
+	virtual void Draw(){
+		if(!Render){
+			Render = true;
+			SetStateLabel("SetSprite");
+		}
+	}
+	virtual void DrawDeath(){
+		if(!Render){
+			Render = true;
+			SetStateLabel("Death");
+		}
+	}
+
+
+	override void tick(){
+		super.tick();
+
+		if(ticksFromStart==3){
+			if(!bISMONSTER){
+				Draw();
+			} else{
+				if(health>0){
+					Draw();
+				} else {
+					DrawDeath();
+				}
+			}
+		}else{ticksFromStart++;}
+
+
+	}
+	virtual int getCurrentDistance(){
+		return CurrentDistance;
+	}
+	virtual void setCurrentDistance(int dist){
+		CurrentDistance = dist;
+	}
+	virtual int getActivationDistance(){
+		PlayerInfo players = players[consoleplayer];
+		return Cvar.GetCVar("z_natue_activation_radius", players).GetInt()?Cvar.GetCVar("z_natue_activation_radius", players).GetInt():1024;
+	}
+	States
+	{
+		Active: TNT1 A 1; Loop;
+		Inactive: TNT1 A 1; Loop;
+		SetSprite:
+			"####" "#" 1; Loop; //?????
+	}
+}

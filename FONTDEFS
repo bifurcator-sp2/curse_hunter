@@ -1,0 +1,97 @@
+   HANDGRAB
+   {
+   A HANDGRAB
+   B HANDGRA2
+   C HANDGRA3
+   D HANDGRA4
+   E HANDGRA5
+   }
+
+   BLUEFONT
+   {
+       0 STYSNUM0
+       1 STYSNUM1
+       2 STYSNUM2
+       3 STYSNUM3
+       4 STYSNUM4
+       5 STYSNUM5
+       6 STYSNUM6
+       7 STYSNUM7
+       8 STYSNUM8
+       9 STYSNUM9
+       NOTRANSLATION 109	// don't touch the shadow color!
+   }
+
+   ZBHUDFON
+   {
+       0 FBLD0
+       1 FBLD1
+       2 FBLD2
+       3 FBLD3
+       4 FBLD4
+       5 FBLD5
+       6 FBLD6
+       7 FBLD7
+       8 FBLD8
+       9 FBLD9
+       //- FBLDMIN
+       NOTRANSLATION 109	// don't touch the shadow color!
+   }
+
+   ZHUDFON2
+   {
+       0 FBLB0
+       1 FBLB1
+       2 FBLB2
+       3 FBLB3
+       4 FBLB4
+       5 FBLB5
+       6 FBLB6
+       7 FBLB7
+       8 FBLB8
+       9 FBLB9
+       //- FBLDMIN
+       NOTRANSLATION 109	// don't touch the shadow color!
+   }
+
+   ZHUDFON3
+   {
+       0 AMMNUM0
+       1 AMMNUM1
+       2 AMMNUM2
+       3 AMMNUM3
+       4 AMMNUM4
+       5 AMMNUM5
+       6 AMMNUM6
+       7 AMMNUM7
+       8 AMMNUM8
+       9 AMMNUM9
+       //- FBLDMIN
+       NOTRANSLATION 109	// don't touch the shadow color!
+   }
+
+   ZBINVFON
+   {
+       0 BINVFNT0
+       1 BINVFNT1
+       2 BINVFNT2
+       3 BINVFNT3
+       4 BINVFNT4
+       5 BINVFNT5
+       6 BINVFNT6
+       7 BINVFNT7
+       8 BINVFNT8
+       9 BINVFNT9
+       NOTRANSLATION 109	// don't touch the shadow color!
+   }
+
+
+	HNDFN
+	{
+	Template HNDFN%03d
+ 	}
+ 	
+ 	SMALLFONT
+ 	{
+	Template SMFNT%03d
+	}

@@ -1,0 +1,16 @@
+
+
+
+
+menu/activate			0160	// Activate a new menu
+menu/backup			0157	// Backup to previous menu
+menu/prompt			0157	// Activate a prompt "menu"
+menu/cursor			0166	// Move cursor up/down
+menu/change			0165	// Select new value for option
+menu/invalid			0214		// Menu not available
+menu/dismiss			0153	// Dismiss a prompt message
+menu/choose			0162	// Choose a menu item
+menu/clear			0153	// Close top menu
+
+$random menu/quit1 { CultistSee CultistDie }
+$random menu/quit2 { CultistSee CultistDie }

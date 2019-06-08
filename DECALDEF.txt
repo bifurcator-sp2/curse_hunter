@@ -1,0 +1,108 @@
+fader PFade
+{
+DecayStart 15
+DecayTime 5
+}
+
+
+   decal BlDec01 1
+   {
+	pic bsplat1
+	x-scale 0.25
+	y-scale 0.25
+	shade "65 00 00"
+	randomflipx
+	randomflipy
+	animator PFade
+   }
+   decal BlDec02 2
+   {
+	pic bsplat2
+	x-scale 0.25
+	y-scale 0.25
+	shade "65 00 00"
+	randomflipx
+	randomflipy
+	animator PFade
+   }
+   decal BlDec03 3
+   {
+	pic bsplat3
+	x-scale 0.25
+	y-scale 0.25
+	shade "65 00 00"
+	randomflipx
+	randomflipy
+	animator PFade
+   }   
+   decal BlDec04 4
+   {
+	pic bsplat4
+	x-scale 0.25
+	y-scale 0.25
+	shade "65 00 00"
+	randomflipx
+	randomflipy
+	animator PFade
+   }   
+
+    decalgroup BldDec
+   {
+	BLDEC01        1
+	BLDEC02        1
+	BLDEC03        1
+	BLDEC04        1	
+   }  
+
+
+   
+decal BulletChip1
+{
+	pic ZBCHIP1
+	x-scale 0.2
+	y-scale 0.2
+	shade "00 00 00"
+	randomflipx
+	randomflipy
+	animator PFade
+}
+   
+decal webbig
+   {
+	pic webbig
+	x-scale 1.0
+	y-scale 1.0
+	randomflipx
+	randomflipy
+   }   
+
+
+decal hex1 5
+   {
+	pic hexen1
+	x-scale 0.5
+	y-scale 0.5
+	fuzzy
+   }  
+ decal hex2 6
+   {
+	pic hexen2
+	x-scale 2.0
+	y-scale 2.0
+	translucent 0.5
+	fuzzy
+   }   
+decal hex3 7
+   {
+	pic hexen3
+	x-scale 0.4
+	y-scale 0.4
+	translucent 0.5
+} 
+decal hex4 8
+   {
+	pic hexen4
+	x-scale 1.0
+	y-scale 1.0
+	translucent 1.0
+}   

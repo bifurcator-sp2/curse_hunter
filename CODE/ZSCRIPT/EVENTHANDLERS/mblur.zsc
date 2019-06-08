@@ -1,0 +1,73 @@
+
+
+
+class MBlurHandler : StaticEventHandler
+{
+	int			pitch, yaw;
+	double		xtravel, ytravel;
+	
+	override void PlayerEntered(PlayerEvent e)
+	{
+		PlayerInfo plr = players[consoleplayer];
+		if(plr) {	
+			xtravel = 0 ;
+			ytravel = 0 ;
+		}
+	}
+	
+	override void WorldTick()
+	{
+		PlayerInfo plr = players[consoleplayer];
+		if(plr && plr.health > 0 && Cvar.GetCVar( "mblur", plr ).GetBool()) {
+			yaw		=  plr.mo.GetPlayerInput(ModInput_Yaw);
+			pitch	= -plr.mo.GetPlayerInput(ModInput_Pitch);
+		}
+	}
+	
+	override void NetworkProcess(ConsoleEvent e)
+	{
+		PlayerInfo	plr = players[ consoleplayer];
+		if(plr && e.Name ~== "liveupdate") {
+			double pitchdimin	= 1.0 - abs( plr.mo.pitch * 1.0 / 90 );
+			double decay		= 1.0 - Cvar.GetCVar( "mblur_recovery", plr).GetFloat() * 0.01;
+			double amount		= Cvar.GetCVar( "mblur_strength", plr).GetFloat() * 10.0 / 32767 * sqrt(pitchdimin);
+			xtravel				= xtravel * decay + yaw * amount * 0.625;
+			ytravel				= ytravel * decay + pitch * amount;
+			
+			if( Cvar.GetCVar( "mblur_autostop", plr ).GetBool() ) {
+				double threshold = Cvar.GetCVar( "mblur_threshold", plr).GetFloat() * 30;
+				double recovery2 = 1 - Cvar.GetCVar( "mblur_recovery2", plr).GetFloat() * 0.01;
+				if(abs(yaw)		<= threshold) xtravel *= recovery2;
+				if(abs(pitch)	<= threshold) ytravel *= recovery2;
+			}
+		}
+	}
+	
+	override void UiTick()
+	{
+		PlayerInfo	plr = players[consoleplayer];
+		if(plr && plr.health > 0 && Cvar.GetCVar( "mblur", plr).GetBool()) {
+			EventHandler.SendNetworkEvent("liveupdate");
+			
+			int nSamples 		= 1 + Cvar.GetCVar("mblur_samples", plr).GetInt();
+			vector2 blurVec 	= (xtravel, ytravel ) / screen.getheight();
+			
+			Shader.SetUniform2f(plr, "MBlur", "blurVec", blurVec);
+			Shader.SetUniform1f(plr, "MBlur", "nSamples", nSamples);
+				
+			Shader.SetEnabled(plr, "MBlur", true);
+		} else {
+			Shader.SetEnabled(plr, "MBlur", false);
+		}
+	}
+}
+/*
+Thankyou to the following who have helped to shape this effect!
+
+Nash Muhandes
+Caligari87
+Tormentor667
+
+shader
+http://john-chapman-graphics.blogspot.com/2013/01/what-is-motion-blur-motion-pictures-are.html
+*/

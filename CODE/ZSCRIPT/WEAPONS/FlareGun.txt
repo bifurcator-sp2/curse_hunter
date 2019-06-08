@@ -1,0 +1,262 @@
+Class z_FlareGun : CHWeapon
+{
+	default
+	{
+		Scale 0.8;
+		obituary "$FLAREGUN_OBITUARY";
+		radius 20;
+		height 16;
+		inventory.pickupmessage "$FLAREGUN_PICKED";
+		weapon.selectionorder 80;
+		weapon.kickback 30;
+		weapon.ammotype "Flares";
+		weapon.ammouse 1;
+		Weapon.AmmoType2 "Flares";
+		Weapon.AmmoUse2 8;
+		weapon.ammogive 9;
+		+WEAPON.NOAUTOAIM;
+		+SHOOTABLE;
+		+NOBLOOD;
+		+NOBLOODDECALS;
+		+INVULNERABLE;
+		//Weapon.SisterWeapon DoubleFlareGun;
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		GiveInventory("Pointable", 1);
+	}
+
+  states
+  {
+	Ready:
+		FLAR A 1 { A_WeaponReady(); GiveInventory("HaveFlaregun", 1); }
+		loop;
+	Deselect:
+
+		FLAR A 1 A_Lower;
+		loop;
+	Select:
+		TNT1 A 0 {Invoker.HandlingControl();}
+		FLAR A 1 A_Raise;
+		loop;
+	Fire:
+		FLAR A 3 Bright A_GunFlash;
+		FLAR A 0 Bright;
+		FLAR A 0 Bright A_PlayWeaponsound ("FlareGun/fire");
+		FLAR A 4 Bright A_FireProjectile("FlareFire",frandom(-1,1),1,9,0, FPF_NOAUTOAIM );
+	Recover:
+		FLAR C 2 Bright;
+		FLAR D 2 Bright;
+		FLAR E 2;
+		FLAR F 2;
+		FLAR G 2;
+		FLAR H 1 A_ReFire;
+	goto Ready;
+	AltFire:
+		FLAR B 3 A_GunFlash;
+		FLAR A 0 Bright A_PlayWeaponsound("DSFLRFIR");
+		FLAR B 0 Bright {
+			A_PlayWeaponsound ("FlareGun/fire");
+			A_FireProjectile("FlareAltFire",0,1,9,0, FPF_NOAUTOAIM );
+			}
+		goto Recover;
+	Flash:
+		FAFR A 3 Bright;
+		FAFR B 3 bright A_Light1;
+		FAFR C 2 bright A_Light2;
+		FAFR D 2 bright A_Light1;
+		FAFR D 0 A_Light0;
+		stop;
+	Spawn:
+		FGRN A -1;
+		stop;
+  }
+}
+
+//AltFlareExplosion
+Class FlareAltFire : actor
+{
+	int counter;
+	float RollSpeed;
+
+	default
+	{
+		Radius 8;
+		Renderstyle "Add";
+		obituary "$FLAREGUN_OBITUARY";
+		Height 16;
+		Speed 25;
+		Scale 0.5;
+		Damage 0;
+		-SOLID;
+		PROJECTILE;
+		+ROLLSPRITE;
+		+NODAMAGETHRUST;
+		+SEEKERMISSILE;
+		+DONTSPLASH;
+		damagetype "Fire";
+		activesound "FlareGunFlare/inAir";
+	}
+	override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+		RollSpeed = frandom(-64, 64);
+
+	}
+	override void Tick()
+	{
+		Super.Tick();
+		if(waterlevel > 0){
+			A_SetSpeed(default.Speed/3);
+			A_Recoil(1.5);
+			if(vel.x+vel.y+vel.z<1){ a_stop(); a_fadeOut(0.01); }
+		} else if(Speed<default.Speed){
+			bNOGRAVITY = 0;
+		}
+	}
+
+   states
+   {
+	   Spawn:
+		  FAIR A 0 Bright A_LoopActiveSound;
+	   Spawn2:
+		  FAIR ABC 1 Bright light("FirePlace") {
+				A_Explode(1, 32, 0, true, 0, 0, 0, "", "Fire" );
+				A_SpawnItemEx("FlareSparks", 0, 0, 0, random(-2, 2), random(-2, 2), random(-2, 2), 0,SXF_NOCHECKPOSITION);
+				a_setRoll(roll+RollSpeed);
+			}
+		  Loop;
+	   Death:
+			TNT1 AAA 1;
+			FAIR A 0 {
+				counter++;
+				if(waterlevel == 0){
+					A_SpawnItemEx("AltFlareExplosion", random(-32, 32), random(-32, 32), random(-32, 32), frandom(-4, 4), frandom(-4, 4), Frandom(1, 2), 0);
+				}
+				if(counter==8){destroy();}
+			}
+			loop;
+	}
+}
+
+Class FlareFire : actor
+{
+	int counter;
+	int LifeTime;
+	int damCounter;
+	float warpH;
+	float RollSpeed;
+	default
+	{
+		Radius 1;
+		Renderstyle "Add";
+		obituary "$FLAREGUN_OBITUARY";
+		Height 2;
+		Speed 50;
+		Scale 0.5;
+		Damage 0;
+		-SOLID;
+		PROJECTILE;
+		+ROLLSPRITE;
+		+NODAMAGETHRUST;
+		+SEEKERMISSILE;
+		+DONTSPLASH;
+		damagetype "Fire";
+		DeathSound "FlareGunFlare/explo";
+		activesound "FlareGunFlare/inAir";
+	}
+
+	override void Tick()
+	{
+		Super.Tick();
+		LifeTime++;
+		if(LifeTime>=35*15){destroy();}
+		if(counter){
+			A_Warp (AAPTR_TRACER, 4, 0, warpH, 0, WARPF_NOCHECKPOSITION|WARPF_COPYVELOCITY) ;
+		}
+		if(counter>=175 || (tracer && tracer.health<=0)){
+			destroy();
+		}
+		if(waterlevel > 0){
+			A_SetSpeed(default.Speed/3);
+			A_Recoil(1.5);
+			if(vel.x+vel.y+vel.z<1){ a_stop(); a_fadeOut(0.01); }
+		} else if(Speed<default.Speed){
+			bNOGRAVITY = 0;
+		}
+
+		if(!checkSight(players[consoleplayer].mo)){alpha=0.0;} else {alpha=default.Alpha;}
+	}
+	override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+		RollSpeed = frandom(-32, 32);
+	}
+
+   states
+   {
+	   Spawn:
+		  FAIR A 0 Bright A_LoopActiveSound;
+	   Spawn2:
+		  FAIR ABC 1 Bright light("FlareFire") {
+				A_Explode(1, 32, 0, true, 0, 0, 0, "", "Fire" );
+				A_SpawnItemEx("FlareSparks", 0, 0, 0, random(-2, 2), random(-2, 2), random(-2, 2), 0,SXF_NOCHECKPOSITION);
+				a_setRoll(roll+RollSpeed);
+			}
+		  Loop;
+	   Death:
+			FAIR AAAAA 1 light("FlareFire") {
+				for(int i = 0; i<random(5, 10); i++){
+					A_SpawnItemEx("FlareSparks", 0, 0, 0, random(-4, 4), random(-4, 4), random(1, 4), 0,SXF_NOCHECKPOSITION);
+				}
+				A_Explode(32, 64, XF_NOSPLASH, false, 0, 0, 0, "", "Fire");
+			}
+			stop;
+	   XDeath:
+			FAIR D 0 {
+				//actor Victim;
+				BlockThingsIterator it = BlockThingsIterator.Create(self, 8);
+				while (it.Next()){
+					if(it.thing is "PlayerPawn"){ continue;}
+					if (!it.thing.bISMONSTER && !(it.thing is "stationarLight") && !it.thing.FindState ("Pain.fire")) { continue; }
+					if(!tracer || distance3D(tracer) > distance3D(it.thing)){
+						tracer = it.thing;
+					}
+				}
+				if(tracer){
+					warpH = pos.z-tracer.pos.z;
+				}
+			}
+	   XDeath2:
+		FAIR DEFGHI 1 Bright light("FlareFire") {
+				//a_log(tracer.getClassName());
+				A_LoopActiveSound();
+				counter++;
+				damCounter++;
+				A_SpawnItemEx("FlareSparks", 0, 0, 0, random(-2, 2), random(-2, 2), random(-2, 2), 0,SXF_NOCHECKPOSITION);
+				if(!tracer || tracer.health<=0){
+					bNOGRAVITY = 0;
+				}
+			}
+		FAIR D 0 {
+				if(damCounter>=15){
+					A_Explode(17, 48, XF_NOSPLASH, false, 0, 0, 0, "", "Fire");
+					damCounter = 0;
+				}
+			}
+		FAIR D 0 a_jumpif(counter<175, "XDeath2");
+		Stop;
+   }
+}
+
+class HaveFlaregun : Undroppable {
+
+	Default	{ Inventory.MaxAmount 2; }
+
+	override void DoEffect(){
+		if(Owner.CountInv(self.GetClassName())==1){
+			Owner.a_playSound("player/flaregunNpickup", CHAN_VOICE);
+		}
+	}
+}

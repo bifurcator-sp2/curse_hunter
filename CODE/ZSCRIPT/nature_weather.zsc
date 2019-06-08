@@ -1,0 +1,726 @@
+Class Z_nature_Lightning : Actor
+{
+
+	Default
+	{
+		Scale 1.0;
+		+NoInteraction;
+		-SOLID;
+		Renderstyle "Add";
+		alpha 1.0;
+	}
+	Override void PostBeginPlay()
+	{
+		A_SetScale(Frandom(0.1, 0.2));
+		Super.PostBeginPlay();
+	}
+	States
+	{
+	  Spawn:
+		TNT1 A 0 NODELAY A_Jump (256, 1, 2, 3);
+		TNDR A 0 A_jump(256, "Live");
+		TNDR B 0 A_jump(256, "Live");
+		TNDR C 0 A_jump(256, "Live");
+	  Live:
+		"####" "#" 1 {
+				A_fadeOut(0.05, true);
+			}
+		Loop;
+	 }
+}
+
+
+Class Z_nature_HeavyClouds : SwitchableDecoration
+{
+	int radius;
+
+	Default
+	{
+		Scale 1.0;
+
+		+NoInteraction;
+		+FLATSPRITE;
+		Renderstyle "Translucent";
+		alpha 1.0;
+	}
+	Override void PostBeginPlay()
+	{
+		radius = CallACS("GetrainLightningSpawnRadius",0,0,0);
+		Super.PostBeginPlay();
+	}
+
+	States
+	{
+	  Spawn:
+		HCLD A 1;
+		Goto Inactive;
+	  Inactive:
+		HCLD A 1;
+		LOOP;
+	  Active:
+		HCLD A 1 {
+
+			A_SpawnItemEx("Z_nature_Lightning", fRandom(-radius, radius), fRandom(-radius, radius), 0, 0, 0, 0, 0, SXF_NOCHECKPOSITION, 0, 0);
+		}
+
+		Goto Inactive;
+	}
+}
+Class Z_nature_HeavyLight : Actor
+{
+
+	Default
+	{
+		Scale 1.0;
+		+NoInteraction;
+		+FLATSPRITE;
+		Renderstyle "add";
+		alpha 1.0;
+	}
+
+	States
+	{
+	  Spawn:
+		HWLT A 1;
+		Loop;
+	}
+}
+Class Z_nature_haze_particle  : DistanceActivated
+{
+	float ScaleMultiplerMin;
+	float ScaleMultiplerMax;
+	float FadeoutSpeed;
+	float MaxAlpha;
+	float CalcAlpha;
+	bool startFade;
+	Default
+	{
+		Scale 1.0;
+
+		+NoInteraction;
+		+Rollsprite;
+		+FORCEXYBILLBOARD;
+		-SOLID;
+		Renderstyle "Translucent";
+		alpha 0.0;
+	}
+	Override void PostBeginPlay()
+	{
+		MaxAlpha = 0.2;
+		ScaleMultiplerMax = 2.5;
+		ScaleMultiplerMin = 1.0;
+		FadeoutSpeed = 0.002;
+		CalcAlpha = alpha;
+		A_SetScale(Frandom(scale.X*ScaleMultiplerMin, scale.X*ScaleMultiplerMax));
+		startFade = false;
+		Super.PostBeginPlay();
+
+		if( CallACS("GetRain",0,0,0) || CallACS("GetTime",0,0,0)>20*60 || CallACS("GetTime",0,0,0)<8*60 ){
+			//this haze only indoor or if it is rain or not a daydime
+		} else {
+			if(CheckCeilTexture()){
+				self.Destroy();
+			}
+		}
+
+
+	}
+
+	bool CheckCeilTexture()
+	{
+		static const string ceilTex[] = {"F_SKY1"};
+		int fTexLenght = ceilTex.Size();
+
+		for (int i = 0; i < fTexLenght;i++)
+		{
+			TextureID tx=TexMan.CheckForTexture(ceilTex[i],TexMan.Type_Flat);
+			if (tx == ceilingpic)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	virtual void ParticleLife()
+	{
+		playerPawn Player = Players[consoleplayer].mo;
+		//
+		CalcAlpha = Alpha;
+		if(startFade){
+			CalcAlpha -= FadeoutSpeed;
+
+		} else {
+			CalcAlpha += FadeoutSpeed;
+		}
+
+		if(self.alpha>=MaxAlpha && !startFade){
+			startFade = true;
+		}
+
+		CalcAlpha = CalcAlpha>=0?CalcAlpha:0;
+		if(CalcAlpha<=0){destroy();}
+		CalcAlpha = CalcAlpha>MaxAlpha?MaxAlpha:CalcAlpha;
+
+
+		float PitchFrom = 35.0;
+		float PitchTo = 60.0;
+		float ThisPitch = abs(player.pitch);
+
+
+		float FadeStartDist = 256.0;
+		float FadeStoptDist = 64.0;
+		float DistFadeFactor = 1.0;
+		if(CurrentDistance<=FadeStoptDist){
+			DistFadeFactor = 0.0;
+		} else if(CurrentDistance>FadeStartDist){
+		} else {
+			DistFadeFactor = (CurrentDistance-FadeStoptDist)/(FadeStartDist-FadeStoptDist);
+
+		}
+
+		if(ThisPitch<=PitchFrom){
+
+			alpha = CalcAlpha*DistFadeFactor;
+			return;
+		}
+		if(ThisPitch>=PitchTo){
+			alpha = 0.0;
+			return;
+		}
+
+		float RangePerc = (PitchTo-PitchFrom)/100*(ThisPitch-PitchFrom);
+
+
+		alpha = CalcAlpha*(1.0-RangePerc)*DistFadeFactor;
+
+
+	}
+
+	States
+	{
+		SetSprite://for DistanceSpawned
+		Spawn:
+			FOGY A 1 ParticleLife();
+			Loop;
+	 }
+}
+Class z_nature_haze : DistanceActivated
+{
+	//Args[0] - radius
+	//Args[1] - density = number of particles on 8192/8192 square units per tick
+
+	int radius;
+	int iterationNumber;
+	int thinner;
+	int density;
+	Default
+	{
+		radius 64;
+		+NoGravity;
+		-Solid;
+		+ClientSideOnly;
+		alpha 0.0;
+	}
+
+	Override void PostBeginPlay()
+	{
+		radius = Args[0]?Args[0]:512;
+		density = Args[1]?Args[1]:30;
+
+		double SQ = (3.14*radius*radius)/(8192*8192)*density;
+		iterationNumber = (SQ<=1)?1:SQ;
+		thinner = (SQ<=1)?(1/SQ):0;
+
+		Super.PostBeginPlay();
+	}
+
+	void GenerateHazeIndoor()
+	{
+
+		if(Activated && Cvar.GetCVar("z_natue_draw_fog", players[consoleplayer]).GetInt()){
+			for (int i = 0; i < iterationNumber; i++)
+			{
+				if(random(0, thinner)==0){
+					A_SpawnItemEx("Z_nature_haze_particle", Random(-radius, radius), Random(-radius, radius), Random(0, Args[2]) );
+				}
+			}
+		}
+	}
+
+	States
+	{
+		SetSprite://for DistanceSpawned
+		Spawn:
+			TNT1 A 1 GenerateHazeIndoor();
+			Loop;
+	}
+
+}
+
+
+
+
+
+Class Z_Nature_RainDrop : Actor
+{
+	static const string ceilTex[] = {
+		"F_SKY1"
+	};
+
+
+	Default
+	{
+	Radius 1;
+	height 1;
+	  mass 1;
+	  +Missile;
+	  +NoBlockMap;
+	  +FORCEYBILLBOARD;
+	  +Nogravity;
+	  +THRUACTORS;
+	  Xscale 0.5;
+	}
+
+	override void Tick()
+	{
+		SetZ(pos.z-16);
+		Super.Tick();
+	}
+	Override void PostBeginPlay(){
+		Super.PostBeginPlay();
+		if(Master){	Master = null; }
+		if(Tracer){	Tracer = null; }
+	}
+
+	bool CheckCeilTexture()
+	{
+		int fTexLenght = ceilTex.Size();
+		for (int i = 0; i < fTexLenght;i++)
+		{
+			TextureID tx=TexMan.CheckForTexture(ceilTex[i],TexMan.Type_Flat);
+
+			if (tx == ceilingpic){
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+
+	States
+	{
+		Spawn:
+			RND1 A 1 NODELAY
+			{
+
+				if(!CheckCeilTexture() ){
+					return ResolveState("Null");
+				} else { return ResolveState(Null);}
+
+			}
+			Goto Life;
+		Life:
+			RND1 A 1 A_JumpIf(WaterLevel > 0, "Death");
+			Loop;
+		Death:
+			TNT1 A 0 {
+				if(self.ceilingZ-self.pos.z<16){ self.destroy();}//z-script fix
+			}
+			RND1 BCDEFGH 3;
+			Stop;
+	}
+}
+
+Class z_nature_rain_spawner : CustomInventory
+{
+	//rain spawner is inventory item of DistanceController
+	z_nature_player_rain_sound Rsound;
+	float angle;
+	int radius;
+	float DropZ;
+	int c;
+	int DropCount;
+	int RainSoundFullSrength;
+	double RainDens;
+
+	Override void PostBeginPlay(){
+		if(!Owner){ self.destroy();  };
+		RainSoundFullSrength  = 200;
+		if(!Rsound){
+			//a_log("rainsound");
+			Rsound = z_nature_player_rain_sound(Spawn("z_nature_player_rain_sound", Owner.pos));
+			Rsound.Master = Owner;
+			Rsound.Zoffset = 512;
+			Rsound.ChangeTid(CALLacs("GetRainSoundTid", 0, 0, 0));
+			Rsound.A_PlaySound("nature/mediumRain", CHAN_BODY, 1.0, true, ATTN_NORM);
+			//Rsound.A_SoundVolume(CHAN_BODY, 1.0);
+		}
+		Super.PostBeginPlay();
+	}
+
+	Default
+	{
+		Inventory.MaxAmount 1;
+		+INVENTORY.UNDROPPABLE
+		+INVENTORY.UNTOSSABLE
+		+INVENTORY.AUTOACTIVATE
+	}
+
+	override void DoEffect(){
+
+		if(!Cvar.GetCVar("z_natue_render_rain",  players[consoleplayer]).GetInt()){return;}
+
+		if(players[consoleplayer].mo.checkInventory("TotalTimeFreezer", 1)){ return;  }
+		if(players[consoleplayer].mo.checkInventory("TotalTimeFreezerNosound", 1)){ return;  }
+
+		int RainSpawnHeight = 256;//CallACS("GetRainSpawnHeight",0,0,0);
+
+		for(int i = 0; i < CallACS("GetRainDencity",0,0,0); i++){
+			vector3 myPos;
+			angle = random(0, 360);
+			radius = random(32, CallACS("GetRainRadius",0,0,0));
+
+			myPos.x = cos(angle)*radius;
+			myPos.y = sin(angle)*radius;
+			myPos.z = RainSpawnHeight;
+			//a_logFloat(Owner.ceilingZ-Owner.floorZ);
+			/*if(Owner.ceilingZ-Owner.floorZ<=RainSpawnHeight){
+				myPos.z = Owner.pos.z + Owner.ceilingZ+16;//
+			}else{
+
+				myPos.z = Owner.pos.z + RainSpawnHeight;
+			}*/
+			//a_logFloat(myPos.z);
+			Owner.A_SpawnItemEx("Z_Nature_RainDrop", myPos.x, myPos.y, myPos.z, 0, 0, 0, 0,SXF_NOPOINTERS);
+
+		}
+
+		c++;
+
+		if(c>=35){
+
+			c = 0;
+			ThinkerIterator it = ThinkerIterator.Create("Z_Nature_RainDrop");
+			Z_Nature_RainDrop this;
+			while(this = Z_Nature_RainDrop(it.Next())){	DropCount++;}
+			RainDens = double(float(DropCount)/float(RainSoundFullSrength));
+			RainDens = RainDens >1.0 ? 1.0 : RainDens;
+			Rsound.Zoffset = 512-512*RainDens;
+			RainDens = RainDens =0 ? 0.001 : RainDens;
+
+			DropCount = 0;
+		}
+	}
+
+	states
+	{
+		Spawn:
+			TNT1 A 1;
+			stop;
+		Use:
+			TNT1 A 1;
+			Loop;
+	}
+}
+
+class z_nature_player_rain_sound : Actor
+{
+	float Zoffset; //offset manage the rain sound volume
+	Default
+	{
+		+NOINTERACTION;
+		+FORCEXYBILLBOARD;
+
+	}
+	void move(){
+		//super.tick();
+		if(!Master){self.destroy();}
+		if(!Master.CheckInventory("z_nature_rain_spawner", 1)){
+			if(self.pos.z<Master.pos.z+512){
+				setZ(self.pos.z+64);
+			} else {
+				self.destroy();
+			}
+		} else {
+			vector3 myPos = Master.pos;
+			myPos.z = Master.pos.z+Zoffset;
+			self.SetOrigin(myPos, true);
+		}
+		//self.target = Master;
+		//setZ(myPos.z);
+	}
+	States
+	{
+		Spawn:
+			TNTA A 15 move();
+			Loop;
+
+	}
+}
+
+
+
+Class Z_nature_distant_haze_particle : DistanceSpawned
+{
+	float ScaleMultiplerMin;
+	float ScaleMultiplerMax;
+	float FadeoutSpeed;
+	float MaxAlpha;
+	bool startFade;
+
+	Default
+	{
+		Scale 10.0;
+
+		+NoInteraction;
+		+FORCEXYBILLBOARD;
+		-SOLID;
+		Renderstyle "Translucent";
+		alpha 0.0;
+	}
+
+	override int getRenderDistance(){
+		PlayerInfo players = players[consoleplayer];
+		return Cvar.GetCVar("z_natue_renderdistance_tree", players).GetInt()+1024;
+	}
+
+	Override void PostBeginPlay()
+	{
+		MaxAlpha = 0.35;
+		ScaleMultiplerMax = 2.5;
+		ScaleMultiplerMin = 1.0;
+		FadeoutSpeed = 0.05;
+		A_SetScale(Frandom(scale.X*ScaleMultiplerMin, scale.X*ScaleMultiplerMax));
+		Super.PostBeginPlay();
+
+		if(!CheckCeilTexture()){ self.Destroy(); }
+		vector3 fNormal = self.CurSector.FloorPlane.Normal;
+		if( (abs(fNormal.x)+abs(fNormal.y)+abs(fNormal.z))>1.5 ){ self.destroy();}
+		setZ(floorZ);
+	}
+
+	bool CheckCeilTexture()
+	{
+		static const string ceilTex[] = {"F_SKY1"};
+		int fTexLenght = ceilTex.Size();
+
+		for (int i = 0; i < fTexLenght;i++)
+		{
+			TextureID tx=TexMan.CheckForTexture(ceilTex[i],TexMan.Type_Flat);
+			if (tx == ceilingpic)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	virtual void ParticleLife()
+	{
+
+		if(pos.z>players[consoleplayer].mo.pos.z+64){
+			a_fadeout(0.01,FTF_CLAMP);
+		} else {
+			A_fadeTo(MaxAlpha, FadeoutSpeed, FTF_CLAMP);
+		}
+		if(CurrentDistance && CurrentDistance<1536 ){SetStateLabel("Death");}
+		int WORLD_TIME = CallACS("GetTime",0,0,0);
+		if(WORLD_TIME>(06*60) && WORLD_TIME<(19*60)){SetStateLabel("Death");}
+
+
+	}
+
+	States
+	{
+		SetSprite://for DistanceSpawned
+			TNT1 A 1;
+		Spawn:
+			TNT1 A 5  Nodelay {SetZ(floorZ); }
+
+		Draw:
+			FOGY B 1 ParticleLife();
+			loop;
+		Death:
+			FOGY B 1 a_fadeout(0.01,FTF_REMOVE);
+			Loop;
+	}
+}
+
+Class Z_nature_decor_haze_particle : DistanceSpawned
+{
+	float MaxAlpha;
+	float DistFrom;
+	float DistTo;
+	Default
+	{
+		Scale 10.0;
+		+NoInteraction;
+		+FORCEXYBILLBOARD;
+		-SOLID;
+		Renderstyle "Translucent";
+		alpha 0.0;
+	}
+
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		MaxAlpha = 0.35;
+		DistFrom = Args[0]?Args[0]:2000;
+		DistTo = Args[1]?Args[1]:1536;
+	}
+
+	virtual void ParticleLife()
+	{
+
+		float FadeStartDist = DistFrom;
+		float FadeStoptDist = DistTo;
+		float DistFadeFactor = 1.0;
+		if(CurrentDistance<=FadeStoptDist){
+			DistFadeFactor = 0.0;
+		} else if(CurrentDistance>FadeStartDist){
+		} else {
+			DistFadeFactor = (CurrentDistance-FadeStoptDist)/(FadeStartDist-FadeStoptDist);
+		}
+		alpha = MaxAlpha*DistFadeFactor;
+
+	}
+	States
+	{
+		SetSprite://for DistanceSpawned
+			TNT1 A 1;
+		Spawn:
+			TNT1 A 5;
+		Draw:
+			FOGY B 1 ParticleLife();
+			loop;
+		Death:
+			FOGY B 1 a_fadeout(0.01,FTF_REMOVE);
+			Loop;
+	}
+}
+
+Class z_fx_WaterFallSpray : DistanceActivated
+{
+	//args[0] spread x
+	//args[1] spread y
+	//args[2] spread z
+	//args[3] dont spawn waves
+	//scale = scale of particles
+	int radius;
+	int sX;
+	int sY;
+	int sZ;
+	float Xspeed;
+	float Zspeed;
+	Default
+	{
+		radius  16;
+		height  16;
+		+ClientSideOnly;
+		+NOINTERACTION;
+		+NOGRAVITY;
+
+
+	}
+
+	Override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+		sX = args[0]?args[0]:64;
+		sY = args[1]?args[1]:128;
+		sZ = args[2]?args[2]:32;
+
+		Xspeed = 1*scale.x;
+		Zspeed = 6*scale.x;
+	}
+
+
+	Override int getActivationDistance(){
+		return Cvar.GetCVar("z_natue_renderdistance_big_decor", players[consoleplayer]).GetInt();
+	}
+
+	void Spray(){
+		if(Activated && Cvar.GetCVar("z_natue_renderdistance_big_decor", players[consoleplayer]).GetInt()){
+			A_SpawnItemEx("z_fx_WaterFallSpray_particle", Random(-sX, sX), Random(-sY, sY), Random(-sZ, sZ), Xspeed, 0, Zspeed, 0, SXF_SETMASTER|SXF_NOCHECKPOSITION );
+			if(!args[3]){
+				A_SpawnItemEx("WaterDropWaveGreat", Random(-sX/2, sX/2), Random(-sY/2, sY/2), 0, Xspeed, 0, 0, 0, SXF_SETMASTER|SXF_NOCHECKPOSITION, 230 );
+			}
+
+		}
+	}
+
+
+	States
+	{	SetSprite:
+		Spawn:
+			TNT1 A 1 Spray();
+			Loop;
+	}
+
+}
+Class z_fx_WaterFallSpray_particle : DistanceSpawned
+{
+	float MaxAlpha;
+	float DistFrom;
+	float DistTo;
+	Default
+	{
+		Scale 10.0;
+		radius  1;
+		height  1;
+
+		Projectile;
+		+FORCEXYBILLBOARD;
+		-SOLID;
+		Renderstyle "Translucent";
+		-NOGRAVITY;
+
+		+DONTSPLASH;
+		GRAVITY 0.2;
+		alpha 0.0;
+	}
+
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		if(Master){
+			scale.x = Master.scale.x;
+			scale.y = Master.scale.y;
+		}
+	}
+	Override int getRenderDistance(){
+		return Cvar.GetCVar("z_natue_renderdistance_big_decor", players[consoleplayer]).GetInt();
+	}
+	virtual void ParticleLife()
+	{
+		if(vel.z>0){
+			A_FadeIn(0.1/scale.x, FTF_CLAMP);
+		} else {
+			a_fadeout(0.05,FTF_REMOVE);
+		}
+	}
+
+
+	States
+	{
+		SetSprite://for DistanceSpawned
+			TNT1 A 0 Nodelay  A_Jump (256, 1, 2, 3, 4);
+			FWLB A 0 A_jump(256, "Draw");
+			FWLB B 0 A_jump(256, "Draw");
+			FWLB C 0 A_jump(256, "Draw");
+			FWLB D 0 A_jump(256, "Draw");
+
+		Spawn:
+			TNT1 A 5;
+		Draw:
+			"####" "#" 1 ParticleLife();
+			loop;
+		Death:
+			"####" "#" 1 a_fadeout(0.1,FTF_REMOVE);
+			LOOP;
+
+	}
+
+}

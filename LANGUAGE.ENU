@@ -1,0 +1,479 @@
+ [enu default]
+//INTROS
+INTRO_0_1 = "Looks like I’ve killed them all...";
+INTRO_0_2 = "The normal world does not accept the living dead - the murderer...";
+INTRO_0_3 = "My body, which is thirsting for blood and dark magic begins to weaken";
+INTRO_0_4 = "To retire... In my case, it means - to find more suitable grave.";
+INTRO_0_5 = "And then… When my world began to blur...";
+INTRO_0_6 = "Something happened...";
+INTRO_0_7 = "I feel empowered by the presence of a great new force, whose name I do not know.";
+INTRO_0_8 = "It calls me. Calls to return home...";
+INTRO_0_9 = "I shall look for my new family ... whoever they may be...";
+INTRO_0_10 = "Good luck to those who dare to get in my way!";
+
+PRESSANYKEY = "Press any key";
+PRESSANYKEYTOCONTINUE = "Press any key to continue";
+THEGAMEOF = "This game contains scenes of explicit violence,\ndepictions of blood and frequent use of profanity.\nAll as you like.";
+DISCLAIMER = "Here is our progress so far.\nProviding your support you’re letting us stay focus on this project\npatreon.com/bifurcator";
+DISCLAIMER2 = "Here is our progress so far";
+DISCLAIMER3 = "Support this project on";
+DISCLAIMER4 = "patreon.com/bifurcator";
+DISCLAIMER5 = "Caleb poster by kod_connect";
+
+
+
+USETOPICKINVENTORY = "USE to to pick up";
+USETOUSE = "USE to Activate";
+USETOPICKUP = "USE grab it";
+USETHROWDROP = "USE to drop, hold USE to throw";
+USETOQUICKKILL = "USE to Quick Kill";
+USETOLEAPKILL = "USE to Leap Kill";
+USETOSUBORDINATE = "hold USE to Subordinate";
+USETORAISE = "hold USE to Raise Enemy";
+USETOFIREOFF = "Press USE to suppress fire";
+
+RESURRECTED = " was resurrected by Cursed enemy.";
+RAISED = " was Raised by Player.";
+NOTENOUGHSTAMINA = "Not enough Stamina";
+
+
+
+////items
+CURSE_NAME = "The Curse";
+CURSE_PICKUP = "Picked up the Curse";
+CUREDRESISTTHISMAGICK = "Cursed resists this magic"
+LIFEESSENCE = "Life Essence";
+HEARTPICKUP = "Picked up Life Essence";
+CARNAGEPICKUP = "Picked up Carnage Amulet";
+DOMINATIONPICKUP = "Picked up Domination Amulet";
+SURVIVALPICKUP = "Picked up Survival Amulet";
+AM_CARNAGE = "Carnage Amulet";
+AM_DOMINATION = "Domination Amulet";
+AM_SURVIVAL = "Survival Amulet";
+FIREBUG_PICKUP = "Picked up the Fire Bug";
+DOCTORSBAG = "Doctor Bag";
+DOCTORSBAG_PICKUP = "Stole the Doctor's Bag";
+PLAYERREGEN = "Player regenerates";
+
+NO_CURSES = "Can't pickup\nYou have no Curses in inventory.";
+YOU_HAVE_TO_COLLECT = "You have to collect ";
+YOU_HAVE_MORE = " more Curses\nto take ";
+BODYARMOR = "Body Armor";
+BODYARMOR_PICKUP = "Picked up Body Armor";
+FIREARMOR = "Fire Armor";
+FIREARMOR_PICKUP = "Picked up Fire Armor";
+SPIRITARMOR = "Spirit Armor";
+SPIRITARMOR_PICKUP = "Picked up Spirit Armor";
+SUPERARMOR = "Super Armor";
+SUPERARMOR_PICKUP = "Picked up Super Armor";
+
+
+
+
+//Weapons
+SAWEDOFF_NAME = "Sawed-off Shotgun!";
+SAWEDOFF_TAKED = "You got the Sawed-off Shotgun!";
+SAWEDOFF_obituary = "%o chewed on %k's Sawed-off Shotgun.";
+TNT_NAME = "Bundle of TNT";
+TNT_TAKED = "Picked up a Bundle of TNT";
+TNT_REMOTE_NAME = "Bundle of TNT with remote ignition";
+TNT_REMOTE_TAKED = "Its time for mindgames!";
+TNT_REMOTE_OBITUARY = "%o found %k's little bomb!";
+
+TNTBOX_NAME = "Case of TNT";
+TNTBOX_PICKED = "Picked up case of TNT";
+TNTPROX_NAME = "Proximity TNT!";
+TNTPROX_PICKED = "Picked up proximity TNT!";
+TOMMYGUN_NAME = "Tommy Gun";
+TOMMYGUN_PICKED = "You got the Tommy Gun!";
+TOMMYGUN_OBITUARY = "%o sung %k's tommy tune";
+FLAREBOX_PICKED = "Picked up a box of flares";
+FLAREGUN_OBITUARY = "%o was cooked by %k's Flare Gun.";
+FLAREGUN_PICKED = "Picked up Flare Gun";
+
+
+
+//Ammo
+SHELLS_NAME = "Shells";
+SHELLS_PICKED = "Picked up shells";
+BULLETS_NAME = "Bullets";
+BULLETS_PICKED = "Picked up bullets";
+
+/////Switches
+SWITCH_STD_NAME = "Switch";
+SWITCH_ENDLEVEL_NAME = "End level";
+
+
+/////keys
+KEY_EYE = "Eye Key";
+KEY_EYE_PICKUP = "Picked up the Eye Key.";
+KEY_EYE_NEED = "That requires an Eye Key.";
+KEY_DAGGER = "Dagger Key";
+KEY_DAGGER_PICKUP = "Picked up the Dagger Key.";
+KEY_DAGGER_NEED = "That requires a Dagger Key.";
+KEY_SKULL = "Skull Key";
+KEY_SKULL_PICKUP = "Picked up the Skull Key.";
+KEY_SKULL_NEED = "That requires a Skull Key.";
+KEY_MOON = "Moon Key";
+KEY_MOON_PICKUP = "Picked up the Moon Key.";
+KEY_MOON_NEED = "That requires a Moon Key.";
+KEY_SPIDER = "Spider Key";
+KEY_SPIDER_PICKUP = "Picked up the Spider Key.";
+KEY_SPIDER_NEED = "That requires a Spider Key.";
+KEY_FIRE = "Fire Key";
+KEY_FIRE_PICKUP = "Picked up the Fire Key.";
+KEY_FIRE_NEED = "That requires a Fire Key.";
+
+
+
+////Monsters
+DEFILER_NAME = "Defiler";
+DEFILER_DEFENDER_NAME = "Defiler's defender";
+FIREBALL_OBITUARY = "%o was cooked by little fireball.";
+RAT_NEST_NAME = "Rat Nest";
+RPIDER_NEST_NAME = "Spider Nest";
+
+MONSTER_NAME = "Monster";
+MONSTER_DEATHNAME = "Killed Monster";
+MONSTER_BURNDEATHNAME = "Burned Monster";
+MONSTER_GIBDEATHNAME = "Ripped Monster";
+MONSTER_HEADSHOTED = "Decapitated Monster";
+
+ZOMBIEHEAD_NAME = "Zombie's head";
+ZOMBIEHEAD_BURNED = "Cremated the zombie's head";
+
+ZOMBIE_NAME = "Zombie";
+ZOMBIE_OBITUARY = "%o got the zombie's AXE";
+ZOMBIE_DEATHNAME = "Zombie";
+ZOMBIE_BURNDEATHNAME = "Burned zombie";
+ZOMBIE_GIBDEATHNAME = "Ripped zombie";
+ZOMBIE_HEADSHOTED = "Decapitated zombie";
+    
+    
+FIRE_ZOMBIE_NAME = "Fire Zombie";
+FIRE_ZOMBIE_DEATHNAME = "Fire Zombie";
+FIRE_ZOMBIE_BURNDEATHNAME = "Burned Fire Zombie";
+FIRE_ZOMBIE_GIBDEATHNAME = "Ripped Fire Zombie";
+FIRE_ZOMBIE_HEADSHOTED = "Decapitated Fire Zombie";    
+
+CULTIST_SHOTGUN_NAME = "Cultist";
+CULTIST_SHOTGUN_OBITUARY = "%o got shut down by angry cultists.";
+CULTIST_SHOTGUN_DEATHNAME = "Dead Cultist";
+CULTIST_SHOTGUN_BURNDEATHNAME = "Burned Cultist";
+CULTIST_SHOTGUN_GIBDEATHNAME = "Gibbed Cultist";
+CULTIST_SHOTGUN_HEADSHOTED = "Decapitated Cultist";
+CULTISTHEAD_NAME = "Cultist's head";
+
+
+CULTIST_TOMMY_NAME = "Fanatic";
+CULTIST_TOMMY_OBITUARY = "%o got shut down by angry fanatic.";
+CULTIST_TOMMY_DEATHNAME = "Dead Fanatic";
+CULTIST_TOMMY_BURNDEATHNAME = "Burned Fanatic";
+CULTIST_TOMMY_GIBDEATHNAME = "Gibbed Fanatic";
+CULTIST_TOMMY_HEADSHOTED = "Decapitated Fanatic";
+
+
+SPIDER_NAME = "Spider";
+SPIDER_OBITUARY = "%o got bitten by a little spider";
+SPIDER_DEATHNAME = "Dead Spider";
+SPIDER_BURNDEATHNAME = "Burned Spider";
+SPIDER_GIBDEATHNAME = "Gibbed Spider";
+
+WOLFSPIDER_NAME = "WolfSpider";
+WOLFSPIDER_OBITUARY = "%o got bitten by a big spider";
+WOLFSPIDER_DEATHNAME = "Dead WolfSpider";
+WOLFSPIDER_BURNDEATHNAME = "Burned WolfSpider";
+WOLFSPIDER_GIBDEATHNAME = "Gibbed WolfSpider";
+
+
+
+BAT_NAME = "Bat";
+BAT_OBITUARY = "%o got bitten by a little bat";
+BAT_DEATHNAME = "Dead Bat";
+
+EEL_NAME = "Bone Eel";
+EEL_OBITUARY = "%o was bit by a bone eel";
+EEL_DEATHNAME = "Dead Bone Eel";
+
+GARGOYLE_NAME = "Gargoyle";
+GARGOYLE_OBITUARY = "%o was killed by a gargoyle.";
+GARGOYLE_DEATHNAME = "Dead Gargoyle";
+GARGOYLE_BURNDEATHNAME = "Burned Gargoyle";
+GARGOYLE_GIBDEATHNAME = "Gibbed Gargoyle";
+GARGOYLE_STATUE_NAME = "Stone Gargoyle";
+
+RAT_NAME = "Rat";
+RAT_OBITUARY = "%o was plagued by a little cute mouse.";
+RAT_DEATHNAME = "Dead Rat";
+RAT_BURNDEATHNAME = "Burned Rat";
+
+POD_NAME = "Chrysalid Pod";
+POD_OBITUARY = "%o was spat on by a Chrysalid Pod";
+POD_DEATHNAME = "Dead Chrysalid Pod";
+POD_BURNDEATHNAME = "Burned Chrysalid Pod";
+POD_GIBDEATHNAME = "Gibbed Chrysalid Pod";
+
+PODSEEDING_NAME = "Chrysalid Pod`s seeding";
+PODSEEDING_OBITUARY = "%o was spat on by a Chrysalid Pod`s seeding";
+PODSEEDING_DEATHNAME = "Dead Chrysalid Pod`s seeding";
+PODSEEDING_BURNDEATHNAME = "Burned Chrysalid Pod`s seeding";
+PODSEEDING_GIBDEATHNAME = "Gibbed Chrysalid Pod`s seeding";
+
+
+
+
+//DECOR
+BIGCANDLEHOLDER = "Big Candle holder";
+SMALLCANDLEHOLDER = "Small Candle holder";
+SKULLCANDLEHOLDER = "Skull Candle holder";
+CEILINGOILLAMP = "Ceiling oil lamp";
+FLOORTALLLAMP = "Tall floor lamp";
+DEATHAWAITS = "Death awaits";
+SMALLTORCH = "Small torch";
+BIGTORCH = "Big torch";
+STONE = "Stone";
+BIGSTONE = "Big Stone";
+THORN = "Thorn bush";
+CHAINLOCK = "Chain Lock";
+ARTIFACT = "Artifact";
+ERESHKIGAL = "Ereshkigal";
+CHEST = "Chest";
+URN = "Funeral Urn";
+STONE_DEBRIS = "Stone debris";
+FUNERAL_URN = "Funeral urn";
+INDOORCEILINGLAMP = "Ceiling candle lamp";
+BIGFLOORTORCH = "Big floor torch";
+BIGFLOORSCULLTORCH = "Big floor scull torch";
+CORPSE = "Corpse";
+SKELETON = "Skeleton";
+BONE = "Bone";
+MENGIR = "Menhir";
+MENGIR_EMPTY = "Exhausted Menhir";
+SACRIFICEACCEPTED = "Sacrifice accepted.";
+MENGIRISEMPTY = "Menhir needs sacrifice";
+TOOMANYHEALTH = "You don't need treatment";
+
+
+//INFO SCREEN
+
+INFO_SCREEN_TITLE = "Information";
+INFO_SCREEN_TITLE1 = "Descriptions";
+INFO_SCREEN_TITLE2 = "Notes";
+INFO_SCREEN_TITLE3 = "Hints";
+INFO_SCREEN_TITLE4 = "Tutorial";
+INFO_SCREEN_NODATA = "The is no records for this section yet";
+
+
+//OBJECTIVES
+OBJ = "New objective:";
+OBJ_COMPLETE = "Objective complete:";
+SOBJ = "New secondary objective:";
+SOBJ_COMPLETE = "Secondary objective complete:";
+
+OBJ0 = "Leave the dungeon";
+OBJ1 = "Find a way out of the cemetery";
+OBJ2 = "Find the Skull Key";
+OBJ3 = "Exit through the gates out";
+OBJ4 = "Find your way through the forest";
+OBJ5 = "Get on the road to the city";
+OBJ6 = "Find your way through the mansion";
+OBJ7 = "Follow the old road to the city";
+
+
+//SECONDARY OBJECTIVES
+SOBJ0 = "Find the Eye Key";
+SOBJ1 = "Open Eye Key locked door";
+SOBJ2 = "Find a way to remove the bars";
+SOBJ3 = "Search the graves to find a weapon";
+SOBJ4 = "Burn the thorn-bushes to release the passage";
+SOBJ5 = "Destroy the Defiler";
+SOBJ6 = "Find a bypass of the ruined bridge";
+SOBJ7 = "Shoot the lock";
+SOBJ8 = "Find a Gun";
+SOBJ9 = "Take the Spider Key";
+SOBJ10 = "Put right item on the Altar";
+SOBJ11 = "Take the Carnage Amulet";
+SOBJ12 = "Find the Spider Key";
+SOBJ13 = "Find the Fire Key";
+SOBJ14 = "Take the Fire Key";
+SOBJ15 = "Put zombie's head on altar bowl";
+SOBJ16 = "Put zombie's head on altar bowl";
+SOBJ17 = "Find a way to bypass the destroyed bridge";
+SOBJ18 = "Cross the rift";
+SOBJ19 = "Find the Skull door";
+SOBJ20 = "Find the Skull key";
+SOBJ21 = "Take the Skull key";
+SOBJ22 = "Goto the Skull door";
+
+//MESSAGES
+MES0 = "Press 'V' to use Sixth Sense\nYou can redefine it in\n'Customize Controlls'\noptions menue";
+MES1 = "Rats are afraid of fire.\nYou can scare them off with a torch.";
+
+
+
+
+
+
+
+//splash screen
+SPLASHSCREEN_TO_CONTINUE = "Press 'USE' button to continue";
+
+SPLASHSCREEN_TITLE_0 = "A curse is a living dark entity.";
+SPLASHSCREEN_0 = "It gives power to the wearer - absorbing his soul in exchange.";
+
+SPLASHSCREEN_TITLE_1 = "The curse can only be destroyed with fire.";
+SPLASHSCREEN_1 = "But it is much more valuable alive.";
+
+SPLASHSCREEN_TITLE_2 = "Seek and destroy the Defilers.";
+SPLASHSCREEN_2 = "So you get an extra curse and reduce the number of enemies.";
+
+SPLASHSCREEN_TITLE_3 = "Kill the damned with a sawed-off shotgun, blow up.";
+SPLASHSCREEN_3 = "So you get a living curse.";
+
+SPLASHSCREEN_TITLE_4 = "To kill the damned by fire is much easier.";
+SPLASHSCREEN_4 = "But so the curse dies and you can not use it for exchange.";
+
+SPLASHSCREEN_TITLE_5 = "Kill the damned in close combat.";
+SPLASHSCREEN_5 = "They are only vulnerable if you are within the radius of the curse.";
+
+SPLASHSCREEN_TITLE_6 = "Exchange Curses for amulets on altars.";
+SPLASHSCREEN_6 = "3 types of amulets give Caleb additional abilities.";
+
+SPLASHSCREEN_TITLE_7 = "Search the nooks and crannies.";
+SPLASHSCREEN_7 = "Cultists are often make caches of ammunition.";
+
+SPLASHSCREEN_TITLE_8 = "You can let the Firebug fly for a long distance.";
+SPLASHSCREEN_8 = "Hit ' F ' several times and Firebug will illuminate your path.";
+
+SPLASHSCREEN_TITLE_9 = "Use Your Gut";
+SPLASHSCREEN_9 = "Press ' V ' and Caleb will be able to see through the veil of reality monsters, objects, the current goal. Even through the walls.";
+
+SPLASHSCREEN_TITLE_10 = "Options/Curse Hunter Options";
+SPLASHSCREEN_10 = "This menu section has advanced drill-down settings to optimize performance and more.";
+
+
+//Helpings
+TUTORIAL = "Tutorial";
+TUTORIAL_TO_CONTINUE = "Press 'USE' button to continue";
+TUTORIAL_TO_CONTINUE_AND_NOT_AGAIN = "Press 'JUMP' button to continue and not show again";
+
+TUTORIAL0 = "In 'the Curse Hunter' You can hold items in hands.\n\nUse torch to light the way.";
+TUTORIAL0image = "SMGTC0";
+
+TUTORIAL1 = "The extinguished torch can be lit with an open fire.";
+
+TUTORIAL2 = "Thornbush can be set on fire with a torch.";
+TUTORIAL2image = "TUTOR2";
+
+TUTORIAL3 = "You can unleash the Firebug to light your way.\nPress ' F ' several times.";
+TUTORIAL3image = "TUTOR3";
+
+TUTORIAL4 = "You freed the Firebug - magical relic being.\nIt will illuminate your way out of gratitude.\nPress ' F ' to toggle Firebug.";
+TUTORIAL4image = "TUTOR3";
+
+TUTORIAL5 = "You can climb upon ladders and jump from one to another.\nHold ' JUMP ' button to jump out.";
+TUTORIAL5image = "TUTOR5";
+
+TUTORIAL6 = "Fire destroys all Curses in Cursed objects.\nUse Guns or Pitchfork to harvest Curses.";
+TUTORIAL6image = "TUTOR6";
+
+TUTORIAL7 = "You entered a curse effect radius.\nCursed objects takes more damage in this range.";
+TUTORIAL7image = "TUTOR7";
+
+TUTORIAL8 = "You have found a Defiler.\nThis is Cabal black magic installation, one of the Cursed object types.\nIt can raise undead from the earth and damn monsters in close range.\nDestroy defilers to harvest Curses.";
+TUTORIAL8image = "TUTOR8";
+
+TUTORIAL9 = "Curse is the Most Valuable item\nYou can exchange it with Power Amulets on specific altars.\nCurses in your inventory improves perks, given by Power Amulets.";
+TUTORIAL9image = "TUTOR9";
+
+TUTORIAL10 = "You got the Quick Kill ability!\nSneak up on the enemy from behind and press USE when the corresponding hint appears.\n\nPress F1 for more information about Caleb's abilities";
+
+TUTORIAL11 = "You got the Leap Kill ability!\nAim to the monster from mid-distance and press USE\n\nPress F1 for more information about Caleb's abilities";
+
+TUTORIAL12 = "You got the Subordinate ability!\nSneak up on the enemy from behind and HOLD USE from close distance\nA subordinated enemy becomes an ally for a while\n\nPress F1 for more information about Caleb's abilities";
+
+TUTORIAL13 = "You got the Sixth Sense ability!\nPress V to activate Sixth Sense.\n\nPress F1 for more information about Caleb's abilities";
+
+TUTORIAL14 = "You got the Raise ability!\nHold USE to Raise pointed corpse.\nRaised one becomes ally until Death.\n\nPress F1 for more information about Caleb's abilities";
+
+TUTORIAL15 = "You got the Regeneration ability!\nPlayer health automatically restores out of battle to 20 points.\n\nPress F1 for more information about Caleb's abilities";
+
+TUTORIAL16 = "You got the Repulsion ability!\nPress CROUCH during jump to generate Repulsion Wave.\n\nPress F1 for more information about Caleb's abilities";
+
+TUTORIAL17 = "You got the Blood Shield ability!\nALTATTACK of Pitchfork casts Blood Shield.\n\nPress F1 for more information about Caleb's abilities";
+
+TUTORIAL18 = "You got the Necromancy ability!\nYou can raise all corpses in field of view.\n\nPress F1 for more information about Caleb's abilities";
+
+TUTORIAL19 = "You have found a Menhir.\nMenhir area is a place of ancestor worshiping.\nThe main purpose of road menhir is to help travelers on a long road. Use menhir to restore health, ammunition and cure poisoning.";
+TUTORIAL19image = "TUTOR19";
+
+
+
+//information
+INFO_GOT = "Information updated.\nPress 'i' to read";
+INFO_TITLE_0 = "The Defiler";
+INFO_0 = "Cursed object created by the highest cultists with application of knowledge acquired in the lower world after opening the first gate in Ganzer.\nThe main purpose of the Defiler-the birth of curses and keeping them under protection.";
+INFO_0image = "inf0";
+
+INFO_TITLE_1 = "The Curse";
+INFO_1 = "The Curse is a living dark entity created by the higher cultists. It grants protection but absorbs the host’s soul in return.\nThe Curse can also be on a static object, then one becomes a Defiler.\nTo get the Ñurse you need to kill its host or destroy a Defiler with physical damage.\nFire destroys the Curse.\nThe Curse can be exchanged for the Amulet of Power on special altars.\nEreshkigal takes these Curses into her world to keep the balance. She provides amulets as a reward.\nCultists use this effect for their own purposes.\nThe Curse raises monsters’ corpses in the radius (except those killed by the fire or dismembered).\nThe Curse has a 10% chance to infect a creature within a radius.";
+INFO_1image = "inf1";
+
+INFO_TITLE_2 = "Amulets Of Power";
+INFO_2 = "Amulet of Power is a reward that Ereshkigal grants to save our world from Curses.\nAfter figuring this out, Highest Cultists started to use this effect to get new powers.\nCollecting several amulets of the same type grants you new abilities in that skill tree.\nActive ability spends stamina.\nThe amount of stamina depends on the total number of abilities.\n1 ability increases stamina cap by 11.15 points. You can have up to 9 amulets doubling your default stamina cap.\nStamina recovery rate depends on the number of collected Curses.\nEach Curse in your inventory recovers 1 stamina per second.\nBasic stamina recovery rate is 5 stamina per second.";
+INFO_2image = "inf2";
+
+INFO_TITLE_3 = "Menhir";
+INFO_3 = "Menhir area is a place of ancestor worshiping.\nThe main purpose of road menhir is to help travelers on a long road.\nUse menhir to restore health and cure poisoning.\nExhausted menhir can be restored by making a sacrifice.\nYou can use any corpse of the defeated monster for this purpose. Fed menhir rewards with ammo.";
+INFO_3image = "inf3";
+
+
+//notes
+NOTE = "The note";
+NOTEPICKUP = "Picked up the note";
+NOTE_0 = "Do finally block the entrances to the catacombs. One in the cave behind the cliff, the other in the old chapel.";
+NOTE_0image = "note1";
+NOTE_1 = "That jerk went back to the catacombs. He's been gone for days. But now he took with him the cemetery key.";
+NOTE_1image = "note1";
+NOTE_2 = "I was told that downstairs there is a door that can be opened with the key to the cemetery. There must be something very valuable in there.";
+NOTE_2image = "note1";
+NOTE_3 = "No, are you kidding me? 2 groups went to look for the moron with the key in the catacombs and no one has ever returned.";
+NOTE_3image = "note1";
+NOTE_4 = "This door should probably open with some artifact placed on the altar.";
+NOTE_4image = "note1";
+NOTE_5 = "The second day we can not get to the Central hall.";
+NOTE_5image = "note1";
+NOTE_6 = "The older ones say He should be here soon. Don't stop him from getting into town. And how he can without a graveyard key?";
+NOTE_6image = "note1";
+NOTE_7 = "The great mistress tells a story of a backslider. Destroy it. The cowards will be hanged on their guts.";
+NOTE_7image = "note1";
+NOTE_8 = "Kill the renegade? Are you serious? The cult has not fully recovered from his last crusade.. I'm not.";
+NOTE_8image = "note1";
+NOTE_9 = "Yesterday at last ate the unbeliever. It's divine. Its apparently been killed - this fragrance is suffering!";
+NOTE_9image = "note1";
+NOTE_10 = "The elders figured out how to pollute the earth, causing monsters to appear. More monsters, more curses! That's genius! ";
+NOTE_10image = "note1";
+NOTE_11 = "Sacrificing 1 curse we desecrate land, which gives birth to the damned. Another would be to make more of them appeared...";
+NOTE_11image = "note1";
+NOTE_12 = "There's a statue nearby. Behind it is a switch. I wonder what it's doing?";
+NOTE_12image = "note1";
+//----- cave garden
+NOTE_13 = "The apostate managed to escape from the graveyard. I shall not show my fear to my brethren.";
+NOTE_13image = "note1";
+NOTE_14 = "There are strange noises could be heard coming from the trees. Some chirring alike. Also one day I think I saw three red dots are moving on the ground. Looks like we are receiving too many stimulators through our food…";
+NOTE_14image = "note1";
+NOTE_15 = "We found a dead body of ours... With its skin gone. It’s still hanging in the House of the Raising Sin’s backyard. Isn’t that apostate too sneaky so he could manage to get to the graveyard right under our nose?";
+NOTE_15image = "note1";
+NOTE_16 = "I shall report to my superiors that those seeds are being successfully established and now the whole area is highly dangerous.";
+NOTE_16image = "note1";
+NOTE_17 = "Our Elders promised a full week in the House of the Rising Sin to one who will kill the apostate. Even fresh martyrs are being brought… But why it doesn’t motivate me?";
+NOTE_17image = "note1";
+
+
+//PUZZLE ITEMS CLASSNAMES
+//DO NOT TRANSLATE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+PUZZLEITEM0 = "z_Ereshkigal_statue";
+PUZZLEITEM1 = "ZombieHead";
+
+
+

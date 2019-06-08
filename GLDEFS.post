@@ -1,0 +1,108 @@
+
+HardwareShader PostProcess scene
+{
+	Name "TonemapVision"
+	Texture ColourmapLUT "textures/lut_vision.png"
+	Shader "Shaders/PostProcessing/FilmicTonemap.fp" 330
+}
+
+HardwareShader PostProcess scene
+{
+	Name "TonemapDamned"
+	Texture ColourmapLUT "textures/lut_damned.png"
+	Shader "Shaders/PostProcessing/FilmicTonemap.fp" 330
+}
+HardwareShader PostProcess scene
+{
+	Name "TonemapPoison"
+	Texture ColourmapLUT "textures/lut_poison.png"
+	Shader "Shaders/PostProcessing/FilmicTonemap.fp" 330
+}
+HardwareShader PostProcess scene
+{
+	Name "TonemapBlood"
+	Texture ColourmapLUT "textures/lut_blood.png"
+	Shader "Shaders/PostProcessing/FilmicTonemap.fp" 330
+}
+
+HardwareShader PostProcess scene
+{
+	Name "dscHeatHaze"
+	Texture HazeBump "textures/haze.png"
+	Shader "Shaders/PostProcessing/dscHeatHaze.fp" 330
+	Uniform float timer
+	Uniform float fHeatHazeChromaAmount
+}
+
+HardwareShader PostProcess scene
+{
+	Name "FilmicTonemap"
+	Texture ColourmapLUT "textures/lut.png"
+	Shader "Shaders/PostProcessing/FilmicTonemap.fp" 330
+}
+HardwareShader PostProcess scene
+{
+	Name "TonemapDefault"
+	Texture ColourmapLUT "textures/lut.png"
+	Shader "Shaders/PostProcessing/FilmicTonemap.fp" 330
+}
+
+
+
+HardwareShader PostProcess scene
+{
+	Name "CubicCA"
+	Shader "Shaders/PostProcessing/CubicCA.fp" 330
+}
+
+HardwareShader PostProcess scene
+{
+	Name "NaturalVignette"
+	Shader "Shaders/PostProcessing/NaturalVignette.fp" 330
+}
+
+HardwareShader PostProcess scene
+{
+	Name "FilmGrain"
+	Uniform float timer
+	Shader "Shaders/PostProcessing/FilmGrain.fp" 330
+}
+
+HardwareShader PostProcess scene
+{
+	Name "TiltShiftPass1"
+	Shader "Shaders/PostProcessing/TiltShift1.fp" 330
+}
+
+HardwareShader PostProcess scene
+{
+	Name "TiltShiftPass2"
+	Shader "Shaders/PostProcessing/TiltShift2.fp" 330
+}
+
+HardwareShader PostProcess scene
+{
+	Name "TiltShiftPass3"
+	Shader "Shaders/PostProcessing/TiltShift3.fp" 330
+}
+
+
+HardwareShader PostProcess beforebloom
+{
+	Name "MBlur"
+	Shader "Shaders/PostProcessing/MBlur.fp" 330
+	Uniform vec2 blurVec
+	Uniform int nSamples
+}
+
+HardwareShader postprocess scene
+{
+	Name "Vignette"
+	Shader "shaders/PostProcessing/Vignette.fp" 330
+	
+	Uniform float vignetteOpacity
+	Uniform float vignetteScale
+	Uniform vec3 vignetteColor
+	Uniform vec3 vignetteWeights
+	Texture texVignette "textures/vignetteTex.png"
+}

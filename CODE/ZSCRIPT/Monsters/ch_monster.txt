@@ -1,0 +1,880 @@
+//===========================================================================
+//
+// Dasic Curse Hunter monster DEF
+//
+//===========================================================================
+class CHmonster : DistanceSpawned
+{
+	string	N_NAME;
+	string	N_DEATHNAME;
+	string	N_BURNDEATHNAME;
+	string	N_GIBDEATHNAME;
+	string	N_HEADSHOTED;
+
+	string LandingSound;
+	string MyBloodColor;
+	int putOutFireChance;
+	int putOutFireDelay;
+	int LastDamage;
+	int OldHealth;
+	bool killedByPlayer;
+	bool XdeathResolved;
+	bool noLegs;
+	bool burned;
+	double oldVelZ;
+
+	//float SawedOffRecoilDist;
+	//float TommyRecoilDist;
+
+	Default
+	{
+
+		Monster;
+		+FLOORCLIP;
+		+DropOff;
+		+DONTOVERLAP;
+		+RANDOMIZE;
+		BloodType "RedBlood";
+		RenderStyle "Translucent";
+		DamageFactor "KineticPlayerDamage", 1.0;
+		DamageFactor "FakeRat", 1.0;
+	}
+	virtual void SetNames(){
+		N_NAME = StringTable.Localize("$MONSTER_NAME");
+		N_DEATHNAME = StringTable.Localize("$MONSTER_DEATHNAME");
+		N_BURNDEATHNAME = StringTable.Localize("$MONSTER_BURNDEATHNAME");
+		N_GIBDEATHNAME = StringTable.Localize("$MONSTER_GIBDEATHNAME");
+		N_HEADSHOTED = StringTable.Localize("$MONSTER_HEADSHOTED");
+
+	}
+	virtual void FastChase(){
+		if(!random(0, 1)){
+			a_faceTarget();
+			a_recoil(-2);
+		}
+		a_chase();
+	}
+	virtual void BDSM(){
+		actor BDSM = spawn("z_BurnDeathSmoke", pos);
+		giveInventory("BurnDeathMark", 1);
+		burned = 1;
+		BDSM.Master = self;
+	}
+	override void Activate (Actor activator)
+	{
+		bDormant = false;
+		a_clearTarget();
+		SetStateLabel("Active");
+		a_clearTarget();
+	}
+
+	override void Deactivate (Actor activator)
+	{
+		bDormant = true;
+		SetStateLabel("Inactive");
+
+	}
+
+	virtual void BallisticForeseengAttack(string ProjectileClassName, string AttackSound, int SeeRadius){
+			if(!Target){ return;}
+			int pspeed = 12;
+			float dt = distance3D(Target);
+			vector3 mPos;
+			float TimeTicks = dt/pspeed;
+
+			mPos.x = Target.pos.x+target.vel.x*TimeTicks;
+			mPos.y = Target.pos.y+target.vel.y*TimeTicks;
+			mPos.z = Target.pos.z+target.vel.z*TimeTicks;
+			actor Marker = spawn("TargetMarker", mPos);
+			Target = Marker;
+
+			a_faceTarget();
+			a_playSound("pod/attack");
+
+			float zv = dt*5/SeeRadius+(target.pos.z-pos.z)*22/SeeRadius;
+			if(zv>10){zv=10;}
+			A_ThrowGrenade (ProjectileClassName, -8, pspeed, zv);
+	}
+
+
+	override void Tick(){
+		super.tick();
+
+		oldVelZ = vel.z;
+		if(OldHealth-health > 0){
+			LastDamage = OldHealth-health;
+		}
+		OldHealth = health;
+		if(health>0){
+			if(putOutFireChance && checkInventory("burner", 1)){
+				putOutFireDelay++;
+				if(putOutFireDelay==35*3){
+					putOutFireDelay=0;
+					if(random(0, 100)<putOutFireChance){
+						takeInventory("burner", 1);
+					}
+				}
+			}
+		}
+		if(health<=0){
+
+			self.takeInventory("Unhandable", 1);
+			bSHOOTABLE = 1;
+			bSOLID = 0;
+			bGHOST = 1;
+
+			if(!XdeathResolved && InStateSequence(CurState, ResolveState("Xdeath"))){
+				XdeathResolved = 1;
+				players[ConsolePlayer].mo.GiveInventory("PlayerBlowLaughCounter", 1);
+
+			}
+		}
+
+	}
+	Override int getRenderDistance(){return Cvar.FindCvar("monsters_render_radius").GetInt() ;}
+	Override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+
+		LandingSound = "monster/landing";
+		killedByPlayer = 0;
+		RenderDistance = Cvar.FindCvar("monsters_render_radius").GetInt() ;////???
+
+
+		self.giveInventory("MonsterDamageController", 1);
+		self.giveInventory("Pointable", 1);
+		self.giveInventory("Monster", 1);
+		self.giveInventory("Unhandable", 1);
+		self.giveInventory("RaiseReady", 1);
+		if(Master){ bCOUNTKILL = 0;}// it means monster was spawned by nest or another. no need to count
+	}
+
+
+
+	states
+	{
+		Inactive:
+			"####" "#" 10 { bDORMANT = true; }
+			Loop;
+		Active:
+			"####" "#" 1 { bDORMANT = false; }
+			"####" "#" 1 a_jump(255, "Spawn");
+			Goto SetSprite;
+	}
+
+
+}
+class Monster : Undroppable {}
+class FireDeathMark : Undroppable {}
+class GibDeathMark : Undroppable {}
+class BurnDeathMark : Undroppable {}
+class MenhirSkipMark : Undroppable {}
+
+
+class MonsterDamageController : Undroppable
+{
+
+	override void ModifyDamage (int damage, Name damageType, out int newdamage, bool passive)
+	{
+		if(passive){
+			if(damage>0){
+				if(damageType == "Fire"){
+					if(damage>5){
+						newdamage = max(0, ApplyDamageFactors(GetClass(), damageType, damage, damage));
+					} else {
+						newdamage = 0;
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
+Class HeadShotController : CustomInventory
+{
+
+	bool HST_spawned;
+	Default
+	{
+		Inventory.MaxAmount 1;
+		+INVENTORY.UNDROPPABLE;
+		+INVENTORY.UNTOSSABLE;
+		+INVENTORY.AUTOACTIVATE;
+
+	}
+
+	override void DoEffect(){
+		if(!HST_spawned && !bDORMANT){
+			HeadShotTarget HST = HeadShotTarget(Spawn("HeadShotTarget",owner.pos));
+			HST.Master = owner;
+			HST_spawned = true;
+		}
+	}
+
+	states
+	{
+		Spawn:
+			TNT1 A 1;
+			stop;
+		Use:
+			TNT1 A 1;
+			Loop;
+	}
+}
+Class FootShotController : HeadShotController
+{
+	override void DoEffect(){
+		if(!HST_spawned){
+			FootShotTarget HST = FootShotTarget(Spawn("FootShotTarget",owner.pos));
+			HST.Master = owner;
+			HST_spawned = true;
+		}
+	}
+}
+
+Class FootShotTarget: actor
+{
+
+	Default
+	{
+		+SHOOTABLE;
+		+NODAMAGETHRUST;
+		+NORADIUSDMG;
+		+NOGRAVITY;
+		+NEVERTARGET;
+		+DONTTHRUST;
+		+NOTAUTOAIMED;
+		health 15;
+		radius 17;
+		height 16;
+		BloodType "RedBlood";
+		DamageFactor "Fire", 0.0;
+		DamageFactor "Splash", 0.0;
+		DamageFactor "Blast", 0.0;
+		DamageFactor "KineticPlayerDamage", 0.0;
+		DamageFactor "FakeRat", 1.0;
+
+	}
+	Override void PostBeginPlay()
+	{
+		if(Master){
+			A_setHealth(master.health/2);
+			A_SetSize(master.radius+2, master.height/4);
+			self.giveInventory("Unhandable", 1);
+		}
+	}
+
+	virtual void Behaviour(){
+		if(Master && Master.health>0 && Master.checkInventory("FootShotController", 1)){
+			SetOrigin(Master.pos, true);
+		} else {
+			self.destroy();
+		}
+	}
+	states
+	{
+		Spawn:
+			TNT1 A 1 Behaviour();
+			Loop;
+		Death:
+			TNT1 A 1{
+				if(Master && Master.health>0){
+					A_DamageMaster(Master.default.health/2, "FootShot");
+					Master.takeInventory("FootShotController", 1);
+					CHmonster(Master).noLegs = true;
+					Master.setStateLabel("BlowLegs");
+					self.destroy();
+				} else {self.destroy();}
+			}
+			stop;
+	}
+}
+
+Class HeadShotTarget: actor
+{
+
+
+	Default
+	{
+
+		+SHOOTABLE;
+		+NODAMAGETHRUST;
+		+NORADIUSDMG;
+		+NOGRAVITY;
+		+NEVERTARGET;
+		+DONTTHRUST;
+		+NOTAUTOAIMED;
+		health 15;
+		radius 17;
+		height 16;
+		BloodType "RedBlood";
+		DamageFactor "Fire", 0.0;
+		DamageFactor "Splash", 0.0;
+		DamageFactor "Blast", 0.0;
+		DamageFactor "Poison", 0.0;
+	}
+	Override void PostBeginPlay()
+	{
+		if(Master){
+			A_setHealth(master.health/4);
+			A_SetSize(master.radius+2, master.height/6);
+			self.giveInventory("Unhandable", 1);
+		}
+	}
+
+	virtual void Behaviour(){
+		if(Master && Master.health>0 && Master.checkInventory("HeadShotController", 1)){
+			vector3 selfpos = Master.pos;
+			selfpos.z = Master.pos.z+Master.height-Master.height/6;
+			SetOrigin(selfpos, true);
+		} else {
+			self.destroy();
+		}
+	}
+	states
+	{
+		Spawn:
+			TNT1 A 1 Behaviour();
+			Loop;
+		Death:
+			TNT1 A 1{
+				if(Master && Master.health>0){
+					for(int i = 0; i<random(2, 5); i++){
+						A_SpawnItemEx("BloodTrail", random(-2, 2), random(-2, 2), random(-2, 2), frandom(1.0, 2.0), frandom(-4.0, 4.0), frandom(1.0, 8.0), 0,SXF_NOCHECKPOSITION|SXF_TRANSFERPOINTERS);
+					}
+					a_killMaster("HeadShot");
+					self.destroy();
+				} else {self.destroy();}
+			}
+			stop;
+	}
+}
+
+class AllyMarker : actor
+{
+	Default
+	{
+		+nointeraction;
+		scale 0.5;
+	}
+
+
+	states
+	{
+		Spawn:
+			ALLY A 1 bright {
+				if(!Master || Master.health<=0 || !Master.CheckInventory("Subordinator", 1) ){ self.destroy(); }
+				vector3 mypos = Master.pos;
+				mypos.z = Master.pos.z+Master.height;
+				setOrigin(mypos, 1);
+
+			}
+			Loop;
+	}
+}
+class AllyMarkerTotal : actor
+{
+	Default
+	{
+		+nointeraction;
+		scale 0.5;
+	}
+
+
+	states
+	{
+		Spawn:
+			ALLY A 1 bright {
+				if(!Master || Master.health<=0 || !Master.bFRIENDLY ){ self.destroy(); }
+				if(Master){
+					vector3 mypos = Master.pos;
+					mypos.z = Master.pos.z+Master.height;
+					setOrigin(mypos, 1);
+				}
+			}
+			Loop;
+	}
+}
+
+class BodyBlowTarget : Actor
+{
+//
+	Default
+	{
+
+		+SHOOTABLE;
+		+NOGRAVITY;
+		+NEVERTARGET;
+		//+THRUACTORS;
+		-solid;
+		health 15;
+		radius 17;
+		height 16;
+
+	}
+	Override void PostBeginPlay()
+	{
+		if(Master){
+			A_setHealth(master.GetSpawnHealth()/2);
+			A_SetSize(master.radius-2, master.height-4);
+			//master.bALLOWTHRUFLAGS = 1;
+			self.giveInventory("Unhandable", 1);
+			//a_logint(Master.bloodcolor);
+			//bloodcolor = Master.bloodcolor;
+
+		}
+	}
+
+	virtual void Behaviour(){
+		if(Master && !Master.checkInventory("Raiser", 1) && Master.health<=0){
+			vector3 selfpos = Master.pos;
+			A_SetSize(master.radius-2, master.height-4);
+			SetOrigin(selfpos, true);
+		} else {
+			self.destroy();
+		}
+	}
+	states
+	{
+		Spawn:
+			TNT1 A 1 Behaviour();
+			Loop;
+		Death:
+			TNT1 A 1{
+				self.GiveInventory("HumanDeathGibs" , 1);
+				if(master){master.destroy();}
+			}
+			TNT1 A -1 A_FadeOut(0.01, FTF_REMOVE);
+			loop;
+		Xdeath:
+			TNT1 A 1{
+				self.GiveInventory("HumanXDeathGibs" , 1);
+				if(master){master.destroy();}
+			}
+			TNT1 A -1 A_FadeOut(0.01, FTF_REMOVE);
+			loop;
+	}
+
+}
+
+Class BodyBlowTargetGreen :  BodyBlowTarget
+{
+	default{
+		bloodColor "green";
+		translation "0:255=#[0,255,0]";
+		//translation "0:255=112:127";
+	}
+
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		a_setHealth(50);
+	}
+	states
+	{
+		Death:
+			TNT1 A 1{
+				self.GiveInventory("UniDeathGibsGreen" , 1);
+				if(master){master.destroy();}
+			}
+			TNT1 A -1 A_FadeOut(0.01, FTF_REMOVE);
+			loop;
+		Xdeath:
+			TNT1 A 1{
+				self.GiveInventory("UniDeathGibsGreen" , 1);
+				if(master){master.destroy();}
+			}
+			TNT1 A -1 A_FadeOut(0.01, FTF_REMOVE);
+			loop;
+	}
+}
+
+
+
+
+class MonsterShellXDeathController : Undroppable
+{
+	bool act;
+	virtual void DoIt(){
+		if(Owner){
+			act = 1;
+		}
+	}
+	override void DoEffect()
+	{
+		if(act){
+			Owner.setStateLabel("Xdeath.Shells");
+			act = 0;
+		}
+
+	}
+}
+
+
+/*class seekPlayer : CustomInventory {
+	Default
+	{
+		+INVENTORY.AUTOACTIVATE;
+		+INVENTORY.UNDROPPABLE;
+		Inventory.MaxAmount 1;
+	}
+	States
+	{
+		Spawn:
+			TNT1 A -1;
+			Stop;
+		Use:
+			TNT1 A -1;
+			Stop;
+	}
+}*/
+class SeekPlayerController : CustomInventory
+{
+	int Counter;
+	bool seekPlayer;
+	PlayerMarker Marker;
+	//PlayerMarker OldMarker;
+	//PlayerMarker RealNextMarker;
+	vector3 OldPos;
+	Default
+	{
+		+INVENTORY.AUTOACTIVATE;
+		+INVENTORY.HUBPOWER;
+		+INVENTORY.PERSISTENTPOWER;
+		+INVENTORY.UNDROPPABLE;
+		Inventory.MaxAmount 1;
+	}
+
+	Override void PostBeginPlay()
+	{
+
+	}
+	virtual void NextMarker(){
+		ThinkerIterator it = ThinkerIterator.Create("PlayerMarker");
+		PlayerMarker this;
+		bool markerFounded;
+		//OldMarker = Marker;
+		//
+		while(this = PlayerMarker(it.Next())){
+			if(!Owner){return;}
+			if(Owner.distance2D(this)>512){ continue;}
+			if(!Owner.CheckSight(this, 0)){continue;}
+			if(!Marker || this.counter > Marker.counter){
+				Marker = this;
+				markerFounded = 1;
+			}
+		}
+		if(!markerFounded){
+			it.Reinit();
+			while(this = PlayerMarker(it.Next())){
+				if(Owner.distance2D(this)>512){ continue;}
+				if(!Marker || this.counter == Marker.counter+1){
+					Marker = this;
+					markerFounded = 1;
+					break;
+				}
+			}
+		}
+		if(!markerFounded){
+			Marker = null;
+		}
+	}
+	/*virtual void LowerMarker(){
+		ThinkerIterator it = ThinkerIterator.Create("PlayerMarker");
+		PlayerMarker this;
+		while(this = PlayerMarker(it.Next())){
+			if(Owner.distance2D(this)>512){ continue;}
+			if(!Owner.CheckSight(this, 0)){continue;}
+			if(!Marker || this.counter < Marker.counter){
+				Marker = this;
+			}
+		}
+	}*/
+
+	override void DoEffect()
+	{
+		if(!Owner || Owner.bDORMANT){return;}
+		if(Owner){
+			if(Owner.health<=0){ owner.takeInventory("SeekPlayerController", 1);}
+			if(Counter<15){
+				Counter++;
+			} else {
+				Counter = 0;
+				if(!Owner){return;}
+				if(!Owner.CheckSight(players[consoleplayer].mo, 0)){
+					seekPlayer = 1;
+					//Owner.setStateLabel("ChaseIt");
+				} else {
+					Owner.target = players[consoleplayer].mo;
+					seekPlayer = 0;
+					Marker = null;
+					//a_log("see player");
+				}
+			}
+
+			if(seekPlayer && !Marker){ NextMarker();}
+			if(seekPlayer){
+				if(Marker && Owner&& Owner.distance2D(Marker)<16){
+					NextMarker();
+				}
+				if(Marker && Owner){
+					float delta = abs(OldPos.x-Owner.pos.x) + abs(OldPos.y-Owner.pos.y);
+					if(delta < 1){
+						if(!players[consoleplayer].mo.CheckSight(Marker, 0) && Owner.CheckSight(Marker, 0)){
+							Owner.setOrigin(Marker.pos, 1);
+							//a_log("warp from stuck");
+							NextMarker();
+						}
+					}
+					Owner.target = Marker;
+					Owner.vel.x = cos(Owner.angle)*Owner.speed;
+					Owner.vel.y = sin(Owner.angle)*Owner.speed;
+					//Owner.target = null;
+				}
+			}
+			if(Owner){
+				OldPos = Owner.pos;
+			}
+		}
+	}
+
+	States
+	{
+		Spawn:
+			TNT1 A -1;
+			Stop;
+		Use:
+			TNT1 A -1;
+			Stop;
+	}
+}
+
+class GenericFireDeath : Undroppable
+{
+	override void DoEffect()
+	{
+
+		owner.takeInventory("Material_Blood", 1);
+		owner.takeInventory("Material_Bones", 1);
+		owner.takeInventory("Material_Rock", 1);
+		owner.takeInventory("Material_Wood", 1);
+		owner.takeInventory("Material_Keramic", 1);
+
+		z_firedust_debris_Gen Deb = z_firedust_debris_Gen(owner.spawn("z_firedust_debris_Gen", owner.pos));
+		Deb.Master = owner;
+		Deb.Args[3] = 128;//density
+		Deb.Args[4] = 30;//scale
+
+		z_Dust_Gen Deb2 = z_Dust_Gen(owner.spawn("z_Dust_Gen", owner.pos));
+		Deb2.Master = owner;
+		Deb2.Args[3] = 8;
+		Deb2.Args[4] = 50;//scale
+		Deb2.PostBeginPlay();
+
+		Owner.A_SpawnItemEx("FiredeathSound");
+
+		owner.takeInventory(self.GetClassName(), 1);
+	}
+}
+
+class FiredeathSound : Actor
+{
+	default{
+		+NOINTERACTION;
+		+NOGRAVITY;
+		+DONTTHRUST;
+	}
+	states {
+		spawn:
+			TNT1 A 5;
+			TNT1 A 0 a_playSound("fx/firedeath");
+			TNT1 A 70;
+			TNT1 A 0 destroy();
+			Stop;
+	}
+}
+
+class Bleeder : Undroppable
+{
+	int Counter;
+	override void DoEffect()
+	{
+		Counter++;
+		if( Counter >= 25){
+			Counter = 0;
+			if(Owner){
+				Owner.A_SpawnItemEx("BloodTrail", random(-2, 2), random(-2, 2), random(2, 4), frandom(-2.0, 2.0), frandom(-2.0, 2.0), frandom(4.0, 8.0), 0,SXF_NOCHECKPOSITION|SXF_TRANSFERPOINTERS|SXF_TRANSFERTRANSLATION);
+				if(random(0, 255)>240){
+					Owner.takeInventory(self.GetClassName(), 1);
+				}
+			}
+		}
+
+	}
+}
+
+
+class AvoidFire  : Undroppable
+{
+	int counter;
+	override void DoEffect()
+	{
+		counter++;
+		if(Owner.health>0 && counter>5){
+			counter = 0;
+			BlockThingsIterator it = BlockThingsIterator.Create(Owner, 64);
+			while (it.Next()){
+				if (!(it.thing is "z_fx_fireplace")) { continue; }
+
+				z_fx_fireplace fire = z_fx_fireplace(it.thing);
+				float radius;
+				if (it.thing.master && (it.thing.master is "z_SmallTorch")){
+					radius=192;
+				} else {
+					if(fire.ThisLight){
+						FirePlaceLight Light = FirePlaceLight(fire.ThisLight);
+						if(light.baseIntensity){
+							radius = light.baseIntensity;
+						} else {
+							radius = (fire.r<128)?128:fire.r;
+						}
+
+
+					}
+				}
+
+				if(Owner.distance3D(it.thing)<=radius){
+					float ang = Owner.angle;
+					Owner.Target = fire;
+					Owner.a_facetarget();
+
+					int recSpeed = Owner.speed?Owner.speed*2:4;
+
+					Owner.a_recoil(recSpeed);
+					Owner.angle = ang;
+					Owner.a_clearTarget();
+				}
+			}
+		}
+	}
+}
+
+
+class CultistTalk : Undroppable
+{
+	int counter;
+	override void DoEffect()
+	{
+		if(Owner && Owner.health<=0){
+			Owner.A_StopSound(CHAN_VOICE);
+		}
+		if(Owner && Owner.health>0 && Owner.waterlevel<3 && Owner.InStateSequence(Owner.CurState, Owner.ResolveState("See"))){
+			counter++;
+			if(counter>35*5){
+				counter = 0;
+				if(!random(0, 5)){
+					Owner.A_playsound("CultistAct", CHAN_VOICE);
+				}
+			}
+			//CultistAct
+		}
+	}
+}
+
+
+Class TargetMarker : actor
+{
+	int counter;
+	Default{
+		+NOGRAVITY;
+		-SOLID;
+		+NEVERTARGET;
+		+DONTTHRUST;
+		+DONTSPLASH;
+	}
+	Override void PostBeginPlay()
+	{
+		counter = 50;
+	}
+	States
+	{
+		Spawn:
+			TNT1 A 1 {
+				if(counter<0){ self.destroy(); }
+				counter--;
+			}
+			LOOP;
+	}
+}
+
+class MonsterJumpSoundsController : CustomInventory
+{
+	bool PlayerJumped;
+	bool PlayerFolling;
+	int VL;
+	bool inWater;
+	float velo;
+
+	Default
+	{
+		+INVENTORY.AUTOACTIVATE;
+		+INVENTORY.HUBPOWER;
+		+INVENTORY.PERSISTENTPOWER;
+		+INVENTORY.UNDROPPABLE;
+		Inventory.MaxAmount 1;
+	}
+	override void DoEffect()
+	{
+
+		if(!Owner || Owner.bDORMANT || Owner.health<=0){ return;}
+		if(owner.Vel.z <=-4){
+			PlayerJumped = true;
+			PlayerFolling = true;
+		}
+		if(owner.Vel.z == 0 && PlayerFolling){
+			PlayerJumped = true;
+		}
+
+		if(owner.Vel.z == 0 && PlayerFolling){
+			PlayerJumped = false;
+			PlayerFolling = false;
+			owner.a_playSound(CHmonster(Owner).LandingSound, CHAN_AUTO);
+			//Owner.a_log("Landing");
+		}
+		//
+		if(owner.waterlevel>2 && VL<3){
+			owner.a_playSound("player/inWater",CHAN_BODY);
+			inWater = 1;
+
+		}
+		if(owner.waterlevel==0 && VL>0 && inWater){
+			inWater =0;
+			owner.a_playSound("player/outWater",CHAN_BODY);
+		}
+		VL = owner.waterlevel;
+		////foot step controll
+		velo+=abs(Owner.vel.x+Owner.vel.y);
+		if(velo>=80 && Owner.pos.z == Owner.floorZ && owner.waterlevel<=1){
+			owner.a_playSound("stepsoundDUMMY", CHAN_AUTO);
+			velo = 0;
+		}
+		if(velo>=80 && owner.waterlevel ==2){
+			owner.a_playSound("swimsoundDUMMY", CHAN_AUTO);
+			velo = 0;
+		}
+
+	}
+
+	States
+	{
+		Spawn:
+			TNT1 A -1;
+			Stop;
+		Use:
+			TNT1 A -1;
+			Stop;
+	}
+
+}

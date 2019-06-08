@@ -1,0 +1,19 @@
+clearplayerclasses
+addplayerclass Caleb
+
+
+addkeysection "Curse Hunter's Bindings" "CHbindings"
+addmenukey "Toggle Fire Bug" "use firebug"
+defaultbind "f" "use firebug"
+
+addmenukey "Toggle Six Sence" "use Ability_SixSence"
+defaultbind "v" "use Ability_SixSence"
+
+//addmenukey "Toggle Info Screen" "use InfoScreen"
+//defaultbind "i" "use InfoScreen"
+
+addmenukey "Toggle Info Screen" InfoMenu
+alias InfoMenu"pukename InfoScreen always"
+defaultbind i InfoMenu
+
+

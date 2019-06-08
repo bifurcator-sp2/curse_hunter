@@ -1,0 +1,5 @@
+STARTUPTYPE = "Hexen"
+STARTUPTITLE = "Blood: The Curse Hunter"
+STARTUPCOLORS = "00 00 00", "FF 00 00"
+gibfactor = 0.5
+

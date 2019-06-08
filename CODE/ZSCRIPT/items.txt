@@ -1,0 +1,1200 @@
+class KeyGlow : actor
+{
+	int fadeSpeed;
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+	}
+	Default
+	{
+		scale 0.25;
+		+nointeraction;
+		renderstyle "add";
+	}
+	States
+	{
+	  Spawn:
+		KEYB A 1 BRIGHT{
+			if(master){
+				alpha=frandom(0.6, 1.0);
+			} else {
+				destroy();
+			}
+		}
+		Loop;
+	}
+}
+
+Class z_MoonKeyGiver : ItemGiver
+{
+	Default
+	{
+		scale 0.25;
+		radius 4;
+		height 18;
+	}
+
+	Override void PostBeginPlay()
+	{
+		ItemTogiveClass = "MoonKey";
+		Super.PostBeginPlay();
+		a_spawnItemEx("KeyGlow", 0, 0, 0, 0, 0, 0, 0, SXF_SETMASTER);
+	}
+	States
+	{
+	  Spawn:
+		MKEY A 1 ;
+		Loop;
+	}
+}
+Class MoonKey : Key
+{
+	default{
+		scale 0.25;
+		inventory.pickupmessage "$KEY_MOON_PICKUP";
+		inventory.icon "STKEYS1";
+		 inventory.pickupsound "items/keyPickup";
+
+		tag "$KEY_MOON";
+	}
+  states
+  {
+	  Spawn:
+		MKEY A -1;
+		stop;
+  }
+}
+
+
+Class z_SpiderKeyGiver : ItemGiver
+{
+	Default
+	{
+		scale 0.25;
+		radius 4;
+		height 18;
+	}
+
+	Override void PostBeginPlay()
+	{
+		ItemTogiveClass = "SpiderKey";
+		Super.PostBeginPlay();
+		a_spawnItemEx("KeyGlow", 0, 0, 0, 0, 0, 0, 0, SXF_SETMASTER);
+	}
+	States
+	{
+	  Spawn:
+		SPEY A 1 ;
+		Loop;
+	}
+}
+Class SpiderKey : Key
+{
+	default{
+		scale 0.25;
+		inventory.pickupmessage "$KEY_SPIDER_PICKUP";
+		inventory.icon "STKEYS4";
+		 inventory.pickupsound "items/keyPickup";
+
+		tag "$KEY_SPIDER";
+	}
+  states
+  {
+	  Spawn:
+		SPEY A -1;
+		stop;
+  }
+}
+
+
+
+
+Class z_SkullKeyGiver : ItemGiver
+{
+	Default
+	{
+		scale 0.25;
+		radius 4;
+		height 18;
+	}
+
+	Override void PostBeginPlay()
+	{
+		ItemTogiveClass = "SkullKey";
+		Super.PostBeginPlay();
+		a_spawnItemEx("KeyGlow", 0, 0, 0, 0, 0, 0, 0, SXF_SETMASTER);
+	}
+	States
+	{
+	  Spawn:
+		SKEY A 1 ;
+		Loop;
+	}
+}
+Class SkullKey : Key
+{
+	default{
+		scale 0.25;
+		inventory.pickupmessage "$KEY_SKULL_PICKUP";
+		inventory.icon "STKEYS3";
+		 inventory.pickupsound "items/keyPickup";
+
+		tag "$KEY_SKULL";
+	}
+  states
+  {
+	  Spawn:
+		SKEY A -1;
+		stop;
+  }
+}
+
+
+
+Class z_FireKeyGiver : ItemGiver
+{
+	Default
+	{
+		scale 0.25;
+		radius 4;
+		height 18;
+	}
+
+	Override void PostBeginPlay()
+	{
+		ItemTogiveClass = "FireKey";
+		Super.PostBeginPlay();
+		a_spawnItemEx("KeyGlow", 0, 0, 0, 0, 0, 0, 0, SXF_SETMASTER);
+	}
+	States
+	{
+	  Spawn:
+		FKEY A 1 ;
+		Loop;
+	}
+}
+Class FireKey : Key
+{
+	default{
+		scale 0.25;
+		inventory.pickupmessage "$KEY_FIRE_PICKUP";
+		inventory.icon "STKEYS5";
+		 inventory.pickupsound "items/keyPickup";
+
+		tag "$KEY_FIRE";
+	}
+  states
+  {
+	  Spawn:
+		FKEY A -1;
+		stop;
+  }
+}
+
+
+
+
+Class z_DaggerKeyGiver : ItemGiver
+{
+	Default
+	{
+		scale 0.25;
+		radius 4;
+		height 18;
+	}
+
+	Override void PostBeginPlay()
+	{
+		ItemTogiveClass = "DaggerKey";
+		Super.PostBeginPlay();
+		a_spawnItemEx("KeyGlow", 0, 0, 0, 0, 0, 0, 0, SXF_SETMASTER);
+	}
+	States
+	{
+	  Spawn:
+		DKEY A 1 ;
+		Loop;
+	}
+}
+Class DaggerKey : Key
+{
+	default{
+		scale 0.25;
+		inventory.pickupmessage "$KEY_DAGGER_PICKUP";
+		inventory.icon "STKEYS0";
+		 inventory.pickupsound "items/keyPickup";
+
+		tag "$KEY_DAGGER";
+	}
+  states
+  {
+	  Spawn:
+		DKEY A -1;
+		stop;
+  }
+}
+
+
+
+
+Class z_EyeKeyGiver : ItemGiver
+{
+	Default
+	{
+		scale 0.25;
+		radius 4;
+		height 18;
+	}
+
+	Override void PostBeginPlay()
+	{
+		ItemTogiveClass = "EyeKey";
+		Super.PostBeginPlay();
+		a_spawnItemEx("KeyGlow", 0, 0, 0, 0, 0, 0, 0, SXF_SETMASTER);
+	}
+	States
+	{
+	  Spawn:
+		EKEY A 1 ;
+		Loop;
+	}
+}
+
+
+Class EyeKey : Key
+{
+	default{
+		scale 0.25;
+		inventory.pickupmessage "$KEY_EYE_PICKUP";
+		inventory.icon "STKEYS2";
+		 inventory.pickupsound "items/keyPickup";
+
+		tag "$KEY_EYE";
+	}
+  states
+  {
+	  Spawn:
+		EKEY A -1;
+		stop;
+  }
+}
+
+
+///////////////////////////////////////////
+
+Class HeartHealth : Health
+{
+	Default
+	{
+	  Scale 0.35;
+	  radius 4;
+	  height 8;
+	  inventory.pickupmessage "$HEARTPICKUP";
+	  inventory.pickupsound "items/heartpickup";
+	  inventory.amount 20;
+	  inventory.maxamount 100;
+	  +CannotPush;
+		+SHOOTABLE;
+		+NOBLOOD;
+		+NOBLOODDECALS;
+		+INVULNERABLE;
+		+DONTTHRUST;
+		-NOGRAVITY;
+	}
+
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		giveInventory("Pointable", 1);
+		giveInventory("Unhandable", 1);
+	}
+
+	states
+	{
+	  Spawn:
+		BHRT ABCD 6 bright light("HeartLight");
+		loop;
+	}
+
+}
+
+
+
+Class PointUsable : SwitchableDecoration
+{
+	vector3 previousPOS;
+	int ActivationDistance;
+	int CurrentDistance;
+	string HoverText;
+	bool active;
+	int ActivationRadius;
+
+
+	virtual void Doit(actor Caller){}
+	virtual bool isActive(){ return active;}
+
+	virtual int getCurrentDistance(){
+		return CurrentDistance;
+	}
+	virtual void setCurrentDistance(int dist){
+		CurrentDistance = dist;
+	}
+	virtual int getActivationDistance(){
+		return ActivationRadius?ActivationRadius:1024;
+	}
+
+	Override void PostBeginPlay(){
+		previousPOS = pos;
+		ActivationRadius = Cvar.GetCVar("z_natue_activation_radius", players[consoleplayer]).GetInt();
+		Super.PostBeginPlay();
+
+		ActivationDistance = getActivationDistance();
+		self.giveInventory("Usable", 1);
+		self.giveInventory("Unhandable", 1);
+
+	}
+	states
+	{
+		Active:
+			TNT1 A 1;
+			Loop;
+		InActive:
+			TNT1 A 1;
+			Loop;
+	}
+}
+
+Class ItemGiver : PointUsable
+{
+	int ItemCount;
+	int GiveCount;
+	string ItemTogiveClass;
+	bool ResetCount;
+	Default
+	{
+		+NOBLOOD;
+		+SHOOTABLE;
+		+DONTTHRUST;
+	}
+	Override void PostBeginPlay()
+	{
+		HoverText = StringTable.Localize("$USETOPICKUP");
+		Super.PostBeginPlay();
+		ItemCount = args[0]?args[0]:1;//number of times to give for GiveCount
+		GiveCount  = args[1]?args[1]:1;
+
+		self.giveInventory(ItemTogiveClass, 1);
+		Inventory Item = Inventory(self.findInventory(ItemTogiveClass));
+
+		if(Item){
+			self.setTag(Item.getTag());
+			self.takeInventory(ItemTogiveClass, 1);
+		}
+		//Usable UsableItem = Usable(self.findInventory("Usable"));
+
+	}
+
+	override void Doit(actor Caller){
+		if(ItemCount>0){
+			AbilityController AC = AbilityController(Caller.findInventory("AbilityController"));
+
+			if(AC.CanTake(ItemTogiveClass)){
+				if(ResetCount){
+					if(Caller.CountInv(ItemTogiveClass) < GiveCount){
+						Caller.a_takeInventory(ItemTogiveClass, GiveCount);
+						Caller.a_giveInventory(ItemTogiveClass, GiveCount);
+						Inventory Item = Inventory(Caller.findInventory(ItemTogiveClass));
+						Caller.a_log(Item.PickupMessage());
+						Caller.a_playSound(Item.PickupSound );
+						ItemCount--;
+					}
+				} else {
+
+					Caller.a_giveInventory(ItemTogiveClass, GiveCount);
+					Inventory Item = Inventory(Caller.findInventory(ItemTogiveClass));
+					Caller.a_log(Item.PickupMessage());
+					Caller.a_playSound(Item.PickupSound );
+					ItemCount--;
+				}
+				AC.analize();
+			}
+
+		}
+		if(ItemCount<=0){
+			self.destroy();
+		}
+	}
+
+
+}
+
+
+
+Class CarnageGiver : ItemGiver
+{
+	Default
+	{
+		scale 0.15;
+		radius 4;
+		height 8;
+	}
+
+	Override void PostBeginPlay()
+	{
+		ItemTogiveClass = "AM_Carnage";
+		Super.PostBeginPlay();
+	}
+	States
+	{
+	  Spawn:
+		AM01 A 1 bright;
+		Loop;
+	}
+}
+Class DominationGiver : ItemGiver
+{
+	Default
+	{
+		scale 0.15;
+		radius 4;
+		height 8;
+	}
+
+	Override void PostBeginPlay()
+	{
+		ItemTogiveClass = "AM_Domination";
+		Super.PostBeginPlay();
+	}
+	States
+	{
+	  Spawn:
+		AM02 A 1 bright;
+		Loop;
+	}
+}
+Class SurvivalGiver : ItemGiver
+{
+	Default
+	{
+		scale 0.15;
+		radius 4;
+		height 8;
+	}
+
+	Override void PostBeginPlay()
+	{
+		ItemTogiveClass = "AM_Survival";
+		Super.PostBeginPlay();
+	}
+	States
+	{
+	  Spawn:
+		AM03 A 1 bright;
+		Loop;
+	}
+}
+
+Class AM_Carnage : Inventory
+{
+
+	Default
+	{
+		//+INVENTORY.AUTOACTIVATE;
+		+INVENTORY.HUBPOWER;
+		+INVENTORY.PERSISTENTPOWER;
+		//+INVENTORY.UNDROPPABLE;
+
+		+COUNTITEM;
+		//+INVENTORY.INVBAR;
+		inventory.maxamount 3;
+		inventory.amount 1;
+		//Inventory.Icon "ARTIFBMB";
+		Inventory.PickupMessage "$CARNAGEPICKUP";
+		Inventory.PickupSound "items/amuletpickup";
+		Tag "$AM_CARNAGE";
+
+		scale 0.15;
+		radius 4;
+		height 8;
+
+	}
+
+	States
+	{
+	  Spawn:
+		AM01 A 1 bright;
+		Loop;
+	  Use:
+		AM01 A 1 bright;
+		Loop;
+	Pickup:
+			TNT1 A 1;
+			Loop;
+	}
+}
+Class AM_Domination : Inventory
+{
+
+	Default
+	{
+		//+INVENTORY.AUTOACTIVATE;
+		+INVENTORY.HUBPOWER;
+		+INVENTORY.PERSISTENTPOWER;
+		//+INVENTORY.UNDROPPABLE;
+
+		+COUNTITEM;
+		//+INVENTORY.INVBAR;
+		inventory.maxamount 3;
+		inventory.amount 1;
+		//Inventory.Icon "ARTIFBMB";
+		Inventory.PickupMessage "$DOMINATIONPICKUP";
+		Inventory.PickupSound "items/amuletpickup";
+		Tag "$AM_DOMINATION";
+
+		scale 0.15;
+		radius 4;
+		height 8;
+
+	}
+
+	States
+	{
+	  Spawn:
+		AM02 A 1 bright;
+		Loop;
+	  Use:
+		AM02 A 1 bright;
+		Loop;
+	Pickup:
+			TNT1 A 1;
+			Loop;
+	}
+}
+Class AM_Survival : Inventory
+{
+
+	Default
+	{
+		//+INVENTORY.AUTOACTIVATE;
+		+INVENTORY.HUBPOWER;
+		+INVENTORY.PERSISTENTPOWER;
+		//+INVENTORY.UNDROPPABLE;
+
+		+COUNTITEM;
+		//+INVENTORY.INVBAR;
+		inventory.maxamount 3;
+		inventory.amount 1;
+		//Inventory.Icon "ARTIFBMB";
+		Inventory.PickupMessage "$SURVIVALPICKUP";
+		Inventory.PickupSound "items/amuletpickup";
+		Tag "$AM_SURVIVAL";
+
+		scale 0.15;
+		radius 4;
+		height 8;
+
+	}
+
+	States
+	{
+	  Spawn:
+		AM03 A 1 bright;
+		Loop;
+	  Use:
+		AM03 A 1 bright;
+		Loop;
+	Pickup:
+			TNT1 A 1;
+			Loop;
+	}
+}
+
+
+class ammoItem { string name; string className; int maxAmount; float prob;}
+
+class AmmoSpawnController
+{
+	/*static int ArrayMax(Array<int> ar){
+		int index = 0;
+		int val = 0;
+		for(int i = 0; i < ar.Size(); ++i) {
+			if(ar[i]>val){val = ar[i]; index = i; }
+		}
+		return index;
+	}*/
+
+	static string getItem(){
+
+		Array<string> Classes;
+		Array<ammoItem> ClassList;
+		Array<int> ProbList;
+		string ClassName = "";
+
+		PlayerInfo Player = players[consoleplayer];
+
+
+
+////////////////////////////////////////////////////////////////////////////////////
+
+		if(Player.mo.findInventory("Sawedoff", 1)){
+			ammoItem Bshell = new("ammoItem");
+			Bshell.name =  "Bshell";
+			Bshell.className =  "Bshells";
+			Bshell.maxAmount = 50;
+			ClassList.push(Bshell);
+		}
+		if(Player.mo.findInventory("TommyGun", 1)){
+			ammoItem Bullet = new("ammoItem");
+			Bullet.name =  "bullet";
+			Bullet.className =  "bullets";
+			Bullet.maxAmount = 300;
+			ClassList.push(Bullet);
+		}
+
+		if(Player.mo.findInventory("Dynamite", 1)){
+			ammoItem TNTAmmo = new("ammoItem");
+			TNTAmmo.name =  "TNTAmmo";
+			TNTAmmo.className =  "TNTBundle";
+			TNTAmmo.maxAmount = 50/5;
+			ClassList.push(TNTAmmo);
+		}
+		if(Player.mo.findInventory("FlareGun", 1)){
+			ammoItem Flares = new("ammoItem");
+			Flares.name =  "Flares";
+			Flares.className =  "Flares";
+			Flares.maxAmount = 100/5;
+			ClassList.push(Flares);
+		}
+
+		int i,c;
+		int p = random(1, 100);
+		Array<string> RandList;
+
+		if(ClassList.Size()){
+			for(i = 0; i < ClassList.Size(); i++) {
+				ClassList[i].prob = 100-Player.mo.countInv(ClassList[i].name)*100/ClassList[i].maxAmount;
+				if(ClassList[i].prob<0){ClassList[i].prob=0;}
+				//Console.Printf("%s", ClassList[i].name);
+				//Console.Printf("%f", ClassList[i].prob);
+				for(c = 0; c < int(ClassList[i].prob); c++) {
+					RandList.Push(ClassList[i].className);
+				}
+			}
+			ClassName = RandList[random(0, RandList.Size()-1)];
+		} else {ClassName = "";}
+
+		if(!random(0, 9)){ ClassName = "Rat"; }
+		//Console.Printf("%s", ClassName);
+		return ClassName;
+
+///////////////////////////////////////////////////////////////////////////////////
+
+		/*
+		if(Player.mo.findInventory("Sawedoff", 1)){
+			Classes.Push("Bshells");
+		}
+		if(Player.mo.findInventory("TommyGun", 1)){
+			Classes.Push("bullets");
+		}
+		if(Player.mo.findInventory("Dynamite", 1)){
+			Classes.Push("TNTBundle");
+		}
+		if(Player.mo.findInventory("FlareGun", 1)){
+			Classes.Push("Flares");
+		}
+
+		if(!random(0, 1)){
+			Classes.Push("Rat");
+		}
+		if(Classes.size()){
+			return Classes[random(0, Classes.size()-1)];
+		} else {
+			return "";
+		}
+		*/
+	}
+
+}
+
+Class ItemContainerResp : DistanceActivated
+{
+
+	default
+	{
+		health 15;
+		+SOLID;
+		+SHOOTABLE;
+		//BloodType "z_nature_rockcracks";
+		+NOBLOODDECALS;
+		height 21;
+		deathHeight 21;
+		radius 22;
+	}
+
+	virtual Void SpawnAmmo(){
+
+		bSOLID = false;
+		bTHRUACTORS = true;
+
+		string Item = AmmoSpawnController.getItem();
+
+		if(Item!=""){
+			a_spawnItemEx(Item, 0, 0, height/2, frandom(-2, 2), frandom(-2, 2), frandom(1, 8), 0, SXF_NOCHECKPOSITION);
+		}
+	}
+
+	States
+	{
+		Spawn:
+			TNT1 A 0 NODELAY { bCORPSE = 0; }
+			"####" "#" -1;
+			Stop;
+		Death:
+			TNT1 A 1;
+		WaitForRespawn:
+			TNT1 A 15 {
+				if(CurrentDistance > Cvar.GetCVar("ITEM_RESPAWN_DISTANCE",  players[consoleplayer]).GetInt()){
+					a_spawnItemEx(self.getClassName());
+					destroy();
+				}
+			}
+			Loop;
+	}
+}
+
+
+Class z_Chest : ItemContainerResp
+{
+
+
+	default
+	{
+		health 15;
+		BloodType "z_nature_woodcracks";
+		height 21;
+		deathHeight 21;
+		radius 22;
+		tag "$CHEST";
+	}
+	Override void PostBeginPlay(){
+		Super.PostBeginPlay();
+		giveInventory("Pointable", 1);
+		giveInventory("Material_Wood", 1);
+	}
+
+	States
+	{
+		SetSprite:
+			CHST A -1;
+			Goto Spawn;
+
+		Death:
+			TNT1 A 1;
+			TNT1 A 0 {
+				int amount = random(0, 3);
+				for(int i=0; i<amount; i++){
+					SpawnAmmo();
+				}
+			}
+			Goto Super::Death;
+
+	}
+}
+
+Class z_DustUrn : ItemContainerResp
+{
+
+	default
+	{
+		scale 0.7;
+		health 20;
+		//BloodType "z_nature_woodcracks";
+		height 48;
+		deathHeight 48;
+		radius 12;
+		+NOBLOOD;
+		tag "$URN";
+	}
+
+	Override void PostBeginPlay(){
+		Super.PostBeginPlay();
+		giveInventory("Pointable", 1);
+		giveInventory("Material_Keramic", 1);
+	}
+
+	States
+	{
+		SetSprite:
+			VASE A -1;
+			Goto Spawn;
+
+		Death:
+			TNT1 A 1;
+			TNT1 A 0 {
+				int amount = random(0, 3);
+				for(int i=0; i<amount; i++){
+					SpawnAmmo();
+				}
+			}
+			Goto Super::Death;
+		WaitForRespawn:
+			TNT1 A 5 Destroy();
+			Stop;
+	}
+}
+
+Class z_DustUrnSpawner : ItemContainerResp
+{
+
+	int respRadius;
+	bool Resurrect;
+	default
+	{
+		scale 0.7;
+		health 20;
+		height 48;
+		deathHeight 48;
+		radius 12;
+		+NOBLOOD;
+		tag "$CHEST";
+	}
+
+	Override void PostBeginPlay(){
+		Super.PostBeginPlay();
+		giveInventory("Pointable", 1);
+		giveInventory("Material_Keramic", 1);
+		respRadius = args[0]?args[0]:256;
+	}
+
+	States
+	{
+		SetSprite:
+			VASE A -1;
+			Goto Spawn;
+
+		Death:
+			TNT1 A 1;
+			TNT1 A 0 {
+				int amount = random(0, 3);
+				for(int i=0; i<amount; i++){
+					SpawnAmmo();
+				}
+			}
+		WaitForRespawn:
+			TNT1 A 35 {
+				if(CurrentDistance > respRadius){
+					BlockThingsIterator it = BlockThingsIterator.Create(self, 24);
+					while (it.Next()){
+						if ((it.thing is "ammo") || (it.thing is "weapon")) {
+							return;
+						}
+					}
+					Resurrect = 1;
+
+				}
+			}
+			TNT1 A 0 A_jumpif(Resurrect, "Respawn");
+			Loop;
+		Respawn:
+			TNT1 A 0 a_spawnItemEx("ResurrFogSmall");
+			TNT1 A 35;
+			TNT1 A 0  a_spawnItemEx(self.getClassName());
+			Stop;
+	}
+
+
+}
+
+
+
+Class DoctorBagGiver : ItemGiver
+{
+	Default
+	{
+		scale 0.5;
+		radius 8;
+		height 16;
+	}
+
+	Override void PostBeginPlay()
+	{
+		ItemTogiveClass = "z_DoctorBag";
+		Super.PostBeginPlay();
+		GiveCount = 100;
+	}
+	States
+	{
+	  Spawn:
+		DBAG A 1;
+		Loop;
+	}
+}
+
+Class z_DoctorBag : CustomInventory
+{
+
+	default
+	{
+		tag "$DOCTORSBAG";
+		Health 1;
+		+FLOORCLIP;
+		+INVENTORY.INVBAR;
+		+DONTSPLASH;
+		inventory.pickupsound "items/pickup";
+		Inventory.MaxAmount 100;
+		Inventory.Amount 100;
+		-INVENTORY.INTERHUBSTRIP;
+		Inventory.Icon "INDOCB";
+		Inventory.PickupMessage "$DOCTORSBAG_PICKUP";
+		Inventory.Interhubamount 100;
+	}
+	States
+	{
+		Spawn:
+			DBAG A -1;
+			Stop;
+		Use:	//restores that one point that is spent for activation
+		aLoop:
+			MEDI A 0 A_JumpIfInventory("z_DoctorBag",1,"TryHeal");
+		End:
+			MEDI A 0;
+			Fail;
+		TryHeal:
+			MEDI A 0 A_JumpIfHealthLower(100,"Heal");
+			Goto End;
+		Heal:
+			//TNT1 A 0 {a_logint(countinv("z_DoctorBag"));}
+			MEDI A 0 { A_TakeInventory("z_DoctorBag",1); A_TakeInventory("poisoningController",1);}
+			MEDI A 1 HealThing(1);
+			Goto aLoop;
+	}
+}
+
+///////////////////////////////////
+//ARMOR
+//////////////////////////////////
+Class z_BodyArmor : Inventory
+{
+	default
+	{
+		Inventory.Amount 100;
+		Inventory.MaxAmount 200;
+		Inventory.PickupMessage "$BODYARMOR_PICKUP";
+		inventory.pickupsound "items/armor_pkup";
+		+INVENTORY.HUBPOWER;
+		//+INVENTORY.INVBAR;
+		Tag "$BODYARMOR";
+		-NOGRAVITY;
+		+SHOOTABLE;
+		+NOBLOOD;
+		+NOBLOODDECALS;
+		+INVULNERABLE;
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		GiveInventory("Pointable", 1);
+	}
+		States
+		{
+			Spawn:
+				ARM1 A -1;
+				Stop;
+		}
+}
+
+Class z_BodyArmorGiver : ItemGiver
+{
+	Default
+	{
+		scale 0.5;
+		radius 16;
+		height 32;
+		scale 1.0;
+	}
+
+	Override void PostBeginPlay()
+	{
+		ItemTogiveClass = "BodyArmor";
+		Super.PostBeginPlay();
+		GiveCount = 100;
+		ResetCount = 1;
+	}
+	States
+	{
+	  Spawn:
+		ARM1 A -1;
+		Stop;
+	}
+}
+
+
+
+Class z_FireArmor : Inventory
+{
+	default
+	{
+		Inventory.Amount 100;
+		Inventory.MaxAmount 200;
+		Inventory.PickupMessage "$FIREARMOR_PICKUP";
+		inventory.pickupsound "items/armor_pkup";
+		+INVENTORY.HUBPOWER;
+		//+INVENTORY.INVBAR;
+		Tag "$FIREARMOR";
+		-NOGRAVITY;
+		+SHOOTABLE;
+		+NOBLOOD;
+		+NOBLOODDECALS;
+		+INVULNERABLE;
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		GiveInventory("Pointable", 1);
+	}
+		States
+		{
+			Spawn:
+				ARMF A -1;
+				Stop;
+		}
+}
+
+Class z_FireArmorGiver : ItemGiver
+{
+	Default
+	{
+		scale 0.5;
+		radius 16;
+		height 32;
+		scale 1.0;
+	}
+
+	Override void PostBeginPlay()
+	{
+		ItemTogiveClass = "FireArmor";
+		Super.PostBeginPlay();
+		GiveCount = 100;
+		ResetCount = 1;
+	}
+	States
+	{
+	  Spawn:
+		ARMF A -1;
+		Stop;
+	}
+}
+
+Class z_SpiritArmor : Inventory
+{
+	default
+	{
+		Inventory.Amount 100;
+		Inventory.MaxAmount 200;
+		Inventory.PickupMessage "$SOULARMOR_PICKUP";
+		inventory.pickupsound "items/armor_pkup";
+		+INVENTORY.HUBPOWER;
+		//+INVENTORY.INVBAR;
+		Tag "$SPIRITARMOR";
+		-NOGRAVITY;
+		+SHOOTABLE;
+		+NOBLOOD;
+		+NOBLOODDECALS;
+		+INVULNERABLE;
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		GiveInventory("Pointable", 1);
+	}
+		States
+		{
+			Spawn:
+				SARM A -1;
+				Stop;
+		}
+}
+
+Class z_SpiritArmorGiver : ItemGiver
+{
+	Default
+	{
+		scale 0.5;
+		radius 16;
+		height 32;
+		scale 1.0;
+	}
+
+	Override void PostBeginPlay()
+	{
+		ItemTogiveClass = "SpiritArmor";
+		Super.PostBeginPlay();
+		GiveCount = 100;
+		ResetCount = 1;
+	}
+	States
+	{
+	  Spawn:
+		SARM A -1;
+		Stop;
+	}
+}
+
+Class z_SuperArmorGiver : ItemGiver
+{
+	Default
+	{
+		scale 0.5;
+		radius 16;
+		height 32;
+		scale 1.0;
+	}
+
+	Override void PostBeginPlay()
+	{
+		ItemTogiveClass = "SuperArmor";
+		Super.PostBeginPlay();
+		GiveCount = 1;
+
+	}
+	States
+	{
+	  Spawn:
+		ARM2 A -1;
+		Stop;
+	}
+}
+
+class z_SuperArmor : CustomInventory
+{
+	default
+	{
+		Inventory.PickupMessage "$SUPERARMOR_PICKUP";
+		inventory.pickupsound "items/superamor";
+		Tag "$SUPERARMOR";
+
+
+		-NOGRAVITY;
+		+SHOOTABLE;
+		+NOBLOOD;
+		+NOBLOODDECALS;
+		+INVULNERABLE;
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		GiveInventory("Pointable", 1);
+	}
+	States
+	{
+		Spawn:
+			ARM2 A -1;
+			Stop;
+		Pickup:
+			TNT1 A 0 GiveInventory("BodyArmor", 200);
+			TNT1 A 0 GiveInventory("FireArmor", 200);
+			TNT1 A 0 GiveInventory("SpiritArmor", 200);
+
+			Stop;
+	}
+}

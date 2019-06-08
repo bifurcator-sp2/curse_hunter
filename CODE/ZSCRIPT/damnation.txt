@@ -1,0 +1,376 @@
+class z_Curse  : CustomInventory
+{
+	bool tutor;
+	Default
+	{
+		//+INVENTORY.AUTOACTIVATE;
+		+INVENTORY.HUBPOWER;
+		+INVENTORY.PERSISTENTPOWER;
+		//+INVENTORY.UNDROPPABLE;
+		Inventory.MaxAmount 100;
+
+		+SHOOTABLE;
+		+NOBLOOD;
+		+NOBLOODDECALS;
+		+INVULNERABLE;
+		+DONTTHRUST;
+		+NOGRAVITY;
+		//Renderstyle "Add";
+		Height 16;
+		Radius 8;
+		Scale 0.25;
+		INVENTORY.PickupMessage  "$CURSE_PICKUP";
+		INVENTORY.PickupSound  "curse/pickup";
+
+		Tag "$CURSE_NAME";
+
+		+FLOATBOB;
+		FloatBobStrength 0.5;
+
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		giveInventory("Pointable", 1);
+		giveInventory("Unhandable", 1);
+		giveInventory("PickupAble", 1);
+		vector3 MyPos = pos;
+		MyPos.z = FloorZ+24;
+		setOrigin(MyPos, 1);
+
+		//players[consoleplayer].mo.a_log("asasd");
+	}
+
+	States
+	{
+		Spawn:
+			CRSE A 1 BRIGHT light("CurseLight") {
+				a_spawnItemEX("FX_FireFlame", frandom(-6, 6), frandom(-6, 6), frandom(0, 6), 0, 0, Frandom(0.5, 1), 0, SXF_NOCHECKPOSITION, 200, 0);
+			 }
+			Loop;
+		Pickup:
+			TNT1 A 1 {
+				if(!invoker.tutor){
+					CALLacs("Tutorial", 9, 0, 0, 0);
+					invoker.tutor = 1;
+				}
+				players[consoleplayer].mo.giveInventory("info_1", 1);
+				CALLacs("SetChapter", 0, 0, 0, 0);
+				CALLacs("SetPage", 1, 0, 0, 0);
+
+			}
+			TNT1 A -1;
+			Stop;
+		Use:
+			TNT1 A -1;
+			Stop;
+	}
+}
+
+/*
+Class z_curseCloud : Actor
+{
+	int spin;
+	float ScaleSpeed;
+	default
+	{
+	  Scale 0.5;
+	  Alpha 0.5;
+	  +NOINTERACTION;
+	  Gravity 0.05;
+	  +NOGRAVITY;
+	  RENDERSTYLE "TRANSLUCENT";
+	  +ClientSideOnly;
+	  +FORCEXYBILLBOARD;
+	  +ROLLSPRITE;
+	 }
+	Override void PostBeginPlay(){
+		Super.PostBeginPlay();
+		spin = frandom(-8, 8);
+		ScaleSpeed = 0.05;
+	}
+	 States
+	 {
+		Spawn:
+			S1MK A 1 {
+				A_SetScale(scale.x+ScaleSpeed);
+				A_fadeOut(0.007, FTF_REMOVE);
+				A_SetRoll(roll+spin,SPF_INTERPOLATE);
+			}
+			Loop;
+
+	 }
+
+}
+*/
+
+
+class z_Damnation : Undroppable
+{
+	bool StartEffect;
+	float ThisRadius;
+	float ThisAngle;
+	bool flamesSpawned;
+	bool tutor7;
+	bool PlayerHasMe;
+	bool Curser;
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		if(Owner.getClassName() == "Defiler" && !random(0, 9)){
+			Curser = 1;
+		}
+		if(Owner.getClassName() != "Defiler"){
+			Owner.a_spawnItemEx("DamnationMarker", 0, 0, 0, 0, 0, 0, 0, SXF_SETMASTER);
+		}
+		ThisRadius = float(Cvar.FindCvar("DAMNATION_BASE_RADIUS").GetInt());
+
+	}
+
+	virtual void SpawnFlames(){
+		if(flamesSpawned){return;}
+		flamesSpawned = 1;
+		for(int i = 0; i < 16; i++){
+			vector3 myPos;
+			ThisAngle = 22.5*i;
+			myPos.x = Owner.x+cos(ThisAngle)*ThisRadius;
+			myPos.y = Owner.y+sin(ThisAngle)*ThisRadius;
+			myPos.z = Owner.z;
+			Actor Fire = Owner.Spawn("DamnedFire", myPos);
+			Fire.Master = Owner;
+			Fire.a_FaceMaster();
+		}
+	}
+
+	override void ModifyDamage (int damage, Name damageType, out int newdamage, bool passive)
+	{
+		float PlayerDistance = Owner.distance3D(players[consoleplayer].mo);
+		if(Owner && PlayerDistance > ThisRadius && passive && damage > 0){
+			newdamage = max(0, ApplyDamageFactors(GetClass(), damageType, damage, damage / 4));
+		}
+
+	}
+
+
+	override void DoEffect()
+	{
+
+		float PlayerDistance = Owner.distance3D(players[consoleplayer].mo);
+
+		if(Owner && Owner.health>0){
+			if(!StartEffect){
+				Owner.a_playSound("damnation/sound", CHAN_AUTO, 1.0, TRUE, ATTN_NORM);
+				StartEffect = 1;
+			}
+			if(PlayerDistance < ThisRadius){
+				players[consoleplayer].mo.giveInventory("DamnVision", 1);
+				PlayerHasMe = 1;
+				SpawnFlames();
+				if(!tutor7){
+					CALLacs("Tutorial", 7, 0, 0, 0);
+					tutor7 = 1;
+				}
+			} else {
+				if(PlayerHasMe){
+					players[consoleplayer].mo.takeInventory("DamnVision", 1);
+					flamesSpawned = 0;
+					PlayerHasMe = 0;
+				}
+			}
+
+			Owner.A_RadiusGive("z_Resurrecter", ThisRadius, RGF_MONSTERS, 1, "", "", 0, 1);
+
+			if(Curser){
+				if(Owner.A_RadiusGive("z_Damnation", ThisRadius*2, RGF_MONSTERS, 1, "", "", 0, 1)){
+					Curser = 0;
+				}
+			}
+
+
+		} else {
+			if(PlayerHasMe){
+				players[consoleplayer].mo.takeInventory("DamnVision", 1);
+			}
+		}
+		if(Owner && Owner.health<=0 && !Owner.checkInventory("FireDeathMark", 1)){
+			Owner.a_spawnItemEx("Curse");
+			Owner.takeInventory(self.GetClassName(), 1);
+		}
+		if(Owner && Owner.health<=0 && Owner.checkInventory("FireDeathMark", 1)){
+			CALLacs("Tutorial", 6, 0, 0, 0);
+			Owner.takeInventory(self.GetClassName(), 1);
+		}
+
+	}
+}
+
+class DamnVision : Undroppable {}
+
+class DontShowDamnationMarker : Undroppable {}
+class DamnationMarker : actor
+{
+	Default
+	{
+		+nointeraction;
+		scale 0.25;
+	}
+
+
+	states
+	{
+		Spawn:
+			TNT1 A 0 NODELAY a_jumpIf( (Master && Master.CheckInventory("DontShowDamnationMarker", 1)), "Inv");
+			DMKR A 1 bright {
+				if(!Master || Master.health<=0 || !Master.CheckInventory("z_Damnation", 1) ){ self.destroy(); }
+				vector3 mypos = Master.pos;
+				mypos.z = Master.pos.z+Master.height+8;
+				setOrigin(mypos, 1);
+
+			}
+			Loop;
+		Inv:
+			TNT1 A 1 a_jumpIf((Master && !Master.CheckInventory("DontShowDamnationMarker", 1)), "Spawn");
+			TNT1 A 1 { if(!Master){self.destroy();} }
+			Loop;
+	}
+}
+
+
+class z_Resurrecter : Undroppable {
+	int CountForResurrect;
+	int CountForDOresurrect;
+	override void DoEffect(){
+		if(!Owner){ return;}
+		if(Owner.checkInventory("FireDeathMark", 1) || Owner.checkInventory("GibDeathMark", 1)  || !Owner.checkInventory("Monster", 1) || Owner.checkInventory("Curse", 1)){
+			Owner.takeInventory("z_Resurrecter", 1);
+		}
+
+		if(Owner && Owner.health<=0){
+			CountForResurrect++;
+
+			if(CountForResurrect>=35*7){
+				Owner.a_spawnItemEx("ResurrFog");
+				CountForDOresurrect++;
+				if(CountForResurrect>=15){
+					if(Owner){
+						a_log(String.Format("%s%s", Owner.GetTag(), StringTable.Localize("$RESURRECTED") ) );
+						Owner.A_RaiseSelf();
+						Owner.takeInventory("z_Resurrecter", 1);
+
+					}
+				}
+
+			}
+		}
+
+	}
+}
+
+class ResurrFog : Actor
+{
+
+	default
+	{
+		+NOINTERACTION;
+		+NOGRAVITY;
+		+DONTTHRUST;
+		+DONTSPLASH;
+		Renderstyle "Add";
+		Translation "0:255=#[255,0,0]";
+		alpha 1.0;
+		yscale 1.0;
+		xscale 0.7;
+		+RANDOMIZE;
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+	}
+	States
+	{
+		Spawn:
+			TNT1 A 0 NODELAY A_playsound("monster/resurrect");
+			FIRD ABCDEFHJKLMNOP 2 bright light("ResurrectLight");
+			FIRD ABCDEFHJKLMNOP 2 bright light("ResurrectLight") a_fadeOut(0.1);
+			Stop;
+	}
+}
+
+class ResurrFogSmall : Actor
+{
+
+	default
+	{
+		+NOINTERACTION;
+		+NOGRAVITY;
+		+DONTTHRUST;
+		+DONTSPLASH;
+		Renderstyle "Add";
+		Translation "0:255=#[255,0,0]";
+		alpha 1.0;
+		yscale 0.6;
+		xscale 0.4;
+		+RANDOMIZE;
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+	}
+	States
+	{
+		Spawn:
+			TNT1 A 0 NODELAY A_playsound("monster/resurrect");
+			FIRD ABCDEFHJKLMNOP 2 bright light("ResurrectLight");
+			FIRD ABCDEFHJKLMNOP 2 bright light("ResurrectLight") a_fadeOut(0.1);
+			Stop;
+	}
+}
+
+class DamnedFire : Actor
+{
+	vector3 RelPos;
+	float ThisRadius;
+	default
+	{
+		+NOINTERACTION;
+		+NOGRAVITY;
+		+DONTTHRUST;
+		+DONTSPLASH;
+		Renderstyle "Add";
+		+WALLSPRITE;
+		alpha 0.5;
+		scale 1.5;
+		+RANDOMIZE;
+	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+		if(Master){
+			RelPos.x = master.pos.x - pos.x;
+			RelPos.y = master.pos.y - pos.y;
+			RelPos.z = master.pos.z;
+		}
+		ThisRadius = float(Cvar.FindCvar("DAMNATION_BASE_RADIUS").GetInt());
+	}
+	States
+	{
+		Spawn:
+			TNT1 A 1 NODELAY a_jump(255, 3, 6, 12);
+		Fire:
+			FIRD ABCDEFHJKLMNOP 3 bright{
+				if(!Master || Master.Health<=0 || Master.distance3D(players[consoleplayer].mo) > ThisRadius){
+					destroy();
+				} else {
+					if(abs(Master.vel.x+Master.vel.y+Master.vel.z)){
+						//A_ChangeVelocity(Master.vel.x, Master.vel.y, Master.vel.z);
+						vector3 MyPos;
+						MyPos.x = Master.pos.x+RelPos.x;
+						MyPos.y = Master.pos.y+RelPos.y;
+						MyPos.z = Master.pos.z;
+						setOrigin(MyPos, 1);
+					}
+				}
+			}
+			Loop;
+	}
+}

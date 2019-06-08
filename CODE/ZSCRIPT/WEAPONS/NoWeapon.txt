@@ -1,0 +1,27 @@
+Class NoWeapon : Weapon
+{
+	default{
+		Weapon.SelectionOrder 8000;
+		+INVENTORY.UNDROPPABLE;
+
+	}
+  States
+  {
+  Ready:
+    TNT1 A 1 A_WeaponReady;
+    Loop;
+  Deselect:
+    TNT1 A 1 A_Lower;
+    Loop;
+  Select:
+    TNT1 A 1 A_Raise;
+    Goto Ready;
+  Fire:
+    TNT1 A 1;
+    Goto Ready;
+  Spawn:
+    TNT1 A 1;
+    Stop;
+
+  }
+}

@@ -1,0 +1,137 @@
+height 0;
+//monospacefonts true, "0";
+
+statusbar fullscreen
+{
+	inInventory DrawHUD
+	{
+
+
+		drawimage "BLUDLEF", 0, 175;
+		drawimage "BLUDRIG", 248, 175;
+		drawnumber 3, ZBHUDFON, pink1, health, 29, 179,1;
+		drawnumber 3, ZHUDFON3, DarkerBlue2, ammo1, 97, 179,1;
+
+			drawswitchableimage BlueCard, "nullimage", "STKEYS0", 83, 180;
+			drawswitchableimage YellowCard, "nullimage", "STKEYS1", 83, 189;
+			drawswitchableimage BlueSkull, "nullimage", "STKEYS3", 71, 170;
+			drawswitchableimage RedCard, "nullimage", "STKEYS2", 71, 168;
+			drawswitchableimage RedSkull, "nullimage", "STKEYS5", 59, 178;
+			drawswitchableimage YellowSkull, "nullimage", "STKEYS4", 59, 189;
+
+		drawbar "TNTMTR01", "TNTMTR00", Ammo ThrowPower, horizontal, 124, 150;
+
+		drawbar "REDABAR", "BLACKBAR",  FireArmor, horizontal, 250, 176;
+		drawbar "BLUEBAR", "BLACKBAR",  BodyArmor, horizontal, 250, 184;
+		drawbar "GRNABAR", "BLACKBAR",  SpiritArmor, horizontal, 250, 192;
+
+		inInventory FireArmor
+		{ drawnumber 4, BLUEFONT, white, FireArmor, 265, 177; }
+
+		inInventory BodyArmor
+		{ drawnumber 4, BLUEFONT, white, BodyArmor, 265, 185; }
+
+		inInventory SpiritArmor
+		{ drawnumber 4, BLUEFONT, white, SpiritArmor, 265, 193; }
+
+		drawnumber 3, ZBHUDFON, pink1, stamina, 63, 179,0;
+
+		inInventory Curse
+		{
+			drawswitchableimage Curse, "nullimage", "CRSEB0", 102, 175;
+			drawnumber 3, BLUEFONT, white, Curse, 120, 194;
+		}
+
+		inInventory AM_Carnage
+		{
+			drawswitchableimage AM_Carnage, "nullimage", "AM01B0", 175, 175;
+			drawnumber 1, BLUEFONT, white, AM_Carnage, 189, 194;
+		}
+		inInventory AM_Domination
+		{
+			drawswitchableimage AM_Domination, "nullimage", "AM02B0", 200, 175;
+			drawnumber 1, BLUEFONT, white, AM_Domination, 215, 194;
+		}
+
+		inInventory AM_Survival
+		{
+			drawswitchableimage AM_Survival, "nullimage", "AM03B0", 230, 175;
+			drawnumber 1, BLUEFONT, white, AM_Survival, 239, 194;
+		}
+
+		drawselectedinventory ZBINVFON, 277, 179, 312, 181, pink1, 0;
+	}
+}
+
+statusbar normal // ZBlooD Status bar
+{
+	inInventory DrawHUD
+	{
+
+
+		drawimage "BLUDLEF", 0, 175;
+		drawimage "BLUDRIG", 248, 175;
+		drawnumber 3, ZBHUDFON, pink1, health, 29, 179,1;
+		drawnumber 3, ZHUDFON3, DarkerBlue2, ammo1, 97, 179,1;
+
+			drawswitchableimage BlueCard, "nullimage", "STKEYS0", 83, 180;
+			drawswitchableimage YellowCard, "nullimage", "STKEYS1", 83, 189;
+			drawswitchableimage BlueSkull, "nullimage", "STKEYS3", 71, 170;
+			drawswitchableimage RedCard, "nullimage", "STKEYS2", 71, 168;
+			drawswitchableimage RedSkull, "nullimage", "STKEYS5", 59, 178;
+			drawswitchableimage YellowSkull, "nullimage", "STKEYS4", 59, 189;
+
+		drawbar "TNTMTR01", "TNTMTR00", Ammo ThrowPower, horizontal, 124, 150;
+
+		drawbar "REDABAR", "BLACKBAR",  FireArmor, horizontal, 250, 176;
+		drawbar "BLUEBAR", "BLACKBAR",  BodyArmor, horizontal, 250, 184;
+		drawbar "GRNABAR", "BLACKBAR",  SpiritArmor, horizontal, 250, 192;
+
+		inInventory FireArmor
+		{ drawnumber 4, BLUEFONT, white, FireArmor, 265, 177; }
+
+		inInventory BodyArmor
+		{ drawnumber 4, BLUEFONT, white, BodyArmor, 265, 185; }
+
+		inInventory SpiritArmor
+		{ drawnumber 4, BLUEFONT, white, SpiritArmor, 265, 193; }
+
+		drawnumber 3, ZBHUDFON, pink1, stamina, 63, 179,0;
+
+		inInventory Curse
+		{
+			drawswitchableimage Curse, "nullimage", "CRSEB0", 102, 175;
+			drawnumber 3, BLUEFONT, white, Curse, 120, 194;
+		}
+
+		inInventory AM_Carnage
+		{
+			drawswitchableimage AM_Carnage, "nullimage", "AM01B0", 175, 175;
+			drawnumber 1, BLUEFONT, white, AM_Carnage, 189, 194;
+		}
+		inInventory AM_Domination
+		{
+			drawswitchableimage AM_Domination, "nullimage", "AM02B0", 200, 175;
+			drawnumber 1, BLUEFONT, white, AM_Domination, 215, 194;
+		}
+
+		inInventory AM_Survival
+		{
+			drawswitchableimage AM_Survival, "nullimage", "AM03B0", 230, 175;
+			drawnumber 1, BLUEFONT, white, AM_Survival, 239, 194;
+		}
+
+		drawselectedinventory ZBINVFON, 277, 179, 312, 181, pink1, 0;
+	}
+}
+
+statusbar inventory
+{
+	drawinventorybar Doom, 7, ZBINVFON, 107, 137, 121, 129, pink1, 1;
+}
+
+statusbar inventoryfullscreen
+{
+	drawinventorybar Doom, 7, ZBINVFON, 113, 180, 127, 172, pink1, 1;
+}
+*/

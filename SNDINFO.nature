@@ -1,0 +1,183 @@
+
+
+//terrain shplashes
+terrain/swampsplash MUCK5
+terrain/jumpdown JUMPD5
+
+
+
+
+//////////////////////////////////////////////////////
+//FX
+//////////////////////////////////////////////////////
+fx/smallFire FIRE1
+$rolloff fx/smallFire 64 192
+fx/mediumFire FIRE2
+$rolloff fx/mediumFire 128 256
+fx/bigFire FIRE3
+
+fx/fireON 	FIREON
+fx/fireOFF	 FIREOFF
+
+fx/lampON 	lampON
+fx/lampOFF	 lampOFF
+
+fx/firedeath FIREDTH1
+
+generic/drop UNIDROP
+
+
+//////////////////////////////////////////////////////
+//NATURE
+//////////////////////////////////////////////////////
+
+nature/breakTree TREEBRK
+nature/breakRock bigrock
+
+
+
+
+stpact1 stpact1 //d3 sound
+stpact2 stpact2 //d3 sound
+stpact3 stpact3 //d3 sound
+stpact4 stpact4 //d3 sound
+stpact5 stpact5 //d3 sound
+$random stone/impact { stpact1 stpact2 stpact3 stpact4 stpact5}
+$rolloff stpact1 1 250
+$rolloff stpact2 1 250
+$rolloff stpact3 1 250
+$rolloff stpact4 1 250
+$rolloff stpact5 1 250
+
+PGENE1 PGENE1
+PGENE2 PGENE2
+PGENE3 PGENE3
+PGENE4 PGENE4
+PGENE5 PGENE5
+$random impact/generic { PGENE1 PGENE2 PGENE3 PGENE4 PGENE5}
+$rolloff impact/generic 1 250
+
+
+crack1 crack1
+crack2 crack2
+crack3 crack3
+crack4 crack4
+$random wooden/brake { crack1 crack2  }
+/*$rolloff crack1 150 250
+$rolloff crack2 150 250
+$rolloff crack3 150 250
+$rolloff crack4 150 250*/
+
+bigGlass/brake bglass1
+
+GLSBNSE1 	GLSBNSE1
+GLSBNSE2 	GLSBNSE2
+GLSBNSE3 	GLSBNSE3
+GLSBNSE4 	GLSBNSE4
+$random glass/bounce { GLSBNSE1 	GLSBNSE2 	GLSBNSE3	 GLSBNSE4 }
+
+
+bone/crack bonecrk
+
+woodbrk1 woodbrk1
+woodbrk2 woodbrk2
+$random nature/woodBrake { woodbrk1 woodbrk2}
+
+keramic/brake KBRAKE
+
+THUNDER1 THUNDER1
+THUNDER2 THUNDER2
+THUNDER3 THUNDER3
+THUNDER4 THUNDER4
+THUNDER5 THUNDER5
+THUNDER6 THUNDER6
+THUNDER7 THUNDER7
+THUNDER8 THUNDER8
+THUNDER9 THUNDER9
+TUNDER10 TUNDER10
+TUNDER11 TUNDER11
+TUNDER12 TUNDER12
+TUNDER14 TUNDER13
+TUNDER14 TUNDER14
+$random Thunder { THUNDER1 THUNDER2 THUNDER3 THUNDER4 THUNDER5 THUNDER6 THUNDER7 THUNDER8  THUNDER9 TUNDER10 TUNDER11 TUNDER12 TUNDER13 TUNDER14 }
+
+forest1 forest1
+forest2 forest2
+forest3 forest3
+forest4 forest4
+$random nature/TreesNight { forest1 forest2 forest3 forest4 }
+
+nature/BudhDay1 BUSHDAY
+nature/BudhNight BUSHNIGH
+
+nature/OsokaDay OSOKDAY
+nature/OsokaNihgt1 OSOKNIGH
+
+nature/GrassNight GRASNIGH
+nature/GrassDay GRASSDAY
+
+MENHIR MENHIR
+
+nature/GILL GILL
+nature/mediumRain BFRAIN
+
+
+mediumRain	BFRAIN
+$AMBIENT 1 mediumRain POINT CONTINUOUS 1.0
+
+nature/drips driploop
+$AMBIENT 2 nature/drips POINT CONTINUOUS 1.0
+
+nature/waterflow water
+$AMBIENT 3 nature/waterflow POINT CONTINUOUS 1.0
+
+amb/catacombs	 catcbs
+$AMBIENT 4 amb/catacombs POINT CONTINUOUS 1.0
+
+amb/church1	 church1
+$AMBIENT 5 amb/church1 POINT CONTINUOUS 1.0
+amb/church2	 church2
+$AMBIENT 6 amb/church2 POINT CONTINUOUS 1.0
+amb/defhum	 defhum
+$AMBIENT 7 amb/defhum POINT CONTINUOUS 1.0
+amb/wind1	 wind1
+$AMBIENT 8 amb/wind1 POINT CONTINUOUS 1.0
+amb/wind2	 wind2
+$AMBIENT 9 amb/wind2 POINT CONTINUOUS 1.0
+amb/wind3	 wind3
+$AMBIENT 10 amb/wind3 POINT CONTINUOUS 1.0
+amb/windhum	 windhum
+$AMBIENT 11 amb/windhum POINT CONTINUOUS 0.5
+
+Ambient/FLESHMOV	FLESHMOV
+$alias FleshMoving Ambient/FLESHMOV
+$ambient 12 FleshMoving point continuous 1.0
+
+amb/wfall wfall
+$ambient 13 amb/wfall point continuous 1.0
+
+amb/caveaAmbient caveabm
+$ambient 14 amb/caveaAmbient point continuous 1.0
+
+nature/watermove watermov
+$AMBIENT 15 nature/watermove POINT CONTINUOUS 1.0
+
+
+
+amb/chain1 chain1
+amb/chain2 chain2
+amb/chain3 chain3
+amb/chain4 chain4
+
+
+debris/metall metalbr
+
+
+
+
+stab_01 stab_01
+stab_02 stab_02
+stab_03 stab_03
+stab_04 stab_04
+stab_05 stab_05
+$random ambient/stab { stab_01 stab_02 stab_03 stab_04 stab_05 } //d3 sounds

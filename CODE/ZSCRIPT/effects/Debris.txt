@@ -1,0 +1,949 @@
+class Material_Base : CustomInventory
+{
+	bool init;
+	bool ThrowDamager;
+	float SUMvelOLD, SUMvel, WeightFactor;
+	Default
+	{
+		+INVENTORY.AUTOACTIVATE;
+		+INVENTORY.HUBPOWER;
+		+INVENTORY.PERSISTENTPOWER;
+		+INVENTORY.UNDROPPABLE;
+		Inventory.MaxAmount 1;
+	}
+	virtual void SpawnDebris(){
+	}
+
+	override void DoEffect()
+	{
+		if(!init){
+			init = true;
+			Owner.bSOLID = true;
+			Owner.bSHOOTABLE = true;
+			Owner.bNOBLOODDECALS = true;
+		} else {
+			if(Owner.health <= 0){
+				SpawnDebris();
+			} else {
+				SUMvel = abs(owner.vel.x)+abs(owner.vel.y)+abs(owner.vel.z);
+				if(ThrowDamager && !owner.findInventory("ItemInHands", 1)){
+					if(SUMvelOLD - SUMvel > 5){
+						WeightFactor = 0.004;
+						int damage = (2*Owner.radius)*(2*Owner.radius)*Owner.height*WeightFactor;
+						owner.A_Explode (damage, Owner.radius+16, XF_NOTMISSILE, false, Owner.radius+10, 0, 0, "", "KineticPlayerDamage");
+						owner.a_playSound("generic/drop", CHAN_AUTO);
+						//a_logint(damage);
+					}
+				}
+				SUMvelOLD = SUMvel;
+			}
+		}
+	}
+	States
+	{
+		Spawn:
+			TNT1 A -1;
+			Stop;
+		Use:
+			TNT1 A -1;
+			Stop;
+	}
+
+}
+
+class Material_Blood : Material_Base
+{
+
+	override void SpawnDebris(){
+		Owner.a_fall();
+		float x = frandom(-Owner.radius, Owner.radius);
+		float y = frandom(-Owner.radius, Owner.radius);
+		float z = Owner.height/2.0;
+		Owner.A_SpawnItemEx("BloodCloud", 0, 0, z, 0, 0, 0, 0,SXF_NOCHECKPOSITION);
+		for(int i = 0; i<random(10, 15); i++){
+			x = frandom(-Owner.radius, Owner.radius);
+			y = frandom(-Owner.radius, Owner.radius);
+			z = frandom(Owner.height*0.3, Owner.height*0.7);
+			Owner.A_SpawnItemEx("UniGib", x, y, z, frandom(-3.0, 3.0), frandom(-3.0, 3.0), frandom(6.0, 8.0), 0,SXF_NOCHECKPOSITION|SXF_TRANSFERPOINTERS|SXF_TRANSFERTRANSLATION);
+		}
+		Owner.A_SpawnItemEx("GibSound", 0, 0, 0, 0, 0, 0, 0,SXF_NOCHECKPOSITION);
+
+	}
+
+	override void DoEffect()
+	{
+		if(!init){
+			init = true;
+			Owner.bSHOOTABLE = true;
+			Owner.bNOBLOODDECALS = true;
+		} else {
+			if(Owner.health <= 0){
+				SpawnDebris();
+				owner.TakeInventory(self.GetClassName(), 1);
+			}
+		}
+	}
+
+}
+class Material_Bones : Material_Base
+{
+
+	override void SpawnDebris(){
+		z_BoneDebris_Gen Deb = z_BoneDebris_Gen(Owner.spawn("z_BoneDebris_Gen", Owner.pos));
+		Deb.Master = Owner;
+		Deb.Args[3] = 16;
+		Deb.PostBeginPlay();
+
+		z_Dust_Gen Deb2 = z_Dust_Gen(Owner.spawn("z_Dust_Gen", Owner.pos));
+		Deb2.Master = Owner;
+		Deb2.Args[3] = 4;
+		Deb2.PostBeginPlay();
+		Owner.a_fall();
+		owner.TakeInventory(self.GetClassName(), 1);
+	}
+
+}
+
+class Material_Rock : Material_Base
+{
+	override void SpawnDebris(){
+		z_RockDebris_Gen Deb = z_RockDebris_Gen(Owner.spawn("z_RockDebris_Gen", Owner.pos));
+		Deb.Master = Owner;
+		Deb.Args[3] = 4;
+		Deb.PostBeginPlay();
+
+		z_Dust_Gen Deb2 = z_Dust_Gen(Owner.spawn("z_Dust_Gen", Owner.pos));
+		Deb2.Master = Owner;
+		Deb2.Args[3] = 4;
+		Deb2.PostBeginPlay();
+		Owner.a_fall();
+		owner.TakeInventory(self.GetClassName(), 1);
+	}
+
+	override void PostBeginPlay(){
+		super.PostBeginPlay();
+		ThrowDamager = 1;
+	}
+
+}
+class Material_Wood : Material_Base
+{
+	override void SpawnDebris(){
+
+		z_WoodDebris_Gen Deb = z_WoodDebris_Gen(Owner.spawn("z_WoodDebris_Gen", Owner.pos));
+		Deb.Master = Owner;
+		Deb.Args[3] = 8;
+		Deb.Args[4] = 50;//scale
+		Deb.PostBeginPlay();
+
+		z_Dust_Gen Deb2 = z_Dust_Gen(Owner.spawn("z_Dust_Gen", Owner.pos));
+		Deb2.Master = Owner;
+		Deb2.Args[3] = 2;//density
+		Deb2.Args[4] = 30;//scale
+
+		Deb2.PostBeginPlay();
+		Owner.a_fall();
+		owner.TakeInventory(self.GetClassName(), 1);
+
+	}
+
+}
+class Material_Keramic : Material_Base
+{
+	override void SpawnDebris(){
+		z_Keramic_Gen Deb = z_Keramic_Gen(Owner.spawn("z_Keramic_Gen", Owner.pos));
+		Deb.Master = Owner;
+		Deb.Args[3] = 24;
+		Deb.Args[4] = 30;//scale
+		Deb.PostBeginPlay();
+
+		Owner.a_fall();
+		owner.TakeInventory(self.GetClassName(), 1);
+	}
+
+}
+
+
+
+
+
+Class z_Debris_Gen : SwitchableDecoration
+{
+	float w;
+	float l;
+	float h;
+	float dens;
+	float amount;
+	string ClassName;
+
+	default
+	{
+	  +NOINTERACTION;
+	  +NOGRAVITY;
+	}
+
+	Override void PostBeginPlay(){
+		Super.PostBeginPlay();
+		w = Args[0]?Args[0]:32;
+		l = Args[1]?Args[1]:64;
+		h = Args[2]?Args[2]:32;
+		if(Master){
+			w = l = Master.radius;
+			h = Master.height;
+		}
+		dens = Args[3]?Args[3]:1;//num of spawns per 32 cube pounts
+		amount = (w*2*l*2*h)/(32*32*32)*dens;
+		amount = amount>128?128:amount;
+		ClassName = "z_dustCloud";
+		//a_logfloat((w*2*l*2*h)/(32*32*32));
+	}
+
+	virtual void DoIt(){
+		for(int i = 0; i<amount; i++){
+			a_spawnItemEX(ClassName, random(-w, W), random(-l, l), random(-h, h), Frandom(2, 4), Frandom(2, 4), Frandom(2, 4), 0, SXF_NOCHECKPOSITION|SXF_SETMASTER, 64, 0);
+
+		}
+	}
+
+	states
+	{
+		Spawn:
+			TNT1 A 0;
+			Goto Inactive;
+		Inactive:
+			TNT1 A -1;
+			Loop;
+		Active:
+			TNT1 A 0 DoIt();
+			Goto Inactive;
+		StopIt:
+			TNT1 A 2;
+			Stop;
+	}
+}
+
+Class z_ColorGlass_Gen : z_Debris_Gen
+{
+	//Args[4] is scale for dust clouds
+	float SpeedXY;
+	Override void PostBeginPlay(){
+		Super.PostBeginPlay();
+		SpeedXY = 2.0;
+
+		ClassName = "z_colorGlass_debris";
+
+		if(Args[0]==1){ //window - wallglass
+			SpeedXY *= 2;
+		}
+
+		if(Master){
+			if(Master.Args[4]){
+				SpeedXY *= (Master.Args[4]*0.01);
+			}
+			DoIt();
+		}
+
+
+	}
+
+	override void DoIt(){
+		for(int i = 0; i<amount; i++){
+			if(Args[0]==1){ //window - wallglass
+				a_spawnItemEX(ClassName, random(-w, W), random(-l, l), random(-h, h), Frandom(0, SpeedXY), Frandom(-SpeedXY/2, SpeedXY/2), Frandom(1, 3), 0, SXF_NOCHECKPOSITION|SXF_SETMASTER, 64, 0);
+			} else {
+				a_spawnItemEX(ClassName, random(-w, W), random(-l, l), random(-h, h), Frandom(-SpeedXY, SpeedXY), Frandom(-SpeedXY, SpeedXY), Frandom(1, 3), 0, SXF_NOCHECKPOSITION|SXF_SETMASTER, 64, 0);
+			}
+		}
+
+
+		a_playSound("bigGlass/brake");
+		if(Master){self.setStateLabel("StopIt");}
+	}
+
+}
+
+
+Class z_Dust_Gen : z_Debris_Gen
+{
+	//Args[4] is scale for dust clouds
+	float SpeedXY;
+	Override void PostBeginPlay(){
+		Super.PostBeginPlay();
+		SpeedXY = 2.0;
+		if(Master){
+			if(Master.Args[4]){
+				SpeedXY *= (Master.Args[4]*0.01);
+			}
+			DoIt();
+		}
+
+	}
+
+	override void DoIt(){
+		for(int i = 0; i<amount; i++){
+			a_spawnItemEX(ClassName, random(-w, W), random(-l, l), random(-h, h), Frandom(-SpeedXY, SpeedXY), Frandom(-SpeedXY, SpeedXY), Frandom(1, 3), 0, SXF_NOCHECKPOSITION|SXF_SETMASTER, 64, 0);
+		}
+		if(Master){self.setStateLabel("StopIt");}
+	}
+
+}
+Class z_RockDebris_Gen : z_Debris_Gen
+{
+	Override void PostBeginPlay(){
+		Super.PostBeginPlay();
+		ClassName = "z_stone_debris";
+		if(Master){DoIt();}
+	}
+
+	override void DoIt(){
+		for(int i = 0; i<amount; i++){
+			a_spawnItemEX(ClassName, random(-w, W), random(-l, l), random(0, h), Frandom(-6, 6), Frandom(-6, 6), Frandom(8, 16), 0, SXF_NOCHECKPOSITION|SXF_SETMASTER, 64, 0);
+		}
+		a_playSound("nature/breakRock");
+		if(Master){self.setStateLabel("StopIt");}
+		//a_logint(amount);
+		//if(Master){self.Destroy();}
+	}
+
+}
+
+Class z_WoodDebris_Gen : z_Debris_Gen
+{
+	Override void PostBeginPlay(){
+		Super.PostBeginPlay();
+		ClassName = "z_wood_debris";
+		if(Master){DoIt();}
+	}
+	override void DoIt(){
+		//a_logint(args[4]);
+		for(int i = 0; i<amount; i++){
+			a_spawnItemEX(ClassName, random(-w, W), random(-l, l), random(0, h), Frandom(-6, 6), Frandom(-6, 6), Frandom(8, 16), 0, SXF_NOCHECKPOSITION|SXF_SETMASTER, 64, 0);
+		}
+		a_playSound("wooden/brake");
+		if(Master){self.setStateLabel("StopIt");}
+	}
+
+}
+
+Class z_BoneDebris_Gen : z_Debris_Gen
+{
+	Override void PostBeginPlay(){
+		Super.PostBeginPlay();
+		ClassName = "z_bone_debris";
+		if(Master){DoIt();}
+	}
+	override void DoIt(){
+		for(int i = 0; i<amount; i++){
+			a_spawnItemEX(ClassName, random(-w, W), random(-l, l), random(0, h), Frandom(-6, 6), Frandom(-6, 6), Frandom(8, 16), 0, SXF_NOCHECKPOSITION|SXF_SETMASTER, 64, 0);
+		}
+		a_playSound("bone/crack");
+		if(Master){self.setStateLabel("StopIt");}
+	}
+
+}
+
+Class z_firedust_debris_Gen : z_Debris_Gen
+{
+	Override void PostBeginPlay(){
+		Super.PostBeginPlay();
+		ClassName = "z_firedust_debris";
+		if(Master){DoIt();}
+	}
+	override void DoIt(){
+		for(int i = 0; i<amount; i++){
+			a_spawnItemEX(ClassName, random(-w, W), random(-l, l), random(0, h), Frandom(-1.5, 1.5), Frandom(-1.5, 1.5), Frandom(1, 1), 0, SXF_NOCHECKPOSITION|SXF_SETMASTER, 64, 0);
+		}
+		//a_playSound("bone/crack");
+		if(Master){self.setStateLabel("StopIt");}
+	}
+
+}
+
+
+Class z_Keramic_Gen : z_Debris_Gen
+{
+	Override void PostBeginPlay(){
+
+		Super.PostBeginPlay();
+		ClassName = "z_keramic_debris";
+		//args[4] = 0.25;
+		if(Master){DoIt();}
+	}
+	override void DoIt(){
+		//a_logint(args[4]);
+		for(int i = 0; i<amount; i++){
+			a_spawnItemEX(ClassName, random(-w, W), random(-l, l), random(0, h), Frandom(-4, 4), Frandom(-4, 4), Frandom(4, 8), 0, SXF_NOCHECKPOSITION|SXF_SETMASTER, 64, 0);
+		}
+		a_playSound("keramic/brake");
+		if(Master){self.setStateLabel("StopIt");}
+	}
+
+}
+
+
+
+Class z_dustCloud : Actor
+{
+	int spin;
+	float ScaleSpeed;
+	default
+	{
+	  Scale 1.0;
+	  Alpha 0.3;
+	  +NOBLOCKMAP;
+	  +DONTSPLASH;
+	  Gravity 0.05;
+	  -NOGRAVITY;
+	  -SOLID;
+	  +WINDTHRUST;
+	  +CannotPush;
+	  RENDERSTYLE "TRANSLUCENT";
+	  +ClientSideOnly;
+	  +FORCEXYBILLBOARD;
+	  +ROLLSPRITE;
+	 }
+	Override void PostBeginPlay(){
+		Super.PostBeginPlay();
+		spin = frandom(-8, 8);
+		if(Master){
+			if(Master.args[4]){
+				A_SetScale(Master.args[4]*0.01);
+				ScaleSpeed = 0.05*scale.x;
+			} else {
+				ScaleSpeed = 0.05;
+			}
+		}
+	}
+	 States
+	 {
+		Spawn:
+			DUST A 1 {
+				A_SetScale(scale.x+ScaleSpeed);
+				A_fadeOut(0.003, FTF_REMOVE);
+				A_SetRoll(roll+spin,SPF_INTERPOLATE);
+			}
+			Loop;
+
+	 }
+
+}
+
+
+Class z_debris_base : DistanceSpawned
+{
+	int spin;
+	default
+	{
+
+		alpha 1.0;
+		+FORCEXYBILLBOARD;
+		+ROLLSPRITE;
+		radius  16;
+		+MISSILE;
+		+NOBOUNCESOUND;
+		damage 0;
+		+ThruSpecies;
+		+ThruActors;
+		+BOUNCEONFLOORS;
+		+BOUNCEONWALLS;
+		+USEBOUNCESTATE;
+		+BOUNCEAUTOOFF;
+		-NOGRAVITY;
+		-NOLIFTDROP;
+		BounceFactor 0.3;
+		//Gravity 0.56;
+
+	}
+	override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+		if(Master){
+			if(Master.args[4]){
+				A_SetScale(frandom(Master.args[4]*0.5*0.01, Master.args[4]*1.5*0.01));
+				//a_logfloat(Master.args[4]*0.5*0.01);
+			} else {
+				A_SetScale(frandom(0.5, 1.0));
+			}
+		} else {
+			A_SetScale(frandom(0.5, 1.0));
+		}
+
+		spin = frandom(-32, 32);
+	}
+
+
+	override int getRenderDistance(){
+		return Cvar.GetCVar("z_natue_renderdistance_grass", players[consoleplayer]).GetInt();
+	}
+
+	States
+	{
+		SetSprite:
+		Spawn:
+			TNT1 A 1 { if(vel.x+vel.y+vel.z > 0){ A_SetRoll(roll+spin,SPF_INTERPOLATE); } }
+			Loop;
+		Draw:
+			"####" "#" 1 { if(vel.x+vel.y+vel.z > 0){ A_SetRoll(roll+spin,SPF_INTERPOLATE); } }
+			loop;
+		Bounce:
+			"####" "#" 1 A_SetRoll(roll+spin,SPF_INTERPOLATE);
+			Loop;
+		Death:
+			"####" "#" -1;
+			stop;
+
+	}
+
+}
+
+Class FlareSparks : z_debris_base
+{
+	int counter;
+
+	default
+	{
+		renderstyle "Add";
+		+NOBLOCKMAP;
+	}
+	override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+		A_SetScale(frandom(0.25, 0.5));
+		spin = frandom(-32, 32);
+	}
+	override void Tick()
+	{
+		Super.Tick();
+		if(waterlevel>0){destroy();}
+		if(counter<35*2){
+			counter++;
+		} else {
+			destroy();
+		}
+	}
+
+	States
+	{
+		SetSprite:
+		Spawn:
+			FSSK A 1 bright;
+			Loop;
+		Draw:
+			"####" ABCD 1 bright;
+			loop;
+		Bounce:
+			"####" ABCD 1 bright A_SetRoll(roll+spin,SPF_INTERPOLATE);
+			Loop;
+		Death:
+			"####" A 1 bright;
+			stop;
+
+	}
+
+}
+
+
+class z_stone_debris : z_debris_base
+{
+	default
+	{
+		+NOBLOODDECALS;
+		BloodType "z_nature_rockcracks";
+		health 20;
+		tag "$STONE_DEBRIS";
+	}
+	States
+	{
+		SetSprite:
+			TNT1 A 0 A_Jump (256, 1, 2, 3, 4);
+			ROC1 A 0 A_jump(256, "Draw");
+			ROC1 B 0 A_jump(256, "Draw");
+			ROC1 C 0 A_jump(256, "Draw");
+			ROC1 D 0 A_jump(256, "Draw");
+		Spawn:
+			TNT1 A 1;
+			 Loop;
+		Draw:
+			"####" "#" 1 { if(vel.x+vel.y+vel.z > 0){ A_SetRoll(roll+spin,SPF_INTERPOLATE); } }
+			loop;
+		Bounce:
+			"####" "#" 1 A_SetRoll(roll+spin,SPF_INTERPOLATE);
+			Loop;
+		Death:
+			ROC1 E -1 {
+				A_SetRoll(0,SPF_INTERPOLATE);
+				bSHOOTABLE = 1;
+				bMISSILE = 0;
+				self.takeInventory("Unhandable", 1);
+				self.takeInventory("Usable", 1);
+				bSHOOTABLE = 1;
+			}
+			Stop;
+
+
+	}
+}
+
+class z_wood_debris : z_debris_base
+{
+	States
+	{
+		SetSprite:
+			TNT1 A 0 A_Jump (256, 1, 2, 3, 4);
+			SGSA A 0 A_jump(256, "Draw");
+			SGSA B 0 A_jump(256, "Draw");
+			SGSA C 0 A_jump(256, "Draw");
+			SGSA D 0 A_jump(256, "Draw");
+		Spawn:
+			TNT1 A 1;
+			 Loop;
+		Draw:
+			"####" "#" 1 { if(vel.x+vel.y+vel.z > 0){ A_SetRoll(roll+spin,SPF_INTERPOLATE); } }
+			loop;
+		Bounce:
+			"####" "#" 1 A_SetRoll(roll+spin,SPF_INTERPOLATE);
+			Loop;
+		Death:
+			SGSA E -1 A_SetRoll(0,SPF_INTERPOLATE);
+			stop;
+
+	}
+}
+
+
+class z_colorGlass_debris : z_wood_debris
+{
+	default
+	{
+		gravity 0.3;
+		mass 2.0;
+		BounceFactor 0.4;
+
+	}
+	override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+
+		switch (random(1, 10)){
+			case 1:
+				A_SetTranslation("RedGlass");
+				break;
+			case 2:
+				A_SetTranslation("BlueGlass");
+				break;
+			case 3:
+				A_SetTranslation("OrangeGlass");
+				break;
+			case 4:
+				A_SetTranslation("YellowGlass");
+				break;
+			case 5:
+				A_SetTranslation("PinkGlass");
+				break;
+
+
+		}
+		//
+
+
+		if(Master){
+			if(Master.args[4]){
+				A_SetScale(frandom(Master.args[4]*0.5*0.01, Master.args[4]*1.5*0.01));
+				//a_logfloat(Master.args[4]*0.5*0.01);
+			} else {
+				A_SetScale(frandom(0.1, 0.2));
+			}
+		} else {
+			A_SetScale(frandom(0.1, 0.2));
+		}
+
+		spin = frandom(-32, 32);
+	}
+	States
+	{
+		SetSprite:
+			TNT1 A 0 A_Jump (256, 1, 2, 3, 4, 5);
+			GB01 A 0 A_jump(256, "Draw");
+			GB01 B 0 A_jump(256, "Draw");
+			GB01 C 0 A_jump(256, "Draw");
+			GB01 D 0 A_jump(256, "Draw");
+			GB01 E 0 A_jump(256, "Draw");
+		Bounce:
+			"####" "#" 1 { A_SetRoll(roll+spin,SPF_INTERPOLATE); a_playSound("glass/bounce"); }
+			Loop;
+		Death:
+			"####" "#" 0 { bFLATSPRITE = 1;}
+			"####" "#" -1;
+			stop;
+	}
+}
+
+class z_bone_debris : z_debris_base
+{
+	States
+	{
+		SetSprite:
+			TNT1 A 0 A_Jump (256, 1, 2, 3, 4, 5);
+			BNE2 A 0 A_jump(256, "Draw");
+			BNE2 B 0 A_jump(256, "Draw");
+			BNE2 C 0 A_jump(256, "Draw");
+			BNE2 D 0 A_jump(256, "Draw");
+			BNE2 E 0 A_jump(256, "Draw");
+		Spawn:
+			TNT1 A 1;
+			 Loop;
+		Draw:
+			"####" "#" 1 A_SetRoll(roll+spin,SPF_INTERPOLATE);
+			loop;
+		Bounce:
+			"####" "#" 1 A_SetRoll(roll+spin,SPF_INTERPOLATE);
+			Loop;
+		Death:
+			"####" "#" -1 A_SetRoll(0,SPF_INTERPOLATE);
+			stop;
+
+	}
+}
+class z_firedust_debris : z_debris_base
+{
+	int counter;
+	default
+	{
+		gravity 0.1;
+		mass 2.0;
+	}
+	override void Tick()
+	{
+		Super.Tick();
+		if(counter<35*2){
+			counter++;
+		} else {
+			a_fadeOut(0.01);
+		}
+	}
+	States
+	{
+		SetSprite:
+			TNT1 A 0 A_Jump (256, 1, 2, 3);
+			FDUS A 0 A_jump(256, "Draw");
+			FDUS B 0 A_jump(256, "Draw");
+			FDUS C 0 A_jump(256, "Draw");
+
+		Spawn:
+			TNT1 A 1;
+			 Loop;
+		Draw:
+			"####" "#" 1 { if(vel.x+vel.y+vel.z > 0){ A_SetRoll(roll+spin,SPF_INTERPOLATE); } }
+			loop;
+		Bounce:
+			"####" "#" 1 A_SetRoll(roll+spin,SPF_INTERPOLATE);
+			Loop;
+		Death:
+			"####" "#" -1 A_SetRoll(0,SPF_INTERPOLATE);
+			stop;
+
+	}
+}
+class z_keramic_debris : z_debris_base
+{
+	States
+	{
+		SetSprite:
+			TNT1 A 0 A_Jump (256, 1, 2, 3, 4);
+			KERA A 0 A_jump(256, "Draw");
+			KERA B 0 A_jump(256, "Draw");
+			KERA C 0 A_jump(256, "Draw");
+			KERA D 0 A_jump(256, "Draw");
+		Spawn:
+			TNT1 A 1;
+			 Loop;
+		Draw:
+			"####" "#" 1;
+			loop;
+		Bounce:
+			"####" "#" 1 A_SetRoll(roll+spin,SPF_INTERPOLATE);
+			Loop;
+		Death:
+			KERA a -1 A_SetRoll(0,SPF_INTERPOLATE);
+			stop;
+
+	}
+}
+
+
+
+
+class NapalmDebris : actor
+{
+	default
+	{
+	  health 5;
+	  radius 1;
+	  height 1;
+	  Speed 8;
+	  Scale 0.15;
+	  PROJECTILE;
+	  +NOBLOCKMAP;
+	  +DONTSPLASH;
+	  +RANDOMIZE;
+	  -NOGRAVITY;
+	  -SOLID;
+	  +WINDTHRUST;
+	  +CannotPush;
+	  RENDERSTYLE "ADD";
+	  +ClientSideOnly;
+	 }
+ states
+  {
+  Spawn:
+    FSPK A 0 bright A_Jump(192,3,4,6,8);
+    FSPK A 10 bright;
+    FSPK A 200 bright A_LowGravity;
+    stop;
+    FSPK B 10 bright;
+    FSPK B 200 bright A_LowGravity;
+    stop;
+    FSPK C 10 bright;
+    FSPK C 200 bright A_LowGravity;
+    stop;
+    FSPK D 10 bright;
+    FSPK D 200 bright A_LowGravity;
+    stop;
+    FSPK E 10 bright;
+    FSPK E 200 bright A_LowGravity;
+    stop;
+  Death:
+    FSPK A 1;
+    stop;
+  }
+}
+
+
+Class z_nature_rockcracks: actor
+{
+	Default
+	{
+		+nointeraction;
+		+clientsideonly;
+	}
+
+	States
+	{
+		Spawn:
+			TNT1 A 1 nodelay {
+				a_playSound("stone/impact", CHAN_AUTO);
+				for(int i = 0; i<random(2, 5); i++){
+					A_SpawnItemEx("z_nature_rockcrack", random(-4, 4), random(-4, 4), random(-4, 4), random(-4, 4), random(-4, 4), random(-4, 4), 0,SXF_NOCHECKPOSITION);
+				}
+			}
+			Stop;
+
+	}
+}
+
+Class z_nature_woodcracks: actor
+{
+	Default
+	{
+		+nointeraction;
+		+clientsideonly;
+	}
+
+	States
+	{
+		Spawn:
+			TNT1 A 1 nodelay {
+				a_playSound("Pitch/Wood", CHAN_AUTO);
+				for(int i = 0; i<random(2, 5); i++){
+					A_SpawnItemEx("z_nature_woodcrack", random(-4, 4), random(-4, 4), random(-4, 4), random(-4, 4), random(-4, 4), random(-4, 4), 0,SXF_NOCHECKPOSITION);
+				}
+			}
+			Stop;
+
+	}
+}
+Class z_nature_BoneCracks: actor
+{
+	Default
+	{
+		+nointeraction;
+		+clientsideonly;
+	}
+
+	States
+	{
+		Spawn:
+			TNT1 A 1 nodelay {
+				a_playSound("Pitch/Wood", CHAN_AUTO);
+				for(int i = 0; i<random(2, 5); i++){
+					A_SpawnItemEx("z_boneCrack", random(-4, 4), random(-4, 4), random(-4, 4), random(-4, 4), random(-4, 4), random(-4, 4), 0,SXF_NOCHECKPOSITION);
+				}
+			}
+			Stop;
+
+	}
+}
+
+
+
+Class z_nature_rockcrack: z_nature_debris
+{
+	Override void PostBeginPlay()
+	{
+		ScaleMultiplerMax = 0.5;
+		ScaleMultiplerMin = 0.3;
+		Super.PostBeginPlay();
+	}
+	States
+	{
+		Spawn:
+			TNT1 A 0 A_Jump (256, 1, 2, 3);
+			ROC1 A 0 A_jump(256, "Life");
+			ROC1 B 0 A_jump(256, "Life");
+			ROC1 C 0 A_jump(256, "Life");
+			Goto Life;
+
+	}
+}
+Class z_nature_woodcrack: z_nature_debris
+{
+	Override void PostBeginPlay()
+	{
+		ScaleMultiplerMax = 0.5;
+		ScaleMultiplerMin = 0.3;
+		Super.PostBeginPlay();
+	}
+	States
+	{
+		Spawn:
+			TNT1 A 0 A_Jump (256, 1, 2, 3);
+			SGSA A 0 A_jump(256, "Life");
+			SGSA B 0 A_jump(256, "Life");
+			SGSA C 0 A_jump(256, "Life");
+			Goto Life;
+
+	}
+}
+
+class z_boneCrack : z_nature_debris
+{
+
+	Override void PostBeginPlay()
+	{
+		ScaleMultiplerMax = 0.7;
+		ScaleMultiplerMin = 1.0;
+		Super.PostBeginPlay();
+	}
+	States
+	{
+		Spawn:
+			TNT1 A 0 A_Jump (256, 1, 2, 3);
+			BNE1 A 0 A_jump(256, "Life");
+			BNE1 B 0 A_jump(256, "Life");
+			BNE1 C 0 A_jump(256, "Life");
+			Goto Life;
+
+	}
+
+}
+

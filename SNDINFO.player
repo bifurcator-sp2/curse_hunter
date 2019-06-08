@@ -1,0 +1,431 @@
+//CUTSCENES
+player/INTRO1 INTRO1
+player/INTRO2 INTRO2
+player/DMPRAY DMPRAY
+player/kigalso extend
+player/AONE AONE
+intro/ihit1 IHIT1
+//Player sounds
+JUMP1 JUMP1
+JUMP2 JUMP2
+$random player/PlayerJump { JUMP1 JUMP2 }
+player/LandingStandart JUMPD5
+player/inWater	WATERIN
+player/outWater	WATEROUT
+player/dropThing TAKEDROP
+
+player/ItStuck	STUCK
+player/LOCKED	LOCKED
+
+player/UseUnactiveItem unactive
+
+
+CalebPain1		CPAIN1
+CalebPain2		CPAIN2
+CalebPain3		CPAIN3
+CalebPain4		CPAIN4
+CalebPain5		CPAIN5
+CalebPain6		CPAIN6
+CalebPain7		CPAIN7
+CalebPain8		CPAIN8
+CalebPain9		CPAIN9
+CalebPain10		CPAIN10
+CalebPain11		CPAIN11
+CalebPain12		CPAIN12
+CalebPain13		CPAIN13
+CalebPain14		CPAIN14
+CalebPain15		CPAIN15
+CalebPain16		CPAIN16
+CalebPain17		CPAIN17
+CalebPain18		CPAIN18
+
+Caleb/Death1	CDIE
+Caleb/Death2	Die2
+Caleb/Death3	Die3
+Caleb/Death4	Die4
+Caleb/Death5	Die5
+Caleb/Death6	Die6
+Caleb/Death7	Die7
+Caleb/Death8	Die8
+Caleb/Death9	Die9
+Caleb/Death10	Die10
+Caleb/Death11	Die11
+Caleb/Death12	Die12
+Caleb/Death13	Die13
+Caleb/Death14	Die14
+Caleb/Death15	Die15
+Caleb/Death16	Die16
+Caleb/Death17	Die17
+Caleb/Death18	Die18
+Caleb/Death19	Die19
+Caleb/Death20	Die20
+
+$Random Caleb/Death {Caleb/Death1	Caleb/Death2	Caleb/Death3 Caleb/Death4 Caleb/Death5 Caleb/Death6 Caleb/Death7 Caleb/Death8 Caleb/Death9 Caleb/Death10 Caleb/Death11 Caleb/Death12 Caleb/Death13 Caleb/Death14 Caleb/Death15 Caleb/Death16 Caleb/Death17 Caleb/Death18 Caleb/Death19 Caleb/Death20 }
+
+$Random CalebPain { CalebPain1 CalebPain2 CalebPain3 CalebPain4 CalebPain5 CalebPain6 CalebPain7 CalebPain8 CalebPain9 CalebPain10 CalebPain11 CalebPain12 CalebPain13 CalebPain14 CalebPain15 CalebPain16 CalebPain17 CalebPain18 }
+
+Caleb/firePain fpain
+
+
+
+Caleb/Lough LOUG1
+Caleb/Lough1A LOUG1A
+$Random Caleb/Lough1 { Caleb/Lough Caleb/Lough1A }
+
+Caleb/Lough2 LOUG2
+Caleb/Lough3 LOUG3
+Caleb/Lough4 LOUG4
+Caleb/Lough5 LOUG5
+Caleb/Lough6 LOUG6
+Caleb/Lough7 LOUG7
+
+
+
+
+
+carnage1 	carnage1
+carnage2 	carnage2
+carnage3 	carnage3
+carnage4 	carnage4
+carnage5 	carnage5
+carnage6 	carnage6
+
+
+$random player/carnage { carnage1 carnage2 carnage3}
+$random player/carnage2 { carnage4 carnage5 carnage6}
+
+CARNST1 	CARNST1
+CARNST2 	CARNST2
+$random player/carnagestop { CARNST1 CARNST2}
+
+SUBORD1 SUBORD1
+SUBORD2 SUBORD2
+SUBORD3 SUBORD3
+SUBORD4 SUBORD4
+SUBORD5 SUBORD5
+$random player/subordinate { SUBORD1 SUBORD2 SUBORD3 SUBORD4 SUBORD5 }
+player/autohill AUTOHILL
+
+player/senseLoop sense
+
+player/shieldPain shpain
+player/shieldOn shion
+player/shieldOff shioff
+player/shieldDie shidie
+
+
+torch/clickOn	TORCHON
+torch/clickOff	TORCHOFF
+
+damnation/sound	damnati
+player/RaiseEnemy raize
+
+player/GotInfo INFOGOT
+
+player/NoStamina NOSTAMI
+//items
+
+items/pickup		PICKUP
+items/heartpickup		HEARTPIC
+items/amuletpickup		AMPICKUP
+items/keyPickup			PICKKEY
+items/megaPickup		PICKMEGA
+items/needKey			needkey
+items/firebug			firebug
+items/firebugInBox		firebug2
+items/firebugBack		firebug3
+dsarmup		dsarmup
+$alias items/armor_pkup		dsarmup
+items/superamor SUPARM
+items/PuzzleON	puzzleon
+CRSEPCK1 CRSEPCK1
+CRSEPCK2 CRSEPCK2
+$random curse/pickup 	{ CRSEPCK1 CRSEPCK2 }
+
+
+
+
+//puffs
+DSRICO1		DSRICO1
+DSRICO2		DSRICO2
+DSRICO3		DSRICO3
+$random Shoot/Bullet 	{DSRICO1 DSRICO2 DSRICO3 dsblank dsblank dsblank}
+$rolloff DSRICO1 128 256
+$rolloff DSRICO2 128 256
+$rolloff DSRICO3 128 256
+$volume Shoot/Bullet 0.5
+
+
+Pitch/Solid	PSTONE
+//$limit PSTONE 20
+
+Pitch/Flash	PFLASH
+Pitch/Stell	PSTEEL
+Pitch/Wood	PWOOD
+
+
+//weapons
+noammo noammo
+
+
+EXPLODCS EXPLODCS
+EXPLODFL EXPLODFL
+EXPLODFM EXPLODFM
+EXPLODFS EXPLODFS
+$random weapons/rocklx {EXPLODCS}
+$random weapons/softExplo {EXPLODFL EXPLODFM EXPLODFS}
+
+
+
+PICKWEAP    PICKWEAP
+dsammoup	dsammoup
+
+fstatk1 	fstatk1
+fstatk2 	fstatk2
+fstatk3		fstatk3
+$random PitchFork/Attack { fstatk1 fstatk2 fstatk3}
+
+
+dsSAWFIR	dsSAWFIR //sawed off normal fire
+weapons/sawedoffload	SWSLOAD
+weapons/sawedofreload1	SWSRLD
+
+SAWNALT				SAWNALT
+player/sawedOffPickup SEAWPICK
+player/sawedOff2Pickup twoguns
+dsstshl1	dsstshl1
+dsstshl2	dsstshl2
+dsstshl3	dsstshl3
+dsstshl4	dsstshl4
+$random Shotgun/Shells	{dsstshl1 dsstshl2 dsstshl3 dsstshl4}
+$limit dsstshl1 0
+$limit dsstshl2 0
+$limit dsstshl3 0
+$limit dsstshl4 0
+
+DSZIPCLS	DSZIPCLS
+TNTFUSE				TNTFUSE
+TNTTOSS				TNTTOSS
+tnt/detonate PROXDET
+
+bullet/casing TGCASING
+tommyGun/Fire TGFIRE
+tommyGun/drumIn CLIPIN
+tommyGun/drumOut clipout
+tommyGun/refire RFLSLCT
+player/TommyPickup	BUMSTICK
+
+
+player/TNTpick TNTPICK
+
+//flare Gun
+FlareGun/fire dsFLRFIR //fire normal
+FlareGunFlare/explo DSRXPLOD //flare death
+FlareGunFlare/inAir dsFLRAIR //flare active
+FlareGunFlareAlt/explo dsEXPLRG //alt flare explo
+player/flaregunNpickup FLAREGUN
+
+//ratweapon
+ratWeapon/headOff RATHADOF
+
+
+
+
+objective/on OBJON
+objective/off OBJOFF
+
+SecondaryObjective/on SOBJON
+SecondaryObjective/off SOBJOFF
+
+
+//CALEB IDLE SONGS
+3100 3100
+3101 3101
+3102 3102
+3103 3103
+3104 3104
+3105 3105
+3106 3106
+3107 3107
+3108 3108
+3109 3109
+3110 3110
+3111 3111
+b2L1 b2L1
+b2L2 b2L2
+b2L3 b2L3
+$random Player/IDLE { 3100 3101 3102 3103 3104 3105 3106 3107 3108 3109 3110 3111 b2L1 b2L2 b2L3 }
+
+
+//CALEB LOUGH WHEN KILL MONSTER
+3004 3004
+3005 3005
+3010 3010
+3013 3013
+3019 3019
+3038 3038
+3039 3039
+3041 3041
+3055 3055
+3056 3056
+3084 3084
+B2T1 B2T1
+B2T2 B2T2
+B2T3 B2T3
+B2T4 B2T4
+B2T5 B2T5
+B2T6 B2T6
+B2T7 B2T7
+B2T8 B2T8
+B2T9 B2T9
+B2T10 B2T10
+B2T10 B2T11
+B2T12 B2T12
+B2T13 B2T13
+B2T14 B2T14
+B2T15 B2T15
+B2T16 B2T16
+B2T17 B2T17
+B2T18 B2T18
+B2T19 B2T19
+B2T20 B2T20
+B2T21 B2T21
+B2T22 B2T22
+B2T23 B2T23
+B2T24 B2T24
+B2T24 B2T25
+B2T26 B2T26
+B2T27 B2T27
+B2T28 B2T28
+B2T29 B2T29
+B2T30 B2T30
+B2T31 B2T31
+B2T32 B2T32
+
+$random Player/Laugh {3004 3005 3010 3013 3019 3038 3039 3041 3055 3056 3084 B2T1 B2T2 B2T3 B2T4 B2T5 B2T6 B2T7 B2T8 B2T9 B2T10 B2T11 B2T12 B2T13 B2T14 B2T15 B2T16 B2T17 B2T18 B2T19 B2T20 B2T21 B2T22 B2T23 B2T24 B2T25 B2T26 B2T27 B2T28 B2T29 B2T30 B2T31 B2T32 }
+
+//CALEB LOUGH WHEN GIB DEATH
+LOUG1	LOUG1
+LOUG2	LOUG2
+LOUG3 	LOUG3
+LOUG4	LOUG4
+LOUG5	LOUG5
+LOUG6	LOUG6
+LOUG7	LOUG7
+LOUG8	LOUG8
+
+
+//PLAYER FOOT STEPS FROM BLOOD2
+void	void //just silence
+
+$playersound player male *jump JUMP1
+
+$playersound player male  *land void
+
+
+//Default
+DJUMP1 DJUMP1
+DJUMP2 DJUMP2
+$random Player/JumpDownDefault { DJUMP1 DJUMP2 }
+DSTEP1 DSTEP1
+DSTEP2 DSTEP2
+DSTEP3 DSTEP3
+DSTEP4 DSTEP4
+$random Player/StepDefault { DSTEP1 DSTEP2 DSTEP3 DSTEP4 }
+
+//Carpet
+DCARP1 DCARP1
+DCARP2 DCARP2
+$random Player/JumpDownCarpet { DCARP1 DCARP2 }
+CRSTEP1 CRSTEP1
+CRSTEP2 CRSTEP2
+CRSTEP3 CRSTEP3
+CRSTEP4 CRSTEP4
+$random Player/StepCarpet { CRSTEP1 CRSTEP2 CRSTEP3 CRSTEP4 }
+
+//Granit
+JDNGRAN1 JDNGRAN1
+JDNGRAN2 JDNGRAN2
+$random Player/JumpDownGranit { JDNGRAN1 JDNGRAN2 }
+GRNSTEP1 GRNSTEP1
+GRNSTEP2 GRNSTEP2
+GRNSTEP3 GRNSTEP3
+GRNSTEP4 GRNSTEP4
+$random Player/StepGranit { GRNSTEP1 GRNSTEP2 GRNSTEP3 GRNSTEP4 }
+
+//GROUND
+JDGRND1 JDGRND1
+JDGRND2 JDGRND2
+$random Player/JumpDownGround { JDGRND1 JDGRND2 }
+STEPGRN1 STEPGRN1
+STEPGRN2 STEPGRN2
+STEPGRN3 STEPGRN3
+STEPGRN4 STEPGRN4
+$random Player/StepGround { STEPGRN1 STEPGRN2 STEPGRN3 STEPGRN4 }
+
+//Metall
+JDMET1 JDMET1
+JDMET2 JDMET2
+$random Player/JumpDownMetall { JDMET1 JDMET2 }
+STEPMET1 STEPMET1
+STEPMET2 STEPMET2
+STEPMET3 STEPMET3
+STEPMET4 STEPMET4
+STEPMET5 STEPMET5
+STEPMET6 STEPMET6
+$random Player/StepMetall { STEPMET1 STEPMET2 STEPMET3 STEPMET4 STEPMET5 STEPMET6 }
+
+//Mud
+JDMUD1 JDMUD1
+JDMUD2 JDMUD2
+$random Player/JumpDownMud { JDMUD1 JDMUD2 }
+STEPMUD1 STEPMUD1
+STEPMUD2 STEPMUD2
+STEPMUD3 STEPMUD3
+STEPMUD4 STEPMUD4
+$random Player/StepMud { STEPMUD1 STEPMUD2 STEPMUD3 STEPMUD4 }
+
+//Stone
+JDSTONE1 JDSTONE1
+JDSTONE2 JDSTONE2
+$random Player/JumpDownStone { JDSTONE1 JDSTONE2 }
+STPSTN1 STPSTN1
+STPSTN2 STPSTN2
+STPSTN3 STPSTN3
+STPSTN4 STPSTN4
+$random Player/StepStone { STPSTN1 STPSTN2 STPSTN3 STPSTN4 }
+
+//Water
+Player/Swim SWIM
+JDWATR1 JDWATR1
+JDWATR2 JDWATR2
+$random Player/JumpDownWater { JDWATR1 JDWATR2 }
+STEPWTR1 STEPWTR1
+STEPWTR2 STEPWTR2
+STEPWTR3 STEPWTR3
+STEPWTR4 STEPWTR4
+STEPWTR5 STEPWTR5
+STEPWTR6 STEPWTR6
+$random Player/StepWater { STEPWTR1 STEPWTR2 STEPWTR3 STEPWTR4 STEPWTR5 STEPWTR6 }
+
+//Wood
+JDWOOD1 JDWOOD1
+JDWOOD2 JDWOOD2
+$random Player/JumpDownWood { JDWOOD1 JDWOOD2 }
+STPWOOD1 STPWOOD1
+STPWOOD2 STPWOOD2
+STPWOOD3 STPWOOD3
+STPWOOD4 STPWOOD4
+$random Player/StepWood { STPWOOD1 STPWOOD2 STPWOOD3 STPWOOD4 }
+
+//bone steps from Undying
+BNESTP1 BNESTP1
+BNESTP2 BNESTP2
+BNESTP3 BNESTP3
+BNESTP4 BNESTP4
+$random Player/StepBone { BNESTP1 BNESTP2 BNESTP3 BNESTP4 }
+$volume Player/StepBone 0.5
+
+
+//Caleb situative talk
+GRAVEYARD GRAVEYRD

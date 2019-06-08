@@ -1,0 +1,113 @@
+class AbilityController : CustomInventory
+{
+//gives to player ability item by amulet count analize
+	bool NoTutorial;
+	default
+	{
+		+INVENTORY.AUTOACTIVATE;
+		+INVENTORY.HUBPOWER;
+		+INVENTORY.PERSISTENTPOWER;
+		+INVENTORY.UNDROPPABLE;
+		Inventory.MaxAmount 1;
+	}
+
+	virtual Void  analize(){
+
+		if(Owner.countinv("AM_Carnage")>0){
+			if(!Owner.countinv("Ability_QuickKill")){
+				Owner.giveInventory("Ability_QuickKill", 1);
+				if(!NoTutorial){CALLacs("Tutorial", 10, 0, 0, 0);}
+			}
+		}
+		if(Owner.countinv("AM_Carnage")>1){
+			if(!Owner.countinv("Ability_Repulsion")){
+				Owner.giveInventory("Ability_Repulsion", 1);
+				if(!NoTutorial){CALLacs("Tutorial", 16, 0, 0, 0);}
+			}
+		}
+
+		if(Owner.countinv("AM_Carnage")>2){
+			if(!Owner.countinv("Ability_LeapKill")){
+				Owner.giveInventory("Ability_LeapKill", 1);
+				if(!NoTutorial){CALLacs("Tutorial", 11, 0, 0, 0);}
+			}
+		}
+
+		if(Owner.countinv("AM_Domination")>0){
+			if(!Owner.countinv("Ability_Subordinate")){
+				Owner.giveInventory("Ability_Subordinate", 1);
+				if(!NoTutorial){CALLacs("Tutorial", 12, 0, 0, 0);}
+			}
+		}
+		if(Owner.countinv("AM_Domination")>1){
+			if(!Owner.countinv("Ability_Raise")){
+				Owner.giveInventory("Ability_Raise", 1);
+				if(!NoTutorial){CALLacs("Tutorial", 14, 0, 0, 0);}
+			}
+		}
+		if(Owner.countinv("AM_Domination")>2){
+			if(!Owner.countinv("Ability_Necromancy")){
+				Owner.giveInventory("Ability_Necromancy", 1);
+				if(!NoTutorial){CALLacs("Tutorial", 18, 0, 0, 0);}
+			}
+		}
+
+
+		if(Owner.countinv("AM_Survival")>0){
+			if(!Owner.countinv("Ability_SixSence")){
+				Owner.giveInventory("Ability_SixSence", 1);
+				if(!NoTutorial){CALLacs("Tutorial", 13, 0, 0, 0);}
+			}
+		}
+		if(Owner.countinv("AM_Survival")>1){
+			if(!Owner.countinv("Ability_Regeneration")){
+				Owner.giveInventory("Ability_Regeneration", 1);
+				if(!NoTutorial){CALLacs("Tutorial", 15, 0, 0, 0);}
+			}
+		}
+		if(Owner.countinv("AM_Survival")>2){
+			if(!Owner.countinv("Ability_Shield")){
+				Owner.giveInventory("Ability_Shield", 1);
+				if(!NoTutorial){CALLacs("Tutorial", 17, 0, 0, 0);}
+			}
+		}
+		if( Owner.countinv("AM_Survival")+Owner.countinv("AM_Carnage")+Owner.countinv("AM_Domination") ==1 ){
+			Owner.giveInventory("info_2", 1);
+			CALLacs("SetChapter", 0, 0, 0, 0);
+			CALLacs("SetPage", 2, 0, 0, 0);
+		}
+
+	}
+/*
+YOU_HAVE_TO_COLLECT = "You have to collect ";
+YOU_HAVE_MORE = " more Curses\nto take ";
+*/
+	virtual bool CanTake(string Classname){
+		if(Classname=="AM_Carnage" || Classname=="AM_Domination"  || Classname=="AM_Survival"){
+			if(!Owner.countinv("Curse")){ Owner.a_log(StringTable.Localize("$NO_CURSES")); return false; }
+
+			int CountAM = Owner.countinv(Classname);
+			int Need = CountAM*3|1;
+			if(Owner.countinv("Curse") >= Need){
+				Owner.takeInventory("Curse", Need);
+				return true;
+			}
+			int toTake = Need - Owner.countinv("Curse");
+			string Text = String.Format("%s\n%i%s%s", StringTable.Localize("$YOU_HAVE_TO_COLLECT"), toTake,	StringTable.Localize("$YOU_HAVE_MORE"),	StringTable.Localize(String.Format("%s%s","$",Classname))	);
+			Owner.a_log(Text);
+			return false;
+		}
+		return true;
+	}
+
+	States
+	{
+		Spawn:
+			TNT1 A -1;
+			Stop;
+		Use:
+			TNT1 A -1;
+			Stop;
+	}
+
+}

@@ -1,0 +1,162 @@
+class z_corpse : Actor
+{
+	default
+	{
+		Tag "$CORPSE";
+		scale 0.75;
+		radius 16;
+		height 64;
+		DeathHeight 64;
+		health 30;
+		+shootable;
+		+NOGRAVITY;
+		+DONTTHRUST;
+		+ISMONSTER;
+		-COUNTKILL;
+		BloodType "RedBlood";
+		DamageFactor "Fire", 1.0;
+		painchance "Fire", 255;
+	}
+	Override void PostBeginPlay(){
+		Super.PostBeginPlay();
+		giveInventory("Pointable", 1);
+		giveInventory("Material_Blood", 1);
+	}
+
+	States{
+		Spawn:
+			CRP0 A 15;
+			loop;
+		Death:
+			TNT1 A 1 a_fall;
+			stop;
+		Death.Fire:
+			"####" "#" 1 {
+				takeInventory("Burner", 1);
+				giveInventory("GenericFireDeath", 1);
+				a_fall();
+			}
+			TNT1 A 5;
+			Stop;
+		Pain.Fire:
+			"####" "#" 1 giveInventory("Burner", 1);
+			Goto Spawn;
+
+	}
+
+}
+
+
+
+class z_randomHangingCorpse : z_corpse
+{
+	default
+	{
+		radius 8;
+		+SOLID;
+		//+THRUACTORS;
+	}
+	Override void PostBeginPlay(){
+		Super.PostBeginPlay();
+		giveInventory("Unhandable", 1);
+		giveInventory("Material_Blood", 1);
+		A_SpawnItemEx("BloodPoolGround", 0, 0, 0, 0, 0, 0, 0);
+	}
+
+	States{
+		Spawn:
+			TNT1 A 0 NODELAY A_Jump (255, 1, 2, 3, 4, 5);
+			CRP0 A 0 A_jump(256, "Draw");
+			CRP7 C 0 A_jump(256, "Draw");
+			CRP7 F 0 A_jump(256, "Draw");
+			CRP7 G 0 A_jump(256, "Draw");
+			CRP9 A 0 A_jump(256, "Draw2");
+			Goto Draw;
+		Draw:
+			"####" "#" 15;
+			Loop;
+		Draw2:
+			"####" AB 15;
+			Loop;
+		Pain.Fire:
+			"####" "#" 1 giveInventory("Burner", 1);
+			Goto Draw;
+	}
+}
+
+
+class z_randomHangingSceleton : z_corpse
+{
+	default
+	{
+		Tag "$SKELETON";
+		BloodType "z_nature_BoneCracks";
+	}
+	Override void PostBeginPlay(){
+		Super.PostBeginPlay();
+		giveInventory("Unhandable", 1);
+		takeInventory("Material_Blood", 1);
+		giveInventory("Material_Bones", 1);
+	}
+
+	States{
+		Spawn:
+			TNT1 A 0 NODELAY A_Jump (255, 1, 2, 3, 4);
+			CRP7 A 0 A_jump(256, "Draw"); //sceleton
+			CRP7 B 0 A_jump(256, "Draw"); //sceleton
+			CRP7 D 0 A_jump(256, "Draw"); //sceleton
+			CRP7 E 0 A_jump(256, "Draw"); //sceleton
+			Goto Draw;
+		Draw:
+			"####" "#" 15;
+			Loop;
+		Pain.Fire:
+			"####" "#" 1 giveInventory("Burner", 1);
+			Goto Draw;
+	}
+}
+
+
+class z_classicCorpse1 : z_corpse
+{
+	default
+	{
+		scale 0.6;
+		radius 16;
+		height 32;
+	}
+	States{
+		Spawn:
+			CRP1 A 15;
+			Loop;
+		Pain.Fire:
+			"####" "#" 1 giveInventory("Burner", 1);
+			Goto Spawn;
+	}
+}
+class z_classicCorpse2 : z_classicCorpse1
+{
+	default
+	{
+		height 18;
+	}
+	States{
+		Spawn:
+			CRP1 B 15;
+			Loop;
+		Pain.Fire:
+			"####" "#" 1 giveInventory("Burner", 1);
+			Goto Spawn;
+	}
+}
+class z_classicCorpse3 : z_classicCorpse2
+{
+	States{
+		Spawn:
+			CRP1 C 15;
+			Loop;
+		Pain.Fire:
+			"####" "#" 1 giveInventory("Burner", 1);
+			Goto Spawn;
+	}
+}
