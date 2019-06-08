@@ -525,6 +525,7 @@ Class z_Mengir : PointUsable
 	override void Tick()
 	{
 		Super.Tick();
+
 		if(!ItIsUsed && getCurrentDistance()<getActivationDistance()){
 			a_spawnItemEx("MengirFly", random(-radius, radius), random(-radius, radius), random(height/2, height), 0, 0, 0, 0, SXF_NOCHECKPOSITION, 250 );
 		}
@@ -599,6 +600,7 @@ class MengirEater : Undroppable {
 	bool started;
 	int OwnerDestroyDelay;
 	string Item;
+	int lifetime;
 
 	virtual Void SpawnAmmo(){
 		if(Owner){
@@ -615,6 +617,7 @@ class MengirEater : Undroppable {
 
 	override void DoEffect(){
 		if(!Owner){ return; }
+		lifetime++;
 		if(!started){
 			started = true;
 			Owner.takeInventory("itemInHands", 1);
@@ -648,7 +651,7 @@ class MengirEater : Undroppable {
 			}
 
 		}
-		if(Owner && Owner.vel.z<0){
+		if(Owner && (Owner.vel.z<0 || lifetime > 35*3)){
 			z_Mengir Mengir = z_Mengir(Owner.Master);
 			Mengir.ItIsUsed = 0;
 			Mengir.setTag("$MENGIR");

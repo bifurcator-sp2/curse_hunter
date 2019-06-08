@@ -1,4 +1,4 @@
-Class Caleb : PlayerPawn
+Class Caleb : CalebMovementModel
 {
 	int HoldFire;
 	int OldHealth;
@@ -193,7 +193,7 @@ class SurvivalEffect  : HealEffect {}
 
 class CalebMovementModel : DoomPlayer
 {
-		const m_flMaxSpeed = 480.0 * ups;
+	const m_flMaxSpeed = 480.0 * ups;
 	const m_flMaxSpeedCrouch = 320 * ups;
 	const DBL_EPSILON =	2.2204460492503131e-016;
 	const JumpHeight = 56.0f;
@@ -719,7 +719,7 @@ class CalebMovementModel : DoomPlayer
 				{
 					player.OnGround = false;
 
-					Vel.Z = 100;
+					Vel.Z = 100 * ups;
 					player.jumpTics = -1;
 					return;
 				}
@@ -797,12 +797,12 @@ class CalebMovementModel : DoomPlayer
 
 			if (JustPressed(BT_Jump))
 			{
-				wishVel.z += 100;
+				wishVel.z += 100 * ups;
 			}
 
 			if(!fm && !sm && !um)
 			{
-				wishVel.z -= 60;
+				wishVel.z -= 60 * ups;
 			}
 			else
 			{
@@ -990,6 +990,15 @@ class CalebMovementModel : DoomPlayer
 		if ( A == B )
 			return val >= B ? D : C;
 		return C + (D - C) * (val - A) / (B - A);
+	}
+
+	override Vector2 BobWeapon(double ticFrac)
+	{
+		Vector2 test = Super.BobWeapon(ticFrac);
+
+		test.y += vel.z ;
+
+		return test;
 	}
 
 	virtual void Friction()
