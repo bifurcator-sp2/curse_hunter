@@ -837,65 +837,7 @@ script "MES" (int mesId) {
 
 
 
-//MUSIC LIB
-////////////////////////////////////////////////////////////////////////
-bool LockChangeMusic;
-int MusVolume = 1.0;
-str MusicTrack = "SURFACE";
-int MusicTrackID = 7;
-str FightTrack = "stndrt";
-str DayMusic = "SURFACE";
-int DayMusicID = 7;
 
-script "ChangeMusic"(int Track, int NighTimeOverride) {
-	while (LockChangeMusic){ delay(1);}
-	LockChangeMusic = 1;
-	/*
-	GARDEN
-	MARKET
-	SNOW
-	SURFACE
-	SWAMP
-	TOWN
-	changes to NIGHT from 20.00 to 07.00
-	*/
-	int McangeSpeed = 0.02;
-
-	str mTrack[11];
-	mTrack[0] = "BOSS";
-	mTrack[1] = "CATACOMB";
-	mTrack[2] = "GARDEN";
-	mTrack[3] = "MANOR";
-	mTrack[4] = "MARKET";
-	mTrack[5] = "NIGHT";
-	mTrack[6] = "SNOW";
-	mTrack[7] = "SURFACE";
-	mTrack[8] = "SWAMP";
-	mTrack[9] = "TITLE";
-	mTrack[10] = "TOWN";
-/*
-	str mFight[4];
-	mFight[0] = "stndrt";
-	mFight[1] = "cabal";
-	mFight[2] = "flight";
-	mFight[3] = "townf";
-*/
-
-
-	if(MusicTrack!=mTrack[Track]){
-		MusicTrack = mTrack[Track];
-		MusicTrackID = Track;
-		while (MusVolume > 0){ MusVolume-=McangeSpeed; SetMusicVolume(MusVolume); delay(1);}
-		SetMusicVolume(0.0);
-		SetMusic (MusicTrack, 0);
-		while (MusVolume < 1.0){ MusVolume+=McangeSpeed; SetMusicVolume(MusVolume); delay(1);}
-	} else {
-		while (MusVolume < 1.0){ MusVolume+=McangeSpeed; SetMusicVolume(MusVolume); delay(1);}
-		SetMusicVolume(1.0);
-	}
-
-	LockChangeMusic = 0;
-}
 
 /*
 script "NightMusicMonitoring" ENTER

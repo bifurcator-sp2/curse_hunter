@@ -33,7 +33,6 @@ class z_gargoyle : CHmonster
 {
 	int cntr;
 	bool init;
-	bool seePlayer;
 	int jump;
 	actor Marker;
 	int MarkerDelay;
@@ -320,10 +319,11 @@ class z_gargoyle : CHmonster
 		"####" "#" 1 {
 			self.takeInventory("QuickKillReady", 1);
 			self.takeInventory("SubordinatedReady", 1);
-			A_setSize(16, 8);
+			A_setSize(16, 16);
 			bSHOOTABLE = 1;
 			bSOLID = 1;
-			bGHOST = 1;
+			bTHRUACTORS = 1;
+			//bGHOST = 1;
 			if(!random(0,1) && !burned){
 				self.giveInventory("Bleeder", 1);
 			}

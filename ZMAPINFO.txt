@@ -35,7 +35,7 @@ episode MPASS {
 }
 map HEMOTEST "Tutorial"{
 	NEXT = "INTRO"
-	music = "GARDEN"
+	//music = "GARDEN"
 	FALLINGDAMAGE
 	MONSTERFALLINGDAMAGE
 	InterMusic = "DMPRAY"
@@ -49,20 +49,32 @@ map INTRO "Intro"{
 
 map CEMETERY "Cemetery"
 {
-music = "SURFACE"
+//music = "SURFACE"
 FALLINGDAMAGE
 MONSTERFALLINGDAMAGE
 NEXT = "MPASS"
 InterMusic = "DMPRAY"
 }
+
 map MPASS "Cave Garden"
 {
-music = "SURFACE"
+//music = "SURFACE"
 FALLINGDAMAGE
 MONSTERFALLINGDAMAGE
 NEXT = "PATREON"
 InterMusic = "DMPRAY"
 }
+
+map MANOR "House of the Rizing Sin"
+{
+//music = "manson"
+FALLINGDAMAGE
+MONSTERFALLINGDAMAGE
+NEXT = "PATREON"
+InterMusic = "DMPRAY"
+}
+
+
 
 map PATREON "Here we are"
 {
@@ -72,6 +84,14 @@ FALLINGDAMAGE
 MONSTERFALLINGDAMAGE
 InterMusic = "DMPRAY"
 }
+
+
+
+
+
+
+
+
 
 
 skill baby

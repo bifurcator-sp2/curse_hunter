@@ -1,21 +1,4 @@
-/*
-class DistanceControl : StaticEventHandler
-{
-	DistanceController VGC;
-	override void PlayerEntered(PlayerEvent e)
-	{
-		PlayerInfo player = players[e.PlayerNumber];
-		VGC = DistanceController(player.mo.Spawn("DistanceController",player.mo.pos));
 
-	}
-
-	override void WorldTick(){
-		PlayerInfo player = players[consoleplayer];
-		VGC.SetOrigin(player.mo.pos, true);
-		//if (players[consoleplayer].camera == players[consoleplayer].mo && !(ownerRef.player.cheats & CF_CHASECAM))
-	}
-}
-*/
 
 class DistanceControllEvent : EventHandler
 {
@@ -52,10 +35,16 @@ Class DistanceControllerItem : CustomInventory
 	}
 
 	override void DoEffect(){
+		if(!Owner){ return;}
 		if(!DC){
 			DC = DistanceController(Spawn("DistanceController",owner.pos));
 			DC.Master = owner;
+		} else {
+			DC.Master = Owner;
+			DC.PostBeginPlay();
 		}
+		Cvar.GetCVar("z_natue_vegetation_redraw", players[consolePlayer]).SetInt(1);
+		owner.takeInventory(getClassName(), 1);
 	}
 
 	states
@@ -74,29 +63,29 @@ class z_ch_MovingCamera : MovingCamera
 	actor previousMaster;
 	override void Activate (Actor activator){
 		super.Activate(activator);
-		ThinkerIterator iter = ThinkerIterator.Create("DistanceController");
-		Actor FLR;
-		while(FLR = actor(iter.Next())){
-			previousMaster = FLR.Master;
-			FLR.Master = self;
-			FLR.setOrigin(pos, 1);
-			Cvar.GetCVar("z_natue_vegetation_redraw", players[consolePlayer]).SetInt(1);
+		ThinkerIterator it = ThinkerIterator.Create("DistanceController");
+
+		DistanceController DC;
+		DistanceController this;
+		while(this = DistanceController(it.Next())){
+			if(this is "DistanceController"){
+				DC = this;
+				DC.Master = self;
+				DC.PostBeginPlay();
+				Cvar.GetCVar("z_natue_vegetation_redraw", players[consolePlayer]).SetInt(1);
+			}
 		}
+
+		//players[consoleplayer].mo.takeInventory("playerSunFlareController", 1);
+		//players[consoleplayer].mo.takeInventory("playerMoonFlareController", 1);
+
+		//giveInventory("playerSunFlareController", 1);
+		//giveInventory("playerMoonFlareController", 1);
+
 	}
 	override void DeActivate (Actor activator){
 		super.DeActivate(activator);
-
-		ThinkerIterator iter = ThinkerIterator.Create("DistanceController");
-		Actor FLR;
-		while(FLR = actor(iter.Next())){
-			if(previousMaster){
-				FLR.Master = previousMaster;
-			} else {
-				PlayerInfo player = players[consolePlayer];
-				FLR.Master = player.mo;
-			}
-			Cvar.GetCVar("z_natue_vegetation_redraw", players[consolePlayer]).SetInt(1);
-		}
+		players[consoleplayer].mo.giveInventory("DistanceControllerItem", 1);
 	}
 }
 
@@ -120,6 +109,16 @@ class DistanceController :actor
 	bool DrawGrass;
 	bool DrawBushes;
 
+	Override Void Tick(){
+
+
+		super.tick();
+		if(!Master){destroy();}
+		SetOrigin(Master.pos, true);
+		//pitch = master.pitch;
+		//angle = master.angle;
+		//roll = master.roll;
+	}
 
 	Override void PostBeginPlay()
 	{
@@ -150,12 +149,15 @@ class DistanceController :actor
 		if(Cvar.GetCVar("z_natue_vegetation_redraw", players).GetInt()==1){
 			Cvar.GetCVar("z_natue_vegetation_redraw", players).SetInt(0);
 		}
-		//a_log("PostBeginPlay");
+
+		giveInventory("playerSunFlareController", 1);
+		giveInventory("playerMoonFlareController", 1);
+
 	}
 
 	virtual void DistanceControl()
 	{
-		if(!Master){self.destroy();}
+		if(!Master){destroy();}
 //////////////////////////////////////////////////////////
 		if(
 			BushRadius_VIS != int(Cvar.GetCVar("z_natue_renderdistance_bush", players[consoleplayer]).GetInt()*coef)
@@ -201,7 +203,7 @@ class DistanceController :actor
 /////////////////////////////////////////////////////////////
 
 
-		self.SetOrigin(Master.pos, true);
+
 			//rain spawner is inventory item of DistanceController
 			if(CallACS("GetRain",0,0,0) && !CheckInventory("z_nature_rain_spawner", 1)){
 					self.giveInventory("z_nature_rain_spawner", 1);

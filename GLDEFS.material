@@ -6,6 +6,61 @@ material texture GZDOOM{
 	Texture tex_heightmap "materials/heigthmaps/auto/GZDOOM.png"
 }
 
+material texture 1_73{
+	//Shader "Shaders/parallax2.fp"
+	//Texture tex_heightmap "materials/heigthmaps/auto/1_129.png"
+	specularlevel 1
+	glossiness 1
+}
+material texture 0_16{
+	//Shader "Shaders/parallax2.fp"
+	//Texture tex_heightmap "materials/heigthmaps/auto/1_129.png"
+	specularlevel 1
+	glossiness 1
+}
+material texture 4_41{
+	//Shader "Shaders/parallax2.fp"
+	//Texture tex_heightmap "materials/heigthmaps/auto/1_129.png"
+	specularlevel 1
+	glossiness 4
+}
+material texture 0_30{
+	//Shader "Shaders/parallax2.fp"
+	//Texture tex_heightmap "materials/heigthmaps/auto/1_129.png"
+	specularlevel 2
+	glossiness 4
+}
+material texture 1_129W2{
+	//Shader "Shaders/parallax2.fp"
+	//Texture tex_heightmap "materials/heigthmaps/auto/1_129.png"
+	specularlevel 1
+	glossiness 4
+}
+material texture 1_129W1{
+	//Shader "Shaders/parallax2.fp"
+	//Texture tex_heightmap "materials/heigthmaps/auto/1_129.png"
+	specularlevel 1
+	glossiness 4
+}
+material texture 1_129W{
+	//Shader "Shaders/parallax2.fp"
+	//Texture tex_heightmap "materials/heigthmaps/auto/1_129.png"
+	specularlevel 1
+	glossiness 4
+}
+material texture 2_96{
+	//Shader "Shaders/parallax2.fp"
+	//Texture tex_heightmap "materials/heigthmaps/auto/1_129.png"
+	specularlevel 2
+	glossiness 20
+}
+
+material texture 1_129{
+	//Shader "Shaders/parallax2.fp"
+	//Texture tex_heightmap "materials/heigthmaps/auto/1_129.png"
+	specularlevel 1
+	glossiness 4
+}
 
 material texture CAVEFLR{
 	//Shader "Shaders/parallax2.fp"

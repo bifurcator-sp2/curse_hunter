@@ -42,7 +42,10 @@ class FlickerCoronasController : CoronasController
         while ( a = actor(ti.Next()) )
         {
 
-            double dist = players[consoleplayer].mo.Distance3D(a);
+            //double dist = players[consoleplayer].mo.Distance3D(a);
+			double dist = Camera.Distance3D(a);
+
+
             if (!a.alpha ) { continue; }
 			//if (!a.visible) { continue; }
 
@@ -153,7 +156,8 @@ class CoronasController : HUDMessageBase
         while ( a = actor(ti.Next()) )
         {
 
-            double dist = players[consoleplayer].mo.Distance3D(a);
+            //double dist = players[consoleplayer].mo.Distance3D(a);
+			double dist = Camera.Distance3D(a);
             if (!a.alpha ) { continue; }
 			//if (!a.visible) { continue; }
 
@@ -323,7 +327,9 @@ class HUDlensFlaare : HUDMessageBase
 
         while ( a = actor(ti.Next()) ){
 			if(a.getClassName()!= markerClass ){continue;}
-            double dist = players[consoleplayer].mo.Distance3D(a);
+            //double dist = players[consoleplayer].mo.Distance3D(a);
+			double dist = Camera.Distance3D(a);
+
             Vector3 tdir = ViewPos + Level.Vec3Diff(ViewPos,a.Pos);
             Vector3 spos = CoordUtil.WorldToScreen(tdir,ViewPos,ViewPitch,ViewAngle,ViewRoll,players[consoleplayer].FOV);
             if ( spos.z > 1.0 || spos.z < -1 ) continue;
@@ -331,8 +337,9 @@ class HUDlensFlaare : HUDMessageBase
             ActorPosHolder ph = new("ActorPosHolder");
             ph.pos = CoordUtil.ToViewport(spos);
 			ph.dim = TexMan.GetScaledSize(mark);
-			ph.dim /= dist / 1080 * players[consoleplayer].FOV / 90;
-			ph.dim*=15;
+			//ph.dim /= dist / 1080 * players[consoleplayer].FOV / 90;
+			ph.dim /= 1.0+(dist / 1080 * players[consoleplayer].FOV / 90);
+			ph.dim*=30;
 			ph.alpha = a.alpha;
             aph.Push(ph);
         }

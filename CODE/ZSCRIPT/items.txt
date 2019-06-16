@@ -680,10 +680,12 @@ class AmmoSpawnController
 					RandList.Push(ClassList[i].className);
 				}
 			}
-			ClassName = RandList[random(0, RandList.Size()-1)];
+			if(RandList.Size()){
+				ClassName = RandList[random(0, RandList.Size()-1)];
+			} else {ClassName = "";}
 		} else {ClassName = "";}
 
-		if(!random(0, 9)){ ClassName = "Rat"; }
+		if(!random(0, 15)){ ClassName = "Rat"; }
 		//Console.Printf("%s", ClassName);
 		return ClassName;
 

@@ -56,6 +56,8 @@ class z_Nolegs_AxeZombie : Z_AxeZombie
 	default
 	{
 		seesound "";
+		radius 16;
+		height 32;
 	}
 
 	Override void PostBeginPlay()
@@ -71,11 +73,11 @@ class z_Nolegs_AxeZombie : Z_AxeZombie
 			Goto Spawn;
 		Spawn:
 
-			R066 B 1 NODELAY {
+			R066 B 0 NODELAY {
 				takeInventory("HeadShotController", 1);
 				takeInventory("FootShotController", 1);
 				}
-			R066 BCDE 16 A_Look;
+			R067 ABCDEFG 8 A_Look;
 			Loop;
 	}
 }
@@ -321,7 +323,7 @@ class Z_AxeZombie : CHmonster
 				A_SpawnItemEx("BloodTrail", random(-16, 16), random(-16, 16), random(0, 16 ), frandom(-3.0, 3.0), frandom(-3.0, 3.0), frandom(4.0, 6.0), 0,SXF_NOCHECKPOSITION|SXF_TRANSFERPOINTERS|SXF_TRANSFERTRANSLATION);
 
 			}
-			R066 JKL 6 A_chase();
+			R067 ABCDEFG 8 A_chase();
 			Loop;
 
 		Stupid:
@@ -385,7 +387,7 @@ class Z_AxeZombie : CHmonster
 				takeInventory("HeadShotController", 1); takeInventory("FootShotController", 1);
 				setZ(pos.z+(height/2));
 				giveInventory("ManyBlood", 1);
-				a_setSize(radius, height/3);
+				a_setSize(radius, 24);
 			}
 			R066 B 8;
 			R067 ABC 4;
@@ -493,7 +495,7 @@ class Z_AxeZombie : CHmonster
 
 		DeathNoLegs:
 			TNT1 A 0  { a_playSound("human/BodyFall"); A_Scream(); }
-			R067 ABC 8;
+			R068 ABC 8;
 			TNT1 A 0 {
 				self.setTag(N_DEATHNAME);
 				actor BC = self.spawn("BodyBlowTarget", self.pos);BC.Master = self;//this is works
@@ -502,7 +504,7 @@ class Z_AxeZombie : CHmonster
 				}
 
 			}
-			R067 C 1 ;
+			R068 C 1 ;
 			"####" "#" 0 A_SpawnItemEx("HeartHealth", 0, 0, 0, frandom(-2.0, 2.0), frandom(-2.0, 2.0), frandom(4.0, 8.0), 0,SXF_NOCHECKPOSITION, 128 );
 			Goto Corpse;
 

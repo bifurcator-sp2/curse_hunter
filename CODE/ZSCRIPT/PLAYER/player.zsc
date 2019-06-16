@@ -20,8 +20,10 @@ class playerBasicEvent : EventHandler
 		player.mo.giveInventory("PlayerStaminaController", 1);
 
 		player.mo.giveInventory("playerMarkingController", 1);
-		player.mo.giveInventory("playerSunFlareController", 1);
-		player.mo.giveInventory("playerMoonFlareController", 1);
+		player.mo.giveInventory("PlayerCombatMusicController", 1);//ch_monster.txt
+
+		//player.mo.giveInventory("playerSunFlareController", 1);
+		//player.mo.giveInventory("playerMoonFlareController", 1);
 		//player.mo.giveInventory("SupressFireController", 1);
 
 		//player.mo.giveInventory("playerPickupWeaponWoiceController", 1);
@@ -163,42 +165,7 @@ class Undroppable  : CustomInventory
 			Loop;
 	}
 }
-/*
-class playerPickupWeaponWoiceController : Undroppable
-{
-	bool HaveSawedOff;
-	override void DoEffect()
-	{
-		if(Owner.checkInventory("Sawedoff", 1) && !HaveSawedOff){
-			HaveSawedOff = 1;
-			Owner.a_playSound("player/sawedOffPickup");
-		}
-	}
-}
-*/
 
-
-
-/*class InfoScreen  : Undroppable
-{
-	Default
-	{
-		-INVENTORY.AUTOACTIVATE;
-	}
-
-
-
-	virtual void ToggleInfoScreen(){
-		CALLacs("InfoScreen", 0, 0, 0, 0);
-	}
-
-	States
-	{
-		Use:
-			TNT1 A 1 {invoker.ToggleInfoScreen();}
-			Loop;
-	}
-}*/
 
 
 class NoTutorial : Undroppable {
@@ -244,18 +211,8 @@ class TotalTimeFreezerNosound : PowerTimeFreezer
 	}
 
 }
-/*
-class TimeFreezeSounds : Actor
-{
-	states
-	{
-		Spawn:
-			TNT1 A 1 a_log("misc/i_pkup");
-			LOOP;
-	}
 
-}
-*/
+
 
 
 class playerPauseController : Undroppable
@@ -855,7 +812,7 @@ class z_PointController : AdvancedCustomInventory
 					if(Pointed is "inventory" && USE){
 						inventory(Pointed).Touch(Owner);
 					}
-					if(Pointed is "Rat" && USE && Pointed.health>0){
+					if(Pointed is "Rat" && USE && Pointed.health>0 && players[consoleplayer].ReadyWeapon.GetClassName() != "RatWeapon"){
 						string PreviousWeaponClassname = players[consoleplayer].ReadyWeapon.GetClassName();
 						if(PreviousWeaponClassname){
 							CHWeapon Prev = CHWeapon(players[consoleplayer].ReadyWeapon);
@@ -1902,7 +1859,7 @@ class Subordinator : CustomInventory
 				Marker.Master = Owner;
 				//todo spawn friendly marker and effect
 			}
-			if(!Owner.bFRIENDLY){Owner.bFRIENDLY = 1;}
+			if(!Owner.bFRIENDLY){Owner.bFRIENDLY = 1; a_clearTarget();}
 			Counter++;
 			if(Counter>=Time){
 				if(Owner){
@@ -2113,7 +2070,7 @@ class playerSkyFlareController : Undroppable
 	actor Marker;
 	string LightClass;
 	string MarkerClass;
-
+	int RayZoffset;
 
 	virtual void init(){}
 
@@ -2128,6 +2085,13 @@ class playerSkyFlareController : Undroppable
 		float sa, sp, pa, pp;
 
 
+		//a_log(owner.getClassName());
+		if(Owner.Master is "PlayerPawn"){
+			RayZoffset = -24;
+		} else {
+			RayZoffset = 0;
+		}
+
 
 
 		ThinkerIterator it = ThinkerIterator.Create(LightClass);
@@ -2136,6 +2100,7 @@ class playerSkyFlareController : Undroppable
 		}
 		it.reinit();
 		it = ThinkerIterator.Create("SkyViewpoint");
+
 		while(this = actor(it.Next())){
 			Viewpoint = this;
 			sa = Viewpoint.angle;
@@ -2147,26 +2112,37 @@ class playerSkyFlareController : Undroppable
 			FLineTraceData WallCheckRay;
 			//a_logFloat(Viewpoint.pitch);
 
-			Owner.LineTrace(
+			Owner.Master.LineTrace(
 				Viewpoint.angle-sa,
 				8192,
 				Viewpoint.pitch,
 				flags:TRF_THRUACTORS|TRF_THRUBLOCK|TRF_THRUHITSCAN,
-				offsetz: Owner.height-24,
+				offsetz: Owner.Master.height+RayZoffset,
 				data: WallCheckRay
 			);
 
 
-			if (!WallCheckRay.HitType || WallCheckRay.HitType == TRACE_HitCeiling){
+			//if (!WallCheckRay.HitType || WallCheckRay.HitType == TRACE_HitCeiling){
 				if(!Marker){
-					Marker = Owner.spawn(MarkerClass, WallCheckRay.HitLocation);
+					Marker = Owner.Master.spawn(MarkerClass, WallCheckRay.HitLocation);
+					Marker.Master = Owner.Master;
 				}
-			}
-			if(Marker){
-				Marker.setOrigin(WallCheckRay.HitLocation, 1);
-				Viewpoint.angle = sa;
-				Viewpoint.pitch = sp;
-			}
+				if(Marker){
+					Marker.setOrigin(WallCheckRay.HitLocation, 1);
+					if(WallCheckRay.HitType != TRACE_HitCeiling){
+						if(WallCheckRay.HitType == TRACE_HitWall && WallCheckRay.HitLine.special == 9){
+							Marker.alpha = 1.0;
+						} else {
+							Marker.alpha = 0.0;
+						}
+						//Marker.alpha = 0.0;
+					}
+					//a_logint(WallCheckRay.HitType);
+				}
+			//}
+
+			Viewpoint.angle = sa;
+			Viewpoint.pitch = sp;
 		}
 
 
@@ -2178,6 +2154,7 @@ class playerSunFlareController : playerSkyFlareController
 	override void init(){
 		LightClass = "Nature_SUN";
 		MarkerClass = "SunMarker";
+
 	}
 
 }
@@ -2198,11 +2175,14 @@ class playerMoonFlareController : playerSunFlareController
 class SunMarker : actor
 {
 	actor clouds, this;
+	string HitType;
+	bool fadeIn;
 	default{
 		radius 0;
 		height 0;
 		+nogravity;
 		+nointeraction;
+		alpha  0.0;
 		renderstyle "translucent";
 	}
 
@@ -2219,7 +2199,7 @@ class SunMarker : actor
 		}
 
 		TextureID tx = TexMan.CheckForTexture("F_SKY1",TexMan.Type_Flat);
-		if (tx != ceilingpic || pos.z!=ceilingZ){
+		if (tx != ceilingpic || pos.z!=ceilingZ || !CheckSight(Master)){
 			a_fadeOut(0.1, FTF_CLAMP);
 		} else {
 			a_fadeTo(1-clouds.alpha, 0.1, FTF_CLAMP);
@@ -2235,6 +2215,9 @@ class SunMarker : actor
 
 }
 class MoonMarker : SunMarker {}
+
+
+
 
 
 

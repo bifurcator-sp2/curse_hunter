@@ -52,7 +52,28 @@ int currentWorldLight[3] = { 128, 128, 128 };
 int currentSkySector[5] = { 128, 128, 128, 32, 120 };// [red_of_fog, green_of_fog, blue_of_fog, FogDensity, SectorLight]
 int currentWorldSector[5] = { 128, 128, 128, 32, 120 };// [red_of_fog, green_of_fog, blue_of_fog, FogDensity, SectorLight]
 
+Script "AnimateTime" (int Time, int MinutesPerTick){
+	if(!MinutesPerTick){MinutesPerTick=5;}
+	if(WORLD_TIME < Time*60){
+		while(WORLD_TIME < Time*60){
+			WORLD_TIME+=MinutesPerTick;
+			delay(1);
+		}
+		WORLD_TIME = Time*60;
+		Terminate;
+	}
+	if(WORLD_TIME > Time*60){
+		while(WORLD_TIME > Time*60){
+			WORLD_TIME-=MinutesPerTick;
+			delay(1);
+		}
+		WORLD_TIME = Time*60;
+		Terminate;
+	}
 
+	//SetCVar("WORLD_TIME", Time);
+	//WORLD_TIME = Time;
+}
 //rain duration in seconds
 script "StartRain" (int duration, int Dencity){
 	LOCK_WEATHER = 1;
@@ -550,3 +571,104 @@ function int GetLightChannelOffset (int channel, int miutesOfDay, int ArrayId){
 }
 
 
+//MUSIC LIB
+////////////////////////////////////////////////////////////////////////
+bool LockChangeMusic;
+bool LockNighTimeOverride;
+int MusVolume = 1.0;
+str MusicTrack = "";
+int MusicTrackID = 7;
+str FightTrack = "";
+int CurrentCommonTrackID;
+bool PlayingCustomMusic;
+
+script "DayNightMusicWatch" ENTER
+{
+	delay(35);
+	if(PlayingCustomMusic){ Restart;}
+	if(MusicTrack == "SURFACE" || MusicTrack == "NIGHT"){
+		if(!LockNighTimeOverride){
+			if(WORLD_TIME > 19*60 || WORLD_TIME < 6*60){
+				ACS_NamedExecuteAlways("SetMusic", 0, 5, 0);
+				CurrentCommonTrackID = 5;
+			} else {
+				ACS_NamedExecuteAlways("SetMusic", 0, 7, 0);
+				CurrentCommonTrackID = 7;
+			}
+		}
+	}
+	
+	Restart;
+}
+
+
+script "SetCustomMusic" (int Track){
+	ACS_NamedExecuteAlways("SetMusic", 0, Track, 0);
+	PlayingCustomMusic = 1;
+}
+script "RestoreMusic"(void){
+	ACS_NamedExecuteAlways("SetMusic", 0, CurrentCommonTrackID, 0);
+	//log(s: "restoreMusic");
+	PlayingCustomMusic = 0;
+}
+
+
+script "ChangeMusic" (int Track, int NighTimeOverride) {
+	CurrentCommonTrackID = Track;
+	if(PlayingCustomMusic){Terminate;}
+	if(NighTimeOverride){
+		LockChangeMusic = 0;
+		LockNighTimeOverride = 1;
+		ACS_NamedExecuteAlways("SetMusic", 0, Track, NighTimeOverride);
+		Terminate;
+	}
+	if(Track==7 || Track==5){
+		if(WORLD_TIME > 19*60 || WORLD_TIME < 6*60){
+			CurrentCommonTrackID = 5;
+			ACS_NamedExecuteAlways("SetMusic", 0, 5, NighTimeOverride);
+		} else {
+			CurrentCommonTrackID = 7;
+			ACS_NamedExecuteAlways("SetMusic", 0, 7, NighTimeOverride);
+		}
+		terminate;
+	}
+	ACS_NamedExecuteAlways("SetMusic", 0, Track, NighTimeOverride);
+}
+
+script "SetMusic"(int Track, int NighTimeOverride) {
+	while (LockChangeMusic){ delay(1);}
+	LockChangeMusic = 1;
+
+	int McangeSpeed = 0.02;
+
+	str mTrack[13];
+	mTrack[0] = "BOSS";
+	mTrack[1] = "CATACOMB";
+	mTrack[2] = "GARDEN";
+	mTrack[3] = "MANSON";
+	mTrack[4] = "MARKET";
+	mTrack[5] = "NIGHT";
+	mTrack[6] = "SNOW";
+	mTrack[7] = "SURFACE";
+	mTrack[8] = "SWAMP";
+	mTrack[9] = "TITLE";
+	mTrack[10] = "TOWN";
+	mTrack[11] = "RITES";
+	mTrack[12] = "COMBAT1";
+
+
+
+	if(MusicTrack!=mTrack[Track]){
+		MusicTrack = mTrack[Track];
+		MusicTrackID = Track;
+		while (MusVolume > 0){ MusVolume-=McangeSpeed; SetMusicVolume(MusVolume); delay(1);}
+		SetMusicVolume(0.0);
+		SetMusic (MusicTrack, 0);
+		while (MusVolume < 1.0){ MusVolume+=McangeSpeed; SetMusicVolume(MusVolume); delay(1);}
+	} else {
+		while (MusVolume < 1.0){ MusVolume+=McangeSpeed; SetMusicVolume(MusVolume); delay(1);}
+		SetMusicVolume(1.0);
+	}
+
+	LockChangeMusic = 0;
+}

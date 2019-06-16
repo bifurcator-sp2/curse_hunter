@@ -6,8 +6,8 @@ Class z_Rat : CHmonster
 	{
 		tag "$RAT_NAME";
 		Health 10;
-		Radius 8;
-		Height 10;
+		Radius 10;
+		Height 12;
 		DeathHeight 8;
 		Mass 3;
 		Speed 4;
@@ -87,6 +87,8 @@ Class z_Rat : CHmonster
 			"####" "#" 0 {
 				bSHOOTABLE = 1;
 				bSOLID = 0;
+				bTHRUACTORS = 1;
+				bGHOST = 1;
 			}
 			"####" "#" -1;
 			Stop;

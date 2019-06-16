@@ -598,7 +598,7 @@ Class z_nature_plant : DistanceSpawned
 
 
 	virtual void SoundAmbience(){
-		if(!itNOplaySound){
+		if(!itNOplaySound && level.mapName != "TITLEMAP"){
 			int Time;
 			Acounter++;
 			if(Acounter>35){

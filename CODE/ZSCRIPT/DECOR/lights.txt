@@ -678,7 +678,7 @@ class LightFlareStat1 : actor
 		Super.Tick();
 		if(distance3D(players[consoleplayer].mo) < getActivationDistance()){
 			visible = checkSight(players[consoleplayer].mo);
-			if(!visible){alpha=0.0;} else {alpha=defAlpha;}
+			if(!visible){alpha=0.0;} else {A_fadeTo(defAlpha, 0.01, FTF_CLAMP);}
 		} else {
 			//visible = 0;
 			A_fadeout(0.01, FTF_CLAMP);
