@@ -928,13 +928,14 @@ class MonsterJumpSoundsController : CustomInventory
 class PlayerCombatMusicController : Undroppable
 {
 	bool Combat;
-	int CombatFactor1;
+	int CombatFactor1, CombatFactor2;
 	int SecCounter;
-	int factor;
+	int OldFactor, factor;
 
 	Override void PostBeginPlay()
 	{
-		CombatFactor1 = 200;
+		CombatFactor1 = 400;
+		CombatFactor2 = 1500;
 	}
 	override void DoEffect(){
 		SecCounter++;
@@ -945,16 +946,21 @@ class PlayerCombatMusicController : Undroppable
 			CHmonster this;
 			while(this = CHmonster(it.Next()))
 			{
-				if(this.health > 0 && this.Target && this.Target.getClassName() == "Caleb"){
+				if(this.health > 0 && this.Target && this.Target.player){
 					factor+=this.default.health;
 				}
 			}
 
 			//int factor = Owner.countInv("AttackAmountController");
-			a_logint(factor);
-			if(!Combat){
+			//a_logint(factor);
+			if(!Combat || (OldFactor && factor && OldFactor!=factor)){
+				if(factor>=CombatFactor2){
+					Combat = true;
+					CALLacs("SetCustomMusic", 13, 0, 0, 0);
+
+				}
+				else
 				if(factor>=CombatFactor1){
-					//a_log("Combat");
 					Combat = true;
 					CALLacs("SetCustomMusic", 12, 0, 0, 0);
 
@@ -966,6 +972,7 @@ class PlayerCombatMusicController : Undroppable
 					//a_log("None Combat");
 				}
 			}
+			OldFactor = factor;
 		}
 	}
 }
