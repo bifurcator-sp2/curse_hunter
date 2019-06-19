@@ -163,11 +163,12 @@ Class z_QuestItem : z_randomStone
 	default
 	{
 		+DONTTHRUST;
-		//+SOLID;
-		//+PUSHABLE;
+
 	}
 	override void PostBeginPlay(){
 		super.PostBeginPlay();
+		self.takeInventory("Unhandable", 1);
+		self.takeInventory("Usable", 1);
 		startPos = pos;
 	}
 

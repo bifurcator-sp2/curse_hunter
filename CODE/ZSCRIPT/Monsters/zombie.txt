@@ -7,6 +7,7 @@ class z_Earth_AxeZombie : Z_AxeZombie
 {
 	int activationDist;
 	bool StayUp;
+
 	default
 	{
 		seesound "";
@@ -23,7 +24,8 @@ class z_Earth_AxeZombie : Z_AxeZombie
 			UGZZ J 15 a_jumpif(getCurrentDistance()<activationDist, "StayUp");
 			Loop;
 
-		SetSprite://for DistanceSpawned
+		Spawn://for DistanceSpawned
+			TNT1 A 0 NODELAY a_jumpif(StayUp, 2);
 			TNT1 A 1 {
 				A_setSize(RealRadius, 8);
 				giveInventory("DontShowDamnationMarker", 1);
@@ -32,6 +34,13 @@ class z_Earth_AxeZombie : Z_AxeZombie
 				takeInventory("FootShotController", 1);
 				}
 			Goto WaitForStayUp;
+
+			BZOM I 1 NODELAY {
+					giveInventory("HeadShotController", 1);
+					giveInventory("FootShotController", 1);
+				}
+			BZOM I 10 A_Look;
+			Loop;
 
 		Pain:
 			"####" "#" 0 takeInventory("DontShowDamnationMarker", 1);
@@ -53,6 +62,7 @@ class z_Earth_AxeZombie : Z_AxeZombie
 class z_Nolegs_AxeZombie : Z_AxeZombie
 {
 	bool StayUp;
+
 	default
 	{
 		seesound "";
@@ -68,9 +78,9 @@ class z_Nolegs_AxeZombie : Z_AxeZombie
 
 	States
 	{
-		SetSprite://for DistanceSpawned
+		/*SetSprite://for DistanceSpawned
 			TNT1 A 1;
-			Goto Spawn;
+			Goto Spawn;*/
 		Spawn:
 
 			R066 B 0 NODELAY {
@@ -120,7 +130,7 @@ class z_fire_AxeZombie : Z_AxeZombie
 
 	States
 	{
-		SetSprite://for DistanceSpawned
+		Spawn://for DistanceSpawned
 			BZOD E 1 A_SetTranslation("DarkGray");
 			Goto Super::FakeIdle;
 
@@ -285,17 +295,18 @@ class Z_AxeZombie : CHmonster
 	}
 
 	States
-	{	SetSprite://for DistanceSpawned
+	{	//SetSprite://for DistanceSpawned
 		Spawn:
 
 			BZOM I 1 NODELAY {
 					giveInventory("HeadShotController", 1);
 					giveInventory("FootShotController", 1);
 				}
-			BZOM I 10 A_Look;
+			BZOM I 15 A_Look;
 			Loop;
 
 		See:
+			TNT1 A 0 a_jumpIf(health<=0, "Death");
 			TNT1 A 0 a_jumpIf(noLegs, "NoLegs");
 			TNT1 A 0 {
 				giveInventory("HeadShotController", 1);

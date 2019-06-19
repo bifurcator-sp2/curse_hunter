@@ -184,7 +184,7 @@ class DistanceController :actor
 
 		){
 			//settings was changed - redraw all
-			//a_log("New distance controll settings applyed");
+			a_log("New settings applyed");
 			Cvar.GetCVar("z_natue_vegetation_redraw", players[consoleplayer]).SetInt(0);
 
 			ThinkerIterator it = ThinkerIterator.Create("DistanceActivated");
@@ -221,8 +221,7 @@ class DistanceController :actor
 		int old_c = c;
 		c = 0;
 
-
-
+/*
 		ThinkerIterator iter1 = ThinkerIterator.Create("LightFlareStat1");
 		LightFlareStat1 FLR;
 		while(FLR = LightFlareStat1(iter1.Next())){
@@ -233,9 +232,9 @@ class DistanceController :actor
 				FLR.SetStateLabel("Show"); FLR.Activated = true;
 			}
 		}
+*/
 
-
-
+/*
 		ThinkerIterator iter = ThinkerIterator.Create("FirePlaceLight");
 		FirePlaceLight FPL;
 		while(FPL = FirePlaceLight(iter.Next())){
@@ -258,17 +257,20 @@ class DistanceController :actor
 			} else {
 				lt.enable();
 			}
-		}
+		}*/
 
 
 		ThinkerIterator it = ThinkerIterator.Create("DistanceActivated");
 		DistanceActivated this;
-
+		int Dist;
 		while(this = DistanceActivated(it.Next()))
 		{
 			c++;
-			int Dist = this.Distance3D(Master);
-
+			if(this is "z_nature_plant"){
+				Dist = this.Distance2D(Master);
+			} else {
+				Dist = this.Distance3D(Master);
+			}
 			this.setCurrentDistance(Dist);
 
 			if(this is "DistanceSpawned"){
@@ -276,39 +278,35 @@ class DistanceController :actor
 				if(this.Skip ){ continue;}//this is manually placed actor - do not distance controll
 				if(this.tid){ continue;} //this actor was spawned by acs and have not to be distance controlled
 
-				if(Dist >=this.getRenderDistance()*coef)
+				if(Dist>=this.getRenderDistance()*coef)
 				{
-					//a_logint(this.getRenderDistance()*coef);
-					//if(this is "z_randomStone"){ a_log("stone");}
 					this.Destroy();
 					continue;
 				}
 			}
 			if(Dist >=this.getActivationDistance() ){
 				this.disable();
-				//if(this is "z_Pod"){ a_log("z_Pod");}
 
 			} else {
 				this.enable();
 			}
+
+			if(this is "LightFlareStat1"){
+				if(Dist >=this.getActivationDistance() ){
+					this.SetStateLabel("Hide"); this.Activated = false;
+				} else {
+					this.SetStateLabel("Show"); this.Activated = true;
+				}
+			}
+			if(this is "PointUsable"){
+				//int Dist = puse.Distance3D(Master);
+				this.setCurrentDistance(Dist);
+			}
+
 		}
 
 		////
 
-
-			ThinkerIterator PU = ThinkerIterator.Create("PointUsable");
-			PointUsable puse;
-			while(puse = PointUsable(PU.Next()))
-			{
-				int Dist = puse.Distance3D(self);
-				puse.setCurrentDistance(Dist);
-				/*if(Dist >=this.getActivationDistance() ){
-					this.disable();
-
-				} else {
-					this.enable();
-				}*/
-			}
 	}
 
 
@@ -336,20 +334,12 @@ class DistanceController :actor
 
 		if(!mode){
 			grassnum = GetRadiusterations(Grass_DENSITY, GrassRadius_CACHE) - GetRadiusterations(Grass_DENSITY, GrassRadius_VIS);
-			//a_logfloat(GetRadiusterations(Grass_DENSITY, GrassRadius_VIS));
 			treenum = GetRadiusterations(Tree_DENSITY, TreeRadius_CACHE) - GetRadiusterations(Tree_DENSITY, TreeRadius_VIS);
+			treenum*=2;
 		} else {
-			//double RingS = 3.14*(GrassRadius_CACHE*GrassRadius_CACHE-GrassRadius_VIS*GrassRadius_VIS);
-			//double dens = Grass_DENSITY/RingS;
-			//grassnum = dens*3.14*GrassRadius_VIS*GrassRadius_VIS;
-			//a_logint(GetRadiusterations(Grass_DENSITY, GrassRadius_VIS));
 			grassnum = GetRadiusterations(Grass_DENSITY, GrassRadius_VIS);
-			//a_logFloat(grassnum);
-
-			/*double TreeRingS = 3.14*(TreeRadius_CACHE*TreeRadius_CACHE-TreeRadius_VIS*TreeRadius_VIS);
-			double TreeDens = Tree_DENSITY/TreeRingS;
-			treenum = TreeDens*3.14*TreeRadius_VIS*TreeRadius_VIS;*/
 			treenum = GetRadiusterations(Tree_DENSITY, TreeRadius_VIS);
+			treenum*=0.75;
 		}
 
 		for(int i = 0; i<treenum; i++){
@@ -360,18 +350,12 @@ class DistanceController :actor
 			} else {
 				radiusTree = random(0.0, TreeRadius_VIS);
 			}
-				//Gpos.x = self.pos.x+cos(angle)*radiusTree;
-				//Gpos.y = self.pos.y+sin(angle)*radiusTree;
-				//Gpos.Z = self.pos.z;
-				//Spawn("z_nature_tree",Gpos);
-				//Spawn("z_nature_tree_spawner",Gpos);
-				a_spawnItemEX("z_nature_tree_spawner", cos(angle)*radiusTree, sin(angle)*radiusTree, self.pos.z);
+			a_spawnItemEX("z_nature_tree_spawner", cos(angle)*radiusTree, sin(angle)*radiusTree, self.pos.z);
 
 		}
 
 
 		if(DrawGrass){
-		//a_logInt(GrassRadius_VIS*coef);
 			for(int i = 0; i<grassnum; i++){
 				if(n>VD+c){return;} n++;
 				angle = random(0, 359);
@@ -380,10 +364,6 @@ class DistanceController :actor
 				} else {
 					radius = random(0.0, GrassRadius_VIS);
 				}
-				//Gpos.x = self.pos.x+cos(angle)*radius;
-				//Gpos.y = self.pos.y+sin(angle)*radius;
-				//Gpos.Z = self.pos.z;
-				//Spawn("z_nature_grass",Gpos);
 				a_spawnItemEX("z_nature_grass", cos(angle)*radius, sin(angle)*radius, self.pos.z);
 			}
 		}
@@ -401,13 +381,8 @@ class DistanceController :actor
 				DistFogRadius = random(TreeRadius_VIS+1024, TreeRadius_CACHE+1024);
 			} else {
 				DistFogRadius = random(1536, TreeRadius_CACHE+1024);
-				//radius = random(0.0, random(TreeRadius_VIS*1.2*0.6, TreeRadius_CACHE));
 			}
 
-			//Gpos.x = self.pos.x+cos(angle)*DistFogRadius;
-			//Gpos.y = self.pos.y+sin(angle)*DistFogRadius;
-			//Gpos.Z = self.pos.z;
-			//Spawn("Z_nature_distant_haze_particle",Gpos);
 			a_spawnItemEX("Z_nature_distant_haze_particle", cos(angle)*DistFogRadius, sin(angle)*DistFogRadius, self.pos.z);
 		}
 
@@ -486,11 +461,22 @@ Class DistanceActivated : Actor {
 			SetStateLabel("Death");
 		}
 	}
+	override void Activate (Actor activator)
+	{
+		SetStateLabel("Active");
+	}
 
+	override void Deactivate (Actor activator)
+	{
+		SetStateLabel("Inactive");
+
+	}
 
 	override void tick(){
 		super.tick();
-
+		if(self is "PointUsable" || self is "CHmonster"){
+			return;
+		}
 		if(ticksFromStart==3){
 			if(!bISMONSTER){
 				Draw();

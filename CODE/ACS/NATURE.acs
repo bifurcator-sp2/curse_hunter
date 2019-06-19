@@ -603,11 +603,13 @@ script "DayNightMusicWatch" ENTER
 
 
 script "SetCustomMusic" (int Track){
-	ACS_NamedExecuteAlways("SetMusic", 0, Track, 0);
+	ACS_NamedExecute("SetMusic", 0, Track, 0);
 	PlayingCustomMusic = 1;
 }
 script "RestoreMusic"(void){
-	ACS_NamedExecuteAlways("SetMusic", 0, CurrentCommonTrackID, 0);
+	if(MusicTrackID!=CurrentCommonTrackID){
+		ACS_NamedExecuteAlways("SetMusic", 0, CurrentCommonTrackID, 0);
+	}
 	//log(s: "restoreMusic");
 	PlayingCustomMusic = 0;
 }
@@ -670,6 +672,5 @@ script "SetMusic"(int Track, int NighTimeOverride) {
 		while (MusVolume < 1.0){ MusVolume+=McangeSpeed; SetMusicVolume(MusVolume); delay(1);}
 		SetMusicVolume(1.0);
 	}
-
 	LockChangeMusic = 0;
 }

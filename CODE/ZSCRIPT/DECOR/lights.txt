@@ -61,9 +61,10 @@ class stationarLight : PointUsable
 	}
 	States
 	{
+		setSprite:
+			TNT1 A 0;
 		spawn:
 			TNT1 A 1;
-			goto Active;
 		Active:
 			"####" "#" -1 on();
 			Stop;
@@ -585,9 +586,6 @@ class TorchLightStat : distanceControlledDynamicLight
 	double offsetZ;
 	int baseIntensity;
 	int fallOff;
-	bool Activated;
-
-
 
 	override void PostBeginPlay()
 	{
@@ -610,7 +608,7 @@ class TorchLightStat : distanceControlledDynamicLight
 		myPos.z = Master.Pos.z+offsetZ;
 		setOrigin(myPos, 1);
 
-		Activated = true;
+
 
 
 
@@ -619,22 +617,8 @@ class TorchLightStat : distanceControlledDynamicLight
 	virtual void SetFallOff(int falloff){
 		baseIntensity =  falloff;
 	}
-
-	virtual void enable(){ Activated = true; }
-	virtual void disable(){ Activated = false; }
-
-	/*override void Tick()
-	{
-		Super.Tick();
-		if(Activated){
-			if(CurrentDistance<ActivationDistance){
-				args[LIGHT_INTENSITY] = random(baseIntensity-6, baseIntensity+6);
-			}
-		}
-	}*/
-
-
 }
+
 class TorchLightMovable : TorchLightStat
 {
 	override void Tick()
@@ -653,11 +637,9 @@ class TorchLightMovable : TorchLightStat
 
 
 
-class LightFlareStat1 : actor
+class LightFlareStat1 : DistanceActivated
 {
 	float defAlpha;
-	bool Activated;
-	int ActivationDistance;
 	bool visible;
 	default
 	{
@@ -685,7 +667,7 @@ class LightFlareStat1 : actor
 		}
 	}
 
-	virtual int getActivationDistance(){
+	override int getActivationDistance(){
 		PlayerInfo players = players[consoleplayer];
 		return Cvar.GetCVar("z_natue_activation_radius", players).GetInt()?Cvar.GetCVar("z_natue_activation_radius", players).GetInt():1024;
 	}

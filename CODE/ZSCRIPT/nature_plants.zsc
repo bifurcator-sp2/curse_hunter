@@ -597,12 +597,11 @@ Class z_nature_plant : DistanceSpawned
 	}
 
 
+
 	virtual void SoundAmbience(){
 		if(!itNOplaySound && level.mapName != "TITLEMAP"){
 			int Time;
-			Acounter++;
-			if(Acounter>35){
-				Acounter = 0;
+
 				Time = CallACS("GetTime",0,0,0);
 				if(Time>7*60 && Time<20*60){
 					//daytime
@@ -628,8 +627,6 @@ Class z_nature_plant : DistanceSpawned
 						}
 					} else { A_StopSound(CHAN_BODY); }
 				}
-
-			}
 		}
 	}
 
@@ -663,12 +660,15 @@ Class z_nature_plant : DistanceSpawned
 			TNT1 A 1;
 			 Loop;
 		Draw:
-			"####" "#" 1 {
-				a_fadeIn(0.1, FTF_CLAMP);
+			"####" "#" 1 a_fadeIn(0.1, FTF_CLAMP);
+			"####" "#" 0 a_jumpif(alpha==1.0, "DrawLoop");
+			loop;
+		DrawLoop:
+			"####" "#" 35 {
 				SoundAmbience();
-
 			}
 			loop;
+
 	}
 }
 

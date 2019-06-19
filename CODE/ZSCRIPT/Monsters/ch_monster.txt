@@ -118,23 +118,14 @@ class CHmonster : DistanceSpawned
 					}
 				}
 			}
-/*
-			if(!SeePlayer && Target && Target.getClassName() == "Caleb"){
-				SeePlayer = true;
-				players[ConsolePlayer].mo.GiveInventory("AttackAmountController", default.health);
-			}
-			if(SeePlayer && (!Target || Target.getClassName() != "Caleb")){
-				SeePlayer = false;
-				players[ConsolePlayer].mo.TakeInventory("AttackAmountController", default.health);
-			}
-*/
+
 			CheckSightCounter++;
 			if(CheckSightCounter>35){
 				CheckSightCounter = 0;
 				if(!checkSight(Target)){
 					NotSeeSeconds++;
 					if(NotSeeSeconds > 15){
-						target = null;
+						a_clearTarget();
 					}
 				} else {
 					NotSeeSeconds = 0;
@@ -142,7 +133,6 @@ class CHmonster : DistanceSpawned
 			}
 		}
 		if(health<=0){
-
 			self.takeInventory("Unhandable", 1);
 			bSHOOTABLE = 1;
 			bSOLID = 0;
@@ -153,13 +143,7 @@ class CHmonster : DistanceSpawned
 				players[ConsolePlayer].mo.GiveInventory("PlayerBlowLaughCounter", 1);
 
 			}
-/*
-			if(SeePlayer){
-				Target = null;
-				SeePlayer = false;
-				players[ConsolePlayer].mo.TakeInventory("AttackAmountController", default.health);
-			}
-*/
+			a_clearTarget();
 		}
 
 
@@ -814,9 +798,9 @@ class CultistTalk : Undroppable
 		if(Owner && Owner.health<=0){
 			Owner.A_StopSound(CHAN_VOICE);
 		}
-		if(Owner && Owner.health>0 && Owner.waterlevel<3 && Owner.InStateSequence(Owner.CurState, Owner.ResolveState("See"))){
+		if(Owner && Owner.health>0 && Owner.Target && Owner.waterlevel<3 && Owner.InStateSequence(Owner.CurState, Owner.ResolveState("See"))){
 			counter++;
-			if(counter>35*5){
+			if(counter>35*10){
 				counter = 0;
 				if(!random(0, 5)){
 					Owner.A_playsound("CultistAct", CHAN_VOICE);
@@ -930,7 +914,7 @@ class PlayerCombatMusicController : Undroppable
 	bool Combat;
 	int CombatFactor1, CombatFactor2;
 	int SecCounter;
-	int OldFactor, factor;
+	int OldFactor, factor, musicId;
 
 	Override void PostBeginPlay()
 	{
@@ -956,23 +940,28 @@ class PlayerCombatMusicController : Undroppable
 			if(!Combat || (OldFactor && factor && OldFactor!=factor)){
 				if(factor>=CombatFactor2){
 					Combat = true;
-					CALLacs("SetCustomMusic", 13, 0, 0, 0);
-
+					musicId = 13;
 				}
 				else
 				if(factor>=CombatFactor1){
 					Combat = true;
-					CALLacs("SetCustomMusic", 12, 0, 0, 0);
-
+					musicId = 12;
 				}
 			} else {
 				if(!factor){
-					CALLacs("RestoreMusic", 0, 0, 0, 0);
 					Combat = false;
-					//a_log("None Combat");
+				} else {
+					CALLacs("SetCustomMusic", musicId, 0, 0, 0);
 				}
 			}
+
+			if(!factor){
+				CALLacs("RestoreMusic", 0, 0, 0, 0);
+			}
+
+
 			OldFactor = factor;
+
 		}
 	}
 }

@@ -320,11 +320,11 @@ Class HeartHealth : Health
 
 
 
-Class PointUsable : SwitchableDecoration
+Class PointUsable : DistanceActivated
 {
 	vector3 previousPOS;
-	int ActivationDistance;
-	int CurrentDistance;
+	//int ActivationDistance;
+	//int CurrentDistance;
 	string HoverText;
 	bool active;
 	int ActivationRadius;
@@ -333,13 +333,13 @@ Class PointUsable : SwitchableDecoration
 	virtual void Doit(actor Caller){}
 	virtual bool isActive(){ return active;}
 
-	virtual int getCurrentDistance(){
+	Override int getCurrentDistance(){
 		return CurrentDistance;
 	}
-	virtual void setCurrentDistance(int dist){
+	Override void setCurrentDistance(int dist){
 		CurrentDistance = dist;
 	}
-	virtual int getActivationDistance(){
+	Override int getActivationDistance(){
 		return ActivationRadius?ActivationRadius:1024;
 	}
 

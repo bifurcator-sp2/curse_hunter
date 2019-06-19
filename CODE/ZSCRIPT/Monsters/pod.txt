@@ -17,7 +17,7 @@ class z_PodSeed : z_Pod
 
 	States
 	{
-		SetSprite:	GPOD A 1;//for DistanceSpawned
+		//SetSprite:	GPOD A 1;//for DistanceSpawned
 
 		Inactive:
 			GPOD A 10;
@@ -70,6 +70,7 @@ class z_Pod : CHmonster
 	  DamageFactor "Blast", 3.0;
 	  DamageFactor "Shell", 2.5;
 	  DamageFactor "Bullet", 0.7;
+	  DamageFactor "PitchFork", 10.0;
 
 	  GibHealth -20;
 	  Monster;
@@ -167,8 +168,8 @@ class z_Pod : CHmonster
 
   States
   {
-	  SetSprite:
-		TNT1 A 1;//for DistanceSpawned
+	  //SetSprite:
+		//TNT1 A 1;//for DistanceSpawned
 	  Spawn:
 		GPOD A 1 {
 			if(CurrentDistance>SeeRadius) {

@@ -77,11 +77,14 @@ Class z_Rat : CHmonster
 			RATW J 15;
 			Goto Corpse;
 		Death.Fire:
+			RABU L 0 A_Scream;
 		    RABU ABCDEONMABCDEONMABCDEONM 4 BRIGHT;
 			RABU  F 8 Bright A_Scream;
-			RABU GH 7 Bright BDSM();
+			RABU L 0 BDSM();
+			RABU GH 7 Bright;
 			RABU IJKIJKIJKIJK 12 Bright;
 			RABU L 64 Bright setTag(N_BURNDEATHNAME);
+
 			Goto Corpse;
 		Corpse:
 			"####" "#" 0 {

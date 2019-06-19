@@ -1479,13 +1479,21 @@ class Raiser : Undroppable {
 
 	override void DoEffect(){
 		if(!Owner){ return;}
-		if(Owner.checkInventory("BurnDeathMark", 1) || Owner.checkInventory("FireDeathMark", 1) || Owner.checkInventory("GibDeathMark", 1)  || !Owner.checkInventory("Monster", 1) || Owner.checkInventory("Curse", 1)){
+		if(
+			Owner.checkInventory("BurnDeathMark", 1) ||
+			Owner.checkInventory("FireDeathMark", 1) ||
+			Owner.checkInventory("GibDeathMark", 1)  ||
+			!Owner.checkInventory("Monster", 1) ||
+			Owner.checkInventory("RaizeBlocker", 1) ||
+			Owner.checkInventory("Curse", 1)
+		){
 			Owner.takeInventory("Raiser", 1);
 			return;
 		}
 
-		if(Owner && Owner.health<=0){
+		if(Owner && Owner.health<=0 && !Owner.checkInventory("RaizeBlocker", 1)){
 			if(Owner){
+				Owner.giveInventory("RaizeBlocker", 1);
 				a_log(String.Format("%s%s", Owner.GetTag(), StringTable.Localize("$RAISED") ) );
 				//Owner.A_RaiseSelf(RF_NOCHECKPOSITION);
 				RaiseActor(Owner, RF_NOCHECKPOSITION);
@@ -1499,6 +1507,7 @@ class Raiser : Undroppable {
 		}
 	}
 }
+class RaizeBlocker : Undroppable {}
 
 
 class Ability_SixSence : Undroppable
@@ -1850,6 +1859,9 @@ class Subordinator : CustomInventory
 	{
 		Super.PostBeginPlay();
 		if(!Time){ Time = 35*30; }
+		if(Owner){
+			Owner.giveInventory("RaizeBlocker", 1);
+		}
 	}
 	Override void Tick(){
 		Super.Tick();
@@ -1986,7 +1998,7 @@ class playerIdleTalkingController : Undroppable
 
 	override void DoEffect()
 	{
-		if(level.mapName == "TITLEMAP" || level.mapName == "INTRO"){ return;}
+		if(level.mapName == "TITLEMAP" || level.mapName == "INTRO" || Owner.health<=0){ return;}
 		if(!Owner.GetPlayerInput(INPUT_BUTTONS)){
 			if(!owner.checkInventory("PlayerTalks", 1)){
 				counter++;
