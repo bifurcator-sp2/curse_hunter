@@ -112,6 +112,7 @@ floor BLD04281 Rock
 floor BLUD0302 Rock
 floor BLUD0430 Rock
 floor BLUD0428 Rock
+floor 2_96 Rock
 
 
 
@@ -120,6 +121,8 @@ floor BLUD030W Mud
 
 floor BLUD0042 Granit
 floor BLUD0609 Granit
+floor 1_109 Granit
+
 
 floor BLUD0020 Wood
 floor BLUD0027 Wood

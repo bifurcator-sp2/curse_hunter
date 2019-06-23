@@ -79,7 +79,7 @@ InterMusic = "DMPRAY"
 map PATREON "Here we are"
 {
 NoIntermission
-music = "INFUSCO"
+//music = "PMortem"
 FALLINGDAMAGE
 MONSTERFALLINGDAMAGE
 InterMusic = "DMPRAY"

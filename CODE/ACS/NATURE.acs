@@ -597,7 +597,7 @@ script "DayNightMusicWatch" ENTER
 			}
 		}
 	}
-	
+
 	Restart;
 }
 
@@ -643,8 +643,8 @@ script "SetMusic"(int Track, int NighTimeOverride) {
 
 	int McangeSpeed = 0.02;
 
-	str mTrack[14];
-	mTrack[0] = "BOSS";
+	str mTrack[15];
+	mTrack[0] = "void";
 	mTrack[1] = "CATACOMB";
 	mTrack[2] = "GARDEN";
 	mTrack[3] = "MANSON";
@@ -658,6 +658,7 @@ script "SetMusic"(int Track, int NighTimeOverride) {
 	mTrack[11] = "RITES";
 	mTrack[12] = "COMBAT1";
 	mTrack[13] = "COMBAT2";
+	mTrack[14] = "PMortem";
 
 
 

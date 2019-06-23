@@ -1326,6 +1326,13 @@ actor Predator : z_Predator 22258
 //$Title Predator ghost
 }
 
+actor HumanXDeathGibsStaticDEC : HumanXDeathGibsStatic 22259
+{
+//$sprite GUT1A0
+//$Category GORE Static
+//$Title Human Xdeath gibs
+}
+
 
 
 

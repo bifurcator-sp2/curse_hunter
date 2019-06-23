@@ -106,3 +106,47 @@ decal hex4 8
 	y-scale 1.0
 	translucent 1.0
 }   
+
+decal BloodStatic1 9
+{
+	pic bsplat1
+	x-scale 0.5
+	y-scale 0.5
+	shade "65 00 00"
+	randomflipx
+	randomflipy
+}
+decal BloodStatic2 10
+{
+	pic bsplat2
+	x-scale 0.5
+	y-scale 0.5
+	shade "65 00 00"
+	randomflipx
+	randomflipy
+}
+decal BloodStatic3 11
+{
+	pic bsplat3
+	x-scale 0.5
+	y-scale 0.5
+	shade "65 00 00"
+	randomflipx
+	randomflipy
+}
+decal BloodStatic4 12
+{
+	pic bsplat4
+	x-scale 0.5
+	y-scale 0.5
+	shade "65 00 00"
+	randomflipx
+	randomflipy
+}
+decalgroup BldDecStatic
+{
+	BloodStatic1        1
+	BloodStatic2        1
+	BloodStatic3        1
+	BloodStatic4        1	
+ }

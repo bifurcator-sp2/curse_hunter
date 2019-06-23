@@ -1998,7 +1998,7 @@ class playerIdleTalkingController : Undroppable
 
 	override void DoEffect()
 	{
-		if(level.mapName == "TITLEMAP" || level.mapName == "INTRO" || Owner.health<=0){ return;}
+		if(level.mapName == "TITLEMAP" || level.mapName == "INTRO" || level.mapName == "PATREON" || Owner.health<=0){ return;}
 		if(!Owner.GetPlayerInput(INPUT_BUTTONS)){
 			if(!owner.checkInventory("PlayerTalks", 1)){
 				counter++;

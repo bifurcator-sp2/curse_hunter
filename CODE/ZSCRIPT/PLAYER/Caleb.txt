@@ -377,6 +377,7 @@ class CalebMovementModel : DoomPlayer
 
 	void Normalize(Vector3 vec)
 	{
+		if(!vec.Length()){return;}
 		double length = vec.Length();
 		vec.x /= length;
 		vec.y /= length;
@@ -509,8 +510,11 @@ class CalebMovementModel : DoomPlayer
 
             Vector3 forward = (Cos(pitch) * Cos(angle), Cos(pitch) * Sin(angle), -Sin(pitch));
             Vector3 right = (AngleToVector(angle - 90), 0);
+
 			Normalize(forward);
+
 			Normalize(right);
+
 
 			Vector3 wishVel = fm * forward + sm * right;
 			wishVel.z += um;

@@ -6,6 +6,18 @@ material texture GZDOOM{
 	Texture tex_heightmap "materials/heigthmaps/auto/GZDOOM.png"
 }
 
+material texture 1_109{
+	//Shader "Shaders/parallax2.fp"
+	//Texture tex_heightmap "materials/heigthmaps/auto/1_129.png"
+	specularlevel 3
+	glossiness 50
+}
+material texture 1_73_1{
+	//Shader "Shaders/parallax2.fp"
+	//Texture tex_heightmap "materials/heigthmaps/auto/1_129.png"
+	specularlevel 1
+	glossiness 1
+}
 material texture 1_73{
 	//Shader "Shaders/parallax2.fp"
 	//Texture tex_heightmap "materials/heigthmaps/auto/1_129.png"
