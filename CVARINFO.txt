@@ -5,7 +5,7 @@ user bool dpwh_chromaticAberration = true;
 user bool dpwh_naturalVignette = false;
 user string dsc_scene_lut = "TonemapBlood";
 user bool dpwh_filmgrain = true;
-
+user bool TH_posterization = false;
 
 server int WORLD_TIME = 0;
 server int WORLD_TIME_DELAY = 35;
@@ -60,6 +60,14 @@ user int DAMNATION_BASE_RADIUS = 196;
 user bool DISCLAIMER = true;
 
 
+user bool tc_pp_noise = true;
+user float tc_pp_noise_amount = 0.1;
+user bool tc_pp_retro = true;
+user bool tc_pp_pixelate = false;
+user bool tc_pp_posterize = true;
+user float tc_pp_posterize_gamma = 0.46;
+user float tc_pp_pixelate_pixelcount = 1.0;
+user float tc_pp_posterize_amount = 20;
 
 
 //Motion blur mod

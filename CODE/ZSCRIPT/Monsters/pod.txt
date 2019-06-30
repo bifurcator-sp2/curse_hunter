@@ -77,6 +77,7 @@ class z_Pod : CHmonster
 	  +DONTTHRUST;
 	  +NODAMAGETHRUST;
 	  +LOOKALLAROUND;
+	  +MISSILEEVENMORE;
 	  +FRIENDLY;
 	  BloodType "GreenBlood";
 	  BloodColor "green";
@@ -193,12 +194,17 @@ class z_Pod : CHmonster
 	  See:
 		GPOD E 10 {
 			if(CurrentDistance>SeeRadius) {
+				if(!bFRIENDLY){bFRIENDLY = true;}
 				a_chase();
 			} else {
-				if(random(0, 100)<35){
+				/*if(random(0, 100)<35){
 					target = players[consolePlayer].mo;
-					setStateLabel("Missile");
-				}
+					if(checkSight(target)){
+						setStateLabel("Missile");
+					}
+				}*/
+				if(bFRIENDLY){bFRIENDLY = false;}
+				a_chase();
 			}
 		}
 		GPOD A 0 a_jumpif(!opened, "Open");

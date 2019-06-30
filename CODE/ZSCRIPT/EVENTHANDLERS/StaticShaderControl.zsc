@@ -47,8 +47,6 @@ class FlickerCoronasController : CoronasController
 
 
             if (!a.alpha ) { continue; }
-			//if (!a.visible) { continue; }
-
 
             Vector3 tdir = ViewPos + Level.Vec3Diff(ViewPos,a.Pos); //+(0,0,a.Height*0.5)
 
@@ -57,7 +55,13 @@ class FlickerCoronasController : CoronasController
 
             ActorPosHolder ph = new("ActorPosHolder");
             ph.pos = CoordUtil.ToViewport(spos);
-			ph.alpha = a.alpha*frandom(0.3, 1.0);
+
+			if(!automapactive && callACS("GetInfoscreenStatus", 0, 0, 0)!=1){
+				ph.alpha = a.alpha*frandom(0.3, 1.0);
+			} else {
+				ph.alpha = 0.0;
+			}
+
 			ph.dist = dist; if(ph.dist>192){ph.dist=192;}
 			ph.dist2 = dist; if(ph.dist2>768){ph.dist2=768;}
 			ph.dim = TexMan.GetScaledSize(mark);
@@ -169,7 +173,12 @@ class CoronasController : HUDMessageBase
 
             ActorPosHolder ph = new("ActorPosHolder");
             ph.pos = CoordUtil.ToViewport(spos);
-			ph.alpha = a.alpha;
+
+			if(!automapactive && callACS("GetInfoscreenStatus", 0, 0, 0)!=1){
+				ph.alpha = a.alpha;
+			} else {
+				ph.alpha = 0.0;
+			}
 			ph.dist = dist; if(ph.dist>192){ph.dist=192;}
 			ph.dist2 = dist; if(ph.dist2>768){ph.dist2=768;}
 			ph.dim = TexMan.GetScaledSize(mark);
@@ -340,7 +349,12 @@ class HUDlensFlaare : HUDMessageBase
 			//ph.dim /= dist / 1080 * players[consoleplayer].FOV / 90;
 			ph.dim /= 1.0+(dist / 1080 * players[consoleplayer].FOV / 90);
 			ph.dim*=30;
-			ph.alpha = a.alpha;
+
+			if(!automapactive && callACS("GetInfoscreenStatus", 0, 0, 0)!=1){
+				ph.alpha = a.alpha;
+			} else {
+				ph.alpha = 0.0;
+			}
             aph.Push(ph);
         }
     }
@@ -534,7 +548,9 @@ Class SDPWHScreenEffects : StaticEventHandler
 		Super.WorldLoaded(e);
 
 		//Cvar.GetCvar("vid_aspect",players[consoleplayer]).SetInt(0);
-		CallACS("splashScreen", 0, 0, 0, 0);
+		if( level.mapName != "TITLEMAP" && level.mapName != "INTRO" && level.mapName != "PATREON"){
+			CallACS("splashScreen", 0, 0, 0, 0);
+		}
 	}
 
 	override void RenderOverlay(RenderEvent e)
@@ -625,6 +641,15 @@ Class SDPWHScreenEffects : StaticEventHandler
 			DisableFilmGrain();
 		}
 
+		if (Cvar.GetCVar("TH_posterization", players).GetInt() > 0)
+		{
+			EnableRetro();
+		}
+		else
+		{
+			DisableRetro();
+		}
+
 
 	//item titles on pointer
 		if(players.mo.FindInventory("z_PointController")){
@@ -682,7 +707,7 @@ Class SDPWHScreenEffects : StaticEventHandler
 		if(players.mo.FindInventory("CarnageEffect1")){
 			let Splash = CarnageEffect1(players.mo.FindInventory("CarnageEffect1"));
 			if(Splash){
-				TextureID CRNGFX = TexMan.CheckForTexture("CRNGFX1",TexMan.Type_Any);
+				TextureID CRNGFX = TexMan.CheckForTexture("CRNGFX",TexMan.Type_Any);
 				screen.DrawTexture(CRNGFX, false, 320.0, 240.0, DTA_VirtualWidth, 640, DTA_VirtualHeight, 480, DTA_Alpha, Splash.alpha);
 			}
 		}
@@ -761,7 +786,34 @@ Class SDPWHScreenEffects : StaticEventHandler
 		PlayerInfo players = players[consoleplayer];
 		Shader.SetEnabled(players, "CubicCA", false);
 	}
+	//===========================================================================
+	// RETRO
+	//===========================================================================
 
+	ui void EnableRetro(void)
+	{
+		PlayerInfo p = players[consoleplayer];
+
+		double a = CVar.GetCVar("tc_pp_pixelate", p).GetBool();
+		double b = CVar.GetCVar("tc_pp_posterize", p).GetBool();
+		double c = CVar.GetCVar("tc_pp_posterize_gamma", p).GetFloat();
+		double d = CVar.GetCVar("tc_pp_pixelate_pixelcount", p).GetFloat();
+		double e = CVar.GetCVar("tc_pp_posterize_amount", p).GetFloat();
+
+		Shader.SetUniform1f(p, "Pasterisation", "enablepixelate", a);
+		Shader.SetUniform1f(p, "Pasterisation", "enableposterization", b);
+		Shader.SetUniform1f(p, "Pasterisation", "gamma", c);
+		Shader.SetUniform1f(p, "Pasterisation", "pixelcount", d);
+		Shader.SetUniform1f(p, "Pasterisation", "posterization", e);
+
+		Shader.SetEnabled(p, "Pasterisation", true);
+	}
+
+	ui void DisableRetro(void)
+	{
+		PlayerInfo p = players[consoleplayer];
+		Shader.SetEnabled(p, "Pasterisation", false);
+	}
 }
 
 

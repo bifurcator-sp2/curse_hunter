@@ -2079,7 +2079,7 @@ class playerMarkingController : Undroppable
 
 class playerSkyFlareController : Undroppable
 {
-	actor Marker;
+	actor Marker,clouds;
 	string LightClass;
 	string MarkerClass;
 	int RayZoffset;
@@ -2134,7 +2134,6 @@ class playerSkyFlareController : Undroppable
 			);
 
 
-			//if (!WallCheckRay.HitType || WallCheckRay.HitType == TRACE_HitCeiling){
 				if(!Marker){
 					Marker = Owner.Master.spawn(MarkerClass, WallCheckRay.HitLocation);
 					Marker.Master = Owner.Master;
@@ -2143,7 +2142,11 @@ class playerSkyFlareController : Undroppable
 					Marker.setOrigin(WallCheckRay.HitLocation, 1);
 					if(WallCheckRay.HitType != TRACE_HitCeiling){
 						if(WallCheckRay.HitType == TRACE_HitWall && WallCheckRay.HitLine.special == 9){
-							Marker.alpha = 1.0;
+							ThinkerIterator it = ThinkerIterator.Create("nature_HeavyClouds");
+							while(this = actor(it.Next())){
+								clouds = this;
+							}
+							Marker.alpha = 1.0-clouds.alpha;
 						} else {
 							Marker.alpha = 0.0;
 						}
@@ -2151,7 +2154,7 @@ class playerSkyFlareController : Undroppable
 					}
 					//a_logint(WallCheckRay.HitType);
 				}
-			//}
+
 
 			Viewpoint.angle = sa;
 			Viewpoint.pitch = sp;
@@ -2217,6 +2220,7 @@ class SunMarker : actor
 			a_fadeTo(1-clouds.alpha, 0.1, FTF_CLAMP);
 		}
 
+
 	}
 
 	states{
@@ -2229,7 +2233,7 @@ class SunMarker : actor
 class MoonMarker : SunMarker {}
 
 
-
+class InfoScreen : Undroppable {}
 
 
 

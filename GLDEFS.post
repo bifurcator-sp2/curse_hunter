@@ -22,6 +22,7 @@ HardwareShader PostProcess scene
 {
 	Name "TonemapBlood"
 	Texture ColourmapLUT "textures/lut_blood.png"
+	//Texture ColourmapLUT "textures/lut_blood_hard.png"
 	Shader "Shaders/PostProcessing/FilmicTonemap.fp" 330
 }
 
@@ -99,10 +100,21 @@ HardwareShader postprocess scene
 {
 	Name "Vignette"
 	Shader "shaders/PostProcessing/Vignette.fp" 330
-	
+
 	Uniform float vignetteOpacity
 	Uniform float vignetteScale
 	Uniform vec3 vignetteColor
 	Uniform vec3 vignetteWeights
 	Texture texVignette "textures/vignetteTex.png"
+}
+
+HardwareShader PostProcess Scene
+{
+	Name "Pasterisation"
+	Shader "shaders/PostProcessing/pasterization.fp" 330
+	Uniform float pixelcount
+	Uniform int posterization
+	Uniform float gamma
+	Uniform int enablepixelate
+	Uniform int enableposterization
 }

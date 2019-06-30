@@ -83,6 +83,8 @@ OptionMenu "ModMenu"
 	Option "Film Grain",dpwh_filmgrain, "OnOff"
 	Option "Cubic Chromatic Aberration", dpwh_chromaticAberration, "OnOff"
 	Option "Vignette", dpwh_naturalVignette, "OnOff"
+	Option "Pasteurization", TH_posterization, "OnOff"
+
 	Option "Motion Blur", "mblur", YesNo
 
 }

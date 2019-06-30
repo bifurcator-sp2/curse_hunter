@@ -151,13 +151,14 @@ Class z_randomStone : DistanceSpawned
 
 	default
 	{
-		+NOBLOOD;
+		/*+NOBLOOD;
 		+SHOOTABLE;
 		+DROPOFF;
 		+GHOST;
 		-NOLIFTDROP;
 		+NODAMAGETHRUST;
-		//+SOLID;
+		+NOBLOCKMAP;*/
+		+NOINTERACTION;
 		alpha 0.0;
 		+FORCEXYBILLBOARD;
 		radius  16;

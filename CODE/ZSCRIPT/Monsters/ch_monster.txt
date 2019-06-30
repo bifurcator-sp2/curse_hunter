@@ -109,6 +109,7 @@ class CHmonster : DistanceSpawned
 		}
 		OldHealth = health;
 		if(health>0){
+			if(OldHealth<=0){giveInventory("Unhandable", 1);}//monster was raized
 			if(putOutFireChance && checkInventory("burner", 1)){
 				putOutFireDelay++;
 				if(putOutFireDelay==35*3){

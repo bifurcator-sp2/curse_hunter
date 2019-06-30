@@ -1333,6 +1333,22 @@ actor HumanXDeathGibsStaticDEC : HumanXDeathGibsStatic 22259
 //$Title Human Xdeath gibs
 }
 
+actor deadPool : z_deadPool 22260
+{
+//$sprite DPOLA0
+//$Category Decor
+//$Title Plate DeadPool
++WALLSPRITE
+scale 0.5
+}
+actor RaizingSin : z_RaizingSin 22261
+{
+//$sprite PLTEA0
+//$Category Decor
+//$Title Plate Raising Sin
++WALLSPRITE
+scale 0.5
+}
 
 
 

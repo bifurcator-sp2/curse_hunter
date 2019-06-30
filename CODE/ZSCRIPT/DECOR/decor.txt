@@ -29,6 +29,50 @@ class BigStoneDecor : Actor
 	}
 }
 
+class WoodDecor : Actor
+{
+	default
+	{
+		health 50;
+		height 32;
+		deathHeight 0;
+		radius 32;
+		MaxStepHeight 8;
+		BloodType "z_nature_woodcracks";
+		+DONTTHRUST;
+		+FLOORCLIP;
+		painchance "Fire", 255;
+		damageFactor "Fire", 0.3;
+	}
+
+	Override void PostBeginPlay(){
+		Super.PostBeginPlay();
+		giveInventory("Material_Wood", 1);
+	}
+
+	States
+	{
+		Spawn:
+			TNT1 A -1;
+			Stop;
+		Death.Fire:
+			"####" "#" 1 {
+				takeInventory("Burner", 1);
+				giveInventory("GenericFireDeath", 1);
+				a_fall();
+			}
+			TNT1 A 5;
+			Stop;
+		Pain.Fire:
+			"####" "#" 1 giveInventory("Burner", 1);
+			Goto Spawn;
+		Death:
+			TNT1 A 1;
+			Stop;
+	}
+
+}
+
 Class z_GargoileStatue : SwitchableDecoration
 {
 	actor Garg;
@@ -41,7 +85,7 @@ Class z_GargoileStatue : SwitchableDecoration
 		Scale 0.58;
 		Tag  "$GARGOYLE_STATUE_NAME";
 		DamageFactor "fire", 0.0;
-		BloodType "z_nature_rockcracks";
+		//BloodType "z_nature_rockcracks";
 	}
 	Override void PostBeginPlay(){
 		Super.PostBeginPlay();
@@ -720,4 +764,43 @@ class MengirFly : Actor
 			Loop;
 	}
 
+}
+
+
+class z_deadPool : WoodDecor
+{
+	Default
+	{
+		+NODAMAGETHRUST;
+		+NOGRAVITY;
+		+WALLSPRITE;
+	}
+	States
+	{
+		Spawn:
+			DPOL A 15;
+			Loop;
+		Pain.Fire:
+			DPOL A 1 giveInventory("Burner", 1);
+			Goto Spawn;
+	}
+}
+
+class z_RaizingSin : WoodDecor
+{
+	Default
+	{
+		+NODAMAGETHRUST;
+		+NOGRAVITY;
+		+WALLSPRITE;
+	}
+	States
+	{
+		Spawn:
+			PLTE A 15;
+			Loop;
+		Pain.Fire:
+			PLTE A 1 giveInventory("Burner", 1);
+			Goto Spawn;
+	}
 }

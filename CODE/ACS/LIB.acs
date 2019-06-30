@@ -543,10 +543,13 @@ script "InfoScreen" (void){
 }
 
 function void showScreen(int chapter, int page, bool SeachTo){
+
 	//if chapter page not found
 	//SeachTo = 0 search backward
 	//SeachTo = 1 search forward
 	SetActivator(0, AAPTR_PLAYER1);
+	//GiveInventory("InfoScreen", 1);
+
 	bool Tfound;
 	int i;
 
@@ -818,12 +821,15 @@ script "HideInfoScreen" (void){
 
 	TakeInventory("TotalTimeFreezer",1);
 	GiveInventory("DrawHUD",1);
+	//TakeInventory("InfoScreen",1);
 	SetHudWrapWidth(0);
 
 	ACS_NamedTerminate("HideInfoScreen", 0);
 }
 
-
+script "GetInfoscreenStatus" (void){
+	setResultValue(InfoScreenON);
+}
 script "MES" (int mesId) {
 	str String = strparam(l:strparam(s:"MES", i:mesId));
 	SetFont("SMALLFONT");

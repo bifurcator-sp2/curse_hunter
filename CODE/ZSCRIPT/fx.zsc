@@ -22,7 +22,7 @@ Class Burner15sec : Burner
 Class Burner : CustomInventory
 {
 	z_fx_fireplace FirePlace;
-	int fx_fireplace_offset;
+	int fx_fireplace_offset, DamageRadius;
 	float fx_fireplace_scale;
 	int timer;
 	int forceIntensity;
@@ -69,6 +69,7 @@ Class Burner : CustomInventory
 	}
 
 	override void DoEffect(){
+	//a_logInt(DamageRadius);
 		if(owner is "PointUsable" && !PointUsable(owner).isActive()){
 			return;
 		}
@@ -160,15 +161,15 @@ Class z_fx_fireplace : DistanceActivated
 	float speed;
 	float r;
 	int DamageDelayCounter;
-	int damage;
+	int damage, DamageRadius;
 	bool TraceMaster;
 	float offsetZ;
 	float h;
-	//float hsmo;
 	bool adaptiveSize;
 	int timer;
 	int forceIntensity;
-	//bool timered;
+	burner MasterBurner;
+
 	Default
 	{
 		radius  16;
@@ -219,6 +220,7 @@ Class z_fx_fireplace : DistanceActivated
 		if(Master){
 			TraceMaster=true;
 			Master.a_playSound("fx/fireON");
+
 		}
 
 
@@ -245,6 +247,12 @@ Class z_fx_fireplace : DistanceActivated
 				PointUsable MST = PointUsable(Master);
 				PrevMasterPos = MST.previousPOS;
 			}
+			if(MasterBurner = Burner(Master.findInventory("Burner"))){
+				if(MasterBurner.DamageRadius){
+					DamageRadius = MasterBurner.DamageRadius;
+
+				}
+			}
 		}
 		Super.Tick();
 	}
@@ -256,6 +264,7 @@ Class z_fx_fireplace : DistanceActivated
 			if(TraceMaster){
 				if(!Master || Master.health<=0 || waterlevel>0){
 						if(ThisLight){ThisLight.Destroy();}
+						if(Master){Master.TakeInventory("Burner", 1); }
 						self.Destroy();
 
 				} else {
@@ -286,7 +295,12 @@ Class z_fx_fireplace : DistanceActivated
 
 			DamageDelayCounter++;
 			if(DamageDelayCounter==35){
-				A_Explode(damage, r*2, XF_NOSPLASH, false, 0, 0, 0, "", "Fire");
+				if(!DamageRadius){
+					DamageRadius = r*2;
+				}
+				int FullDamageRadius = DamageRadius<=16?DamageRadius:0;
+
+				A_Explode(damage, DamageRadius, XF_NOSPLASH, false, FullDamageRadius, 0, 0, "", "Fire");
 				DamageDelayCounter = 0;
 			}
 		}

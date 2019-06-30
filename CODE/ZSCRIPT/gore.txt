@@ -443,27 +443,15 @@ class BloodPoolGround : DistanceSpawned
 		RenderDistance = Cvar.FindCvar("blood_render_radius").GetInt() ;
 		A_SetAngle(random(0, 360));
 		SetZ(floorz);
-		//if(Master is "DistanceSpawned"){
+		if( Master ){
+			if( Master is "StaticGibSpawner" ){
+				skip = true;
+			}
+			if( Master.Master &&  Master.Master is "StaticGibSpawner"){
+				skip = true;
+			}
 
-		/*
-		bool doit = false;
-		if(Master){
-			if(Master is "DistanceSpawned"){
-				if(DistanceSpawned(Master).skip){ doit = true; }
-			}
-			if(Master.Master){
-				if(Master.Master is "DistanceSpawned"){
-					if(DistanceSpawned(Master.Master).skip){ doit = true; }
-				}
-			}
 		}
-		if(doit){
-			skip = true;
-			for(int i = 0; i<16; i++){
-				A_SpawnProjectile ("BloodDecalSpawner", 16, 0, random(0, 359), 0, 16);
-			}
-		}
-		*/
 	}
 	States
 	{
@@ -520,7 +508,9 @@ class BodyBlowController : CustomInventory
 	}
 }
 */
-class HumanXDeathGibsStatic : DistanceActivated
+
+class StaticGibSpawner : actor {}
+class HumanXDeathGibsStatic : StaticGibSpawner
 {
 	Override void PostBeginPlay()
 	{
@@ -536,19 +526,19 @@ class HumanXDeathGibs : Undroppable
 	{
 		Amount = random(5, 15);
 		Super.PostBeginPlay();
-		//if(Owner!DistanceActivated(Owner).skip){
+		if(Owner && !(Owner is "StaticGibSpawner")){
 			Owner.A_SpawnItemEx("BloodCloud", 0, 0, 64, 0, 0, 0, 0,SXF_NOCHECKPOSITION|SXF_TRANSFERPOINTERS);
 			giveInventory("ScreenBloodSplashMakerBig", 1);
-		//}
+		}
 	}
 	override void DoEffect(){
 		if(Amount){
 			Amount--;
 			Owner.A_SpawnItemEx("HumanGib", random(-16, 16), random(-16, 16), random(16, 32 ), frandom(-4.0, 4.0), frandom(-4.0, 4.0), frandom(4.0, 8.0), 0,SXF_NOCHECKPOSITION|SXF_TRANSFERPOINTERS|SXF_TRANSFERTRANSLATION|SXF_SETMASTER);
-			//if(!DistanceActivated(Owner).skip){
+			if(!(Owner is "StaticGibSpawner")){
 				Owner.A_SpawnItemEx("BloodTrail", random(-16, 16), random(-16, 16), random(16, 32 ), frandom(-6.0, 6.0), frandom(-6.0, 6.0), frandom(8.0, 12.0), 0,SXF_NOCHECKPOSITION|SXF_TRANSFERPOINTERS|SXF_TRANSFERTRANSLATION|SXF_SETMASTER);
 				Owner.A_SpawnItemEx("GibSound");
-			//}
+			}
 		}
 
 	}
@@ -807,9 +797,9 @@ class Gib : DistanceSpawned
 		A_SetRoll(random(0, 360));
 		a_setScale(frandom(0.5, 0.7));
 		RollSpeed = random(-24, 24);
-		/*if(Master && DistanceActivated(Master).skip){
+		if( Master && Master is "StaticGibSpawner" ){
 			skip = true;
-		}*/
+		}
 	}
 	override void Tick(){
 		super.tick();
@@ -822,7 +812,9 @@ class Gib : DistanceSpawned
 		Spawn:
 			"####" "#" 1 {
 				A_setRoll(roll+RollSpeed);
-				A_SpawnItemEx("BloodTrailPoint", 0, 0, 0, 0, 0, 0, 0,SXF_NOCHECKPOSITION|SXF_TRANSFERTRANSLATION);
+				if(!skip){
+					A_SpawnItemEx("BloodTrailPoint", 0, 0, 0, 0, 0, 0, 0,SXF_NOCHECKPOSITION|SXF_TRANSFERTRANSLATION);
+				}
 				if(pos.z == floorZ){
 				 SetStateLabel("Death");
 				}
@@ -833,7 +825,14 @@ class Gib : DistanceSpawned
 		Death:
 			"####" "#" 0 {
 				A_setRoll(0.0);
-				A_SpawnItemEx("BloodTrail", random(-2, 2), random(-2, 2), random(2, 4), frandom(-4.0, 4.0), frandom(-4.0, 4.0), frandom(4.0, 8.0), 0,SXF_NOCHECKPOSITION|SXF_TRANSFERTRANSLATION);
+				if(!skip){
+					A_SpawnItemEx("BloodTrail", random(-2, 2), random(-2, 2), random(2, 4), frandom(-4.0, 4.0), frandom(-4.0, 4.0), frandom(4.0, 8.0), 0,SXF_NOCHECKPOSITION|SXF_TRANSFERTRANSLATION);
+				} else {
+					A_SpawnItemEx("BloodPoolGround", 0, 0, 0, 0, 0, 0, 0,SXF_NOCHECKPOSITION|SXF_TRANSFERTRANSLATION|SXF_SETMASTER);
+					for(int i = 0; i<16; i++){
+						A_SpawnProjectile ("BloodDecalSpawner", 16, 0, random(0, 359), CMF_AIMDIRECTION, -16);
+					}
+				}
 			}
 			"####" "#" -1;
 			Stop;
@@ -892,10 +891,15 @@ class BloodDecalSpawner : Actor
 		+MISSILE;
 		speed 6;
 	}
+	Override void PostBeginPlay()
+	{
+		Super.PostBeginPlay();
+
+	}
 	States
 	{
 		Spawn:
-			TNT1 A 10;
+			PNTR A 10;
 			Loop;
 		Death:
 		Xdeath:

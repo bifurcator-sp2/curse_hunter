@@ -245,6 +245,7 @@ Class z_SmallTorch : MovableLight
 			Fire.fx_fireplace_offset = fx_fireplace_offset;
 			Fire.fx_fireplace_scale = 0.15;
 			Fire.forceIntensity = 64;
+			Fire.DamageRadius = radius+8;
 			if(args[0]){ Fire.forceIntensity = args[0];	}
 			args[1] = 0;
 		}
